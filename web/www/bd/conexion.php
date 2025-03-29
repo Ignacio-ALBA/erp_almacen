@@ -2,9 +2,9 @@
  class Conexion{
      public static function Conectar(){
          define('servidor','127.0.0.1');
-         define('nombre_bd','alba_erp');
-         define('usuario','alba_erp');
-         define('password','alba_erp2024;');         
+         define('nombre_bd','alba_almacen');
+         define('usuario','alba_almacen');
+         define('password','alba_almacen2025;');         
          $opciones = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
          
          try{

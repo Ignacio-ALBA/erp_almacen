@@ -1,6 +1,6 @@
 services:
   xampp:
-    container_name: erp_alba_web
+    container_name: erp_almacen_web
     build:
       context: ./web
       dockerfile: Dockerfile
@@ -8,7 +8,7 @@ services:
         XAMPP_FILE: "xampp-linux-x64-8.2.0-0-installer.run"
         XAMPP_URL: "https://cfhcable.dl.sourceforge.net/project/xampp/XAMPP%20Linux/8.2.0/xampp-linux-x64-8.2.0-0-installer.run"
     ports:
-      - "80:80"
+      - "9280:80"
       - "3306:3306"
       #- "8080:8080"  # Puerto que utiliza el túnel de Cloudflare
       # - "22:22" # Descomentar si se desea exponer el puerto SSH
