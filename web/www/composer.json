@@ -1,0 +1,6 @@
+{
+    "require": {
+        "tecnickcom/tcpdf": "^6.8",
+        "knplabs/knp-snappy-bundle": "^1.6"
+    }
+}

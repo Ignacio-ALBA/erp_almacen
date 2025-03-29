@@ -1,0 +1,51 @@
+services:
+  xampp:
+    container_name: erp_alba_web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        XAMPP_FILE: "xampp-linux-x64-8.2.0-0-installer.run"
+        XAMPP_URL: "https://cfhcable.dl.sourceforge.net/project/xampp/XAMPP%20Linux/8.2.0/xampp-linux-x64-8.2.0-0-installer.run"
+    ports:
+      - "80:80"
+      - "3306:3306"
+      #- "8080:8080"  # Puerto que utiliza el túnel de Cloudflare
+      # - "22:22" # Descomentar si se desea exponer el puerto SSH
+    volumes:
+      - ./web/www:/opt/lampp/htdocs
+      - ./web/shared:/shared
+      - x-mysql:/opt/lampp/var/mysql
+      - x-logs-mysql:/var/log/mysql
+      - x-logs-apache2:/var/log/apache2
+      #- ./web/x-config/my.cnf:/opt/lampp/etc/my.cnf
+      - ./web/x-config/php.ini:/opt/lampp/etc/php.ini
+      #- ./web/x-config/config.inc.php:/opt/lampp/htdocs/phpmyadmin/config.inc.php
+      - ./web/x-config/config.inc.php:/opt/lampp/phpmyadmin/config.inc.php
+      - ./web/x-config/httpd.conf:/opt/lampp/etc/httpd.conf
+      #- x-php-sessions:/opt/lampp/temp
+      #- x-phpmyadmin:/opt/lampp/htdocs/phpmyadmin
+    environment:
+      - TZ=America/Mexico_City
+    restart: always
+    networks:
+      - erp_alba-web-network
+    user: root  # Ejecutar el contenedor como root
+
+volumes:
+  x-mysql:
+    external: false
+  x-logs-mysql:
+    external: false
+  x-logs-apache2:
+    external: false
+  x-php-sessions:  # Volumen para sesiones de PHP
+    external: false
+  x-phpmyadmin:  # Volumen para phpMyAdmin
+    external: false
+  shared_data:
+    external: false
+
+networks:
+  erp_alba-web-network:
+    driver: bridge

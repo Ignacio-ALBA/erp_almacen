@@ -1,0 +1,33 @@
+1.-
+```
+mysql -u root -p
+```
+
+La contraseña es "" (sin comillas), sólo da enter
+
+Crea la BD, los usuarios y asigna los permisos
+2.-
+```
+CREATE DATABASE alba_erp
+
+CREATE USER 'alba_erp'@'localhost' IDENTIFIED BY 'alba_erp2024;';
+GRANT ALL PRIVILEGES ON alba_erp.* TO 'alba_erp'@'localhost' IDENTIFIED BY 'alba_erp2024;';
+CREATE USER 'alba_erp'@'127.0.0.1' IDENTIFIED BY 'alba_erp2024;';
+GRANT ALL PRIVILEGES ON alba_erp.* TO 'alba_erp'@'127.0.0.1' IDENTIFIED BY 'alba_erp2024;';
+CREATE USER 'alba_erp'@'%' IDENTIFIED BY 'alba_erp2024;';
+GRANT ALL PRIVILEGES ON alba_erp.* TO 'alba_erp'@'%' IDENTIFIED BY 'alba_erp2024;';
+```
+
+3.-Ver información de los usuarios
+
+```
+SELECT user,host FROM mysql.user;
+SHOW GRANTS FOR 'alba_erp'@'localhost';
+SHOW GRANTS FOR 'alba_erp'@'127.0.0.1';
+```
+
+Salir de mysql
+
+```
+exit;
+```
