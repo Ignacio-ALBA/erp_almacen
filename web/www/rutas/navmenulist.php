@@ -1,5 +1,6 @@
 <?php 
 $navItems = [
+    /* Módulo de Administración comentado
     [
       'label' => 'Administración',
       'icon' => 'bi bi-menu-button-wide',
@@ -37,6 +38,7 @@ $navItems = [
         ]
       ]
     ],
+    
     [
       'label' => 'Planeación',
       'icon' => 'bi bi-laptop',
@@ -190,12 +192,104 @@ $navItems = [
             ]
         ]
       ]
+    ],*/
+    [
+      'label' => 'Registro de eventos',
+      'icon' => 'bi bi-calendar',
+      'route' =>'/rutas/registro_eventos.php',
+      'subitems' => [
+        [
+          "label" => "Registro de Eventos",
+          "href" => "/registro_eventos",
+          "permiso" => [
+            "crear_registro_eventos",
+            "editar_registro_eventos",
+            "ver_registro_eventos",
+            "eliminar_registro_eventos"
+            ]
+        ],
+        [
+          "label" => "Contenido de Registro de Eventos",
+          "href" => "/detalles_registro_eventos",
+          "permiso" => [
+            "crear_detalles_registro_eventos",
+            "editar_detalles_registro_eventos",
+            "ver_detalles_registro_eventos",
+            "eliminar_detalles_registro_eventos"
+            ]
+        ],
+        [
+          "label" => "Comentarios de Registro de Eventos",
+          "href" => "/comentarios_registro_eventos",
+          "permiso" => [
+            "crear_comentarios_registro_eventos",
+            "editar_comentarios_registro_eventos",
+            "ver_comentarios_registro_eventos",
+            "eliminar_comentarios_registro_eventos"
+            ]
+        ]
+      ]
     ],
+    [
+      'label' => 'Tiempo Real',
+      'icon' => 'bi bi-clock',
+      'route' =>'/rutas/tiempo_real.php',
+      'subitems' => [
+        [
+          "label" => "Tiempo Real",
+          "href" => "/tiempo_real",
+          "permiso" => [
+            "crear_tiempo_real",
+            "editar_tiempo_real",
+            "ver_tiempo_real",
+            "eliminar_tiempo_real"
+            ]
+        ],
+        ]
+      ],
+    [
+      'label' => 'Central de servicios',
+      'icon' => 'bi bi-table',
+      'route' =>'/rutas/centralMP.php',
+      'subitems' => [
+        [
+          "label" => "Central de materia prima",
+          "href" => "/materia_prima",
+          "permiso" => [
+            "crear_materia_prima",
+            "editar_materia_prima",
+            "ver_materia_prima",
+            "eliminar_materia_prima"
+            ]
+        ],
+        [
+          "label" => "Central de pedidos de materia prima",
+          "href" => "/pedidos_materia_prima",
+          "permiso" => [
+            "crear_pedidos_materia_prima",
+            "editar_pedidos_materia_prima",
+            "ver_pedidos_materia_prima",
+            "eliminar_pedidos_materia_prima"
+            ]
+        ],
+        [
+          "label" => "Central de productos",
+          "href" => "/central_productos",
+          "permiso" => [
+            "crear_central_productos",
+            "editar_central_productos",
+            "ver_central_productos",
+            "eliminar_central_productos"
+            ]
+        ],
+        ]
+       ],
     [
       'label' => 'Compras',
       'icon' => 'bi bi-bag',
       'route' =>'/rutas/compras.php',
       'subitems' => [
+          /*
         [
           "label" => "Proveedores",
           "href" => "/proveedores",
@@ -215,7 +309,7 @@ $navItems = [
             "ver_comentarios_proveedores",
             "eliminar_comentarios_proveedores"
             ]
-        ],
+        ], */
         [
           "label" => "Listas de Compras",
           "href" => "/listas_compras",
@@ -280,10 +374,10 @@ $navItems = [
           "label" => "Recepciones",
           "href" => "/recepciones_compras",
           "permiso" => [
-            "crear_detalles_recepciones_compras",
-            "editar_detalles_recepciones_compras",
-            "ver_detalles_recepciones_compras",
-            "eliminar_detalles_recepciones_compras"
+            "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
             ]
         ],
         [
@@ -306,6 +400,7 @@ $navItems = [
             "eliminar_comentarios_recepciones"
             ]
         ],
+          /*
         [
           "label" => "Viáticos",
           "href" => "/asignacion_viaticos",
@@ -325,7 +420,7 @@ $navItems = [
             "ver_tipos_viaticos",
             "eliminar_tipos_viaticos"
             ]
-        ],
+        ], */
         [
           "label" => "Tiempos de Entrega",
           "href" => "/tiempos_entregas",
@@ -348,6 +443,7 @@ $navItems = [
         ]
       ]
     ],
+      /*
     [
       'label' => 'Contabilidad',
       'icon' => 'bi bi-journal-text',
@@ -519,14 +615,65 @@ $navItems = [
             "ver_tipos_adicionales_th",
             "eliminar_tipos_adicionales_th"
             ]
+        ],
+        [
+          "label" => "Tipos de Colaboradores",
+          "href" => "/tipos_usuario",
+          "permiso" => [
+            "crear_tipos_usuario",
+            "editar_tipos_usuario",
+            "ver_tipos_usuario",
+            "eliminar_tipos_usuario",
+            "asignar_permisos_tipos_usuario"
+            ]
         ]
       ]
-    ],
+    ],  */
     [
       'label' => 'Catálogos',
       'icon' => 'bi bi-card-list',
       'route' =>'/rutas/catalogo.php',
       'subitems' => [
+        [
+          "label" => "Clientes",
+          "href" => "/clientes",
+          "permiso" => [
+            "crear_clientes",
+            "editar_clientes",
+            "ver_clientes",
+            "eliminar_clientes"
+            ]
+        ],
+        [
+          "label" => "Comentarios de Clientes",
+          "href" => "/comentarios_clientes",
+          "permiso" => [
+            "crear_comentarios_clientes",
+            "editar_comentarios_clientes",
+            "ver_comentarios_clientes",
+            "eliminar_comentarios_clientes"
+            ]
+        ],
+        [
+          "label" => "Proveedores",
+          "href" => "/proveedores",
+          "permiso" => [
+            "crear_proveedores",
+            "editar_proveedores",
+            "ver_proveedores",
+            "eliminar_proveedores"
+            ]
+        ],
+        [
+          "label" => "Comentarios de Proveedores",
+          "href" => "/comentarios_proveedores",
+          "permiso" => [
+            "crear_comentarios_proveedores",
+            "editar_comentarios_proveedores",
+            "ver_comentarios_proveedores",
+            "eliminar_comentarios_proveedores"
+            ]
+        ],
         [
           "label" => "General",
           "permiso" => [],
@@ -546,10 +693,10 @@ $navItems = [
               "label" => "Categorías",
               "href" => "/categorias",
               "permiso" => [
-                "crear_subcategorias",
-                "editar_subcategorias",
-                "ver_subcategorias",
-                "eliminar_subcategorias"
+                "crear_categorias",
+                "editar_categorias",
+                "ver_categorias",
+                "eliminar_categorias"
                 ]
             ],
             [
@@ -590,16 +737,6 @@ $navItems = [
                 "editar_formatos",
                 "ver_formatos",
                 "eliminar_formatos"
-                ]
-            ],
-            [
-              "label" => "Roles",
-              "href" => "/roles",
-              "permiso" => [
-                "crear_roles",
-                "editar_roles",
-                "ver_roles",
-                "eliminar_roles"
                 ]
             ],
             [
@@ -738,6 +875,6 @@ $navItems = [
         ],
           // Agrega más subitems según sea necesario
       ]
-    ]
+      ]
   ];
 ?>
