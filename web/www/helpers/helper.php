@@ -68,7 +68,13 @@ function debug($data) {
 }
 
 function getServerUrl() {
-    return "http://" . $_SERVER['SERVER_NAME'];
+    $port = $_SERVER['SERVER_PORT'];
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+    
+    // Si el puerto no es el predeterminado (80 para HTTP y 443 para HTTPS), lo agregamos
+    $port = ($port == 80 || $port == 443) ? '' : ":$port";
+    
+    return $protocol . $_SERVER['SERVER_NAME'] . $port;
 }
 
 function getBaseUrl() {
