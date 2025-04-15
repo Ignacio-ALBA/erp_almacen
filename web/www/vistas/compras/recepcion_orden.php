@@ -1,6 +1,6 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
-    $PageSection = "Ordenes de Compras";
+    $PageSection = "Recibir orden de compra";
 ?>
 
 
@@ -17,9 +17,18 @@
 <?php 
 
   $id = 'ordenes_compras';
-  $ButtonAddLabel = "Nueva Orden de Compra";
+  $ButtonAddLabel = "Nueva Recepción";
   $titulos = ['ID', 'Orden de Compra','Código Externo','Grupo de Cotización','Proyecto','Proveedor','Monto Total','Monto Neto','Estado','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true);
+  // Add centered button
+echo '<div class="row mt-3">
+<div class="col-12 text-center">
+    <button type="button" id="btn_finalizar_recepcion" class="btn btn-primary">
+        <i class="bi bi-check-circle"></i> Finalizar recepción
+    </button>
+</div>
+</div>';
+
   CreateModalForm(
     [
       'id'=> $id, 

@@ -239,6 +239,35 @@ function CreateButton($atributos = [],$form = true) {
     return $element;
     
 }
+function CreateButtonP($atributos = [], $form = true) {
+    // Convertir el array de atributos en un string
+    $atributosString = '';
+    foreach ($atributos as $key => $value) {
+        if($key != 'etiqueta' && $key != 'text' && $key != 'html') {
+            $atributosString .= $key . '="' . htmlspecialchars($value) . '" ';
+        }
+    }
+
+    // Obtener el id y el texto del botón
+    $id = isset($atributos['id']) ? $atributos['id'] : null;
+    $text = isset($atributos['text']) ? $atributos['text'] : '';
+    $html = isset($atributos['html']) && $atributos['html'] === true;
+
+    // Crear el botón
+    if($form) {
+        $element = '<div class="form-group">
+                        <button id="' . htmlspecialchars($id) . '" ' . trim($atributosString) . '>' . 
+                        ($html ? $text : htmlspecialchars($text)) . 
+                        '</button>
+                    </div>';
+    } else {
+        $element = '<button id="' . htmlspecialchars($id) . '" ' . trim($atributosString) . '>' . 
+                   ($html ? $text : htmlspecialchars($text)) . 
+                   '</button>';
+    }
+    
+    return $element;
+}
 
 function CreatSwitchCheck($atributos = []) {
     // Convertir el array de atributos en un string
@@ -758,6 +787,53 @@ function CreateModal($formattribute, $contenidoModal,$buttons = []) {
                     </div>
                 </div>
             </div>
+    </div>';
+}
+
+function CreateWeightInput($atributos = []) {
+    $atributosString = '';
+    foreach ($atributos as $key => $value) {
+        if($key != 'etiqueta' && $key != 'class' && $key != 'div_clases'){
+            $atributosString .= $key . '="' . htmlspecialchars($value) . '" ';
+        }
+    }
+
+    $id = isset($atributos['id']) ? $atributos['id'] : null;
+    $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : '';
+    $value = isset($atributos['value']) ? $atributos['value'] : '0.00';
+
+    return '
+    <div class="form-group weight-container" style="margin-top: 15px;">
+        <input class="form-control weight-display" 
+               id="' . htmlspecialchars($id) . '" 
+               value="' . htmlspecialchars($value) . '" 
+               ' . trim($atributosString) . '
+               style="background-color: #001f3f; 
+                      color: #7fdbff; 
+                      font-family: \'Digital-7\', monospace;
+                      font-size: 2em;
+                      text-align: right;
+                      padding-right: 10px;
+                      border: 2px solid #0074D9;
+                      border-radius: 5px;
+                      width: calc(100% - 50px);
+                      display: inline-block;">
+        <span class="weight-unit">kg</span>
+        <div id="error_' . htmlspecialchars($id) . '" class="invalid-feedback"></div>
+    </div>';
+}
+
+function CreateWeightLabel($atributos = []) {
+    $id = isset($atributos['id']) ? $atributos['id'] : null;
+    $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : '';
+    
+    return '
+    <div class="weight-label" style="margin-bottom: 5px;">
+        <label for="' . htmlspecialchars($id) . '" 
+               style="font-weight: bold; 
+                      color: #001f3f;">' 
+        . htmlspecialchars($etiqueta) . 
+        '</label>
     </div>';
 }
 ?>

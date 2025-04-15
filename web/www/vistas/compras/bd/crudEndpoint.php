@@ -100,13 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $consultaselect = "SELECT lc.id_lista_compra,
                     lc.orden,
                     lc.lista_compra,
-                    p.proyecto AS kid_proyecto,
-                    cb.cuenta_bancaria AS kid_cuenta_bancaria,
                     es.estatus AS kid_estatus,
                     lc.fecha_creacion
                 FROM listas_compras lc
-                LEFT JOIN cuentas_bancarias cb ON lc.kid_cuenta_bancaria = cb.id_cuenta_bancaria
-                LEFT JOIN proyectos p ON lc.kid_proyecto = p.id_proyecto
                 LEFT JOIN estatus es ON lc.kid_estatus = es.id_estatus
                 WHERE lc.kid_estatus != 3 AND lc.id_lista_compra = :id";
                 $resultado = $conexion->prepare($consultaselect);

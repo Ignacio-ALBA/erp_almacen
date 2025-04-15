@@ -220,7 +220,52 @@ function GetSection()
         'scriptName' => $scriptName
     ];
 }
+function GetTiemposEntregaForSelect() {
+    $objeto = new Conexion();
+    $conexion = $objeto->Conectar();
+    
+    try {
+        $consultaselect = "SELECT 
+            id_tiempo_entrega as valor,
+            tiempo_entrega as text 
+            FROM tiempos_entrega 
+            WHERE kid_estatus = 1 
+            ORDER BY tiempo_entrega ASC";
+        
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->execute();
+        return $resultado->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+        return [];
+    }
+}
 
+function GetTiposPagoForSelect() {
+    $objeto = new Conexion();
+    $conexion = $objeto->Conectar();
+    
+    try {
+        $consultaselect = "SELECT 
+            id_tipo_pago as valor,
+            tipo_pago as text 
+            FROM tipos_pago 
+            WHERE kid_estatus = 1 
+            ORDER BY tipo_pago ASC";
+        
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->execute();
+        return $resultado->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+        return [];
+    }
+}
+function checkPerms($perms, $iscomponent = false) {
+    $perms = is_array($perms) ? $perms : [$perms];
+    if (in_array("all", $_SESSION["permisos"]) || !empty(array_intersect($perms, $_SESSION["permisos"]))) {
+        return true;
+    }
+    return $iscomponent ? false : header("Location: /index.php");
+}
 
 
 ?>

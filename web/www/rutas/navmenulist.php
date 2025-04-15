@@ -250,11 +250,11 @@ $navItems = [
     [
       'label' => 'Central de servicios',
       'icon' => 'bi bi-table',
-      'route' =>'/rutas/centralMP.php',
+      'route' =>'/rutas/central_servicios.php',
       'subitems' => [
         [
           "label" => "Central de materia prima",
-          "href" => "/materia_prima",
+          "href" => "/central_mp",
           "permiso" => [
             "crear_materia_prima",
             "editar_materia_prima",
@@ -264,7 +264,7 @@ $navItems = [
         ],
         [
           "label" => "Central de pedidos de materia prima",
-          "href" => "/pedidos_materia_prima",
+          "href" => "/central_pedidos_mp",
           "permiso" => [
             "crear_pedidos_materia_prima",
             "editar_pedidos_materia_prima",
@@ -371,6 +371,16 @@ $navItems = [
             ]
         ],
         [
+          "label" => "Recibir Orden",
+          "href" => "/recepcion_orden",
+          "permiso" => [
+            "crear_recibir_orden",
+            "editar_recibir_orden",
+            "ver_recibir_orden",
+            "eliminar_recibir_orden"
+            ]
+        ],
+        [
           "label" => "Recepciones",
           "href" => "/recepciones_compras",
           "permiso" => [
@@ -378,6 +388,15 @@ $navItems = [
             "editar_recepciones_compras",
             "ver_recepciones_compras",
             "eliminar_recepciones_compras"
+            ]
+        ], [
+          "label" => "Recibir Pedido",
+          "href" => "/recepciones_pedidos",
+          "permiso" => [
+            "crear_recepciones_pedidos",
+            "editar_recepciones_pedidos",
+            "ver_recepciones_pedidos",
+            "eliminar_recepciones_pedidos"
             ]
         ],
         [
@@ -443,6 +462,55 @@ $navItems = [
         ]
       ]
     ],
+    [
+      'label' => 'Ventas',
+      'icon' => 'bi bi-cart',
+      'route' =>'/rutas/ventas.php',
+      'subitems' => [
+        [
+          "label" => "Capturar venta",
+          "href" => "/capturar_venta",
+          "permiso" => [
+            "crear_capturar_ventas",
+            "ver_capturar_ventas",
+            "editar_capturar_ventas",
+            "eliminar_capturar_ventas"
+          ]
+          ],
+          [
+            "label" => "Reporte de ventas",
+            "href" => "/reporte_ventas",
+            "permiso" => [
+              "ver_reporte_ventas",
+              "editar_reporte_ventas",
+              "eliminar_reporte_ventas",
+              "crear_reporte_ventas"
+
+              ]
+            ]
+            ]
+          ],
+          [
+            'label' => 'Producción',
+            'icon' => 'bi bi-gear',
+            'route' =>'/rutas/produccion.php',
+            'subitems' => [
+              [
+                "label" => "Capturar producción",
+                "href" => "/capturar_produccion",
+                "permiso" => [
+                  "ver_capturar_produccion"
+                ]
+                ],
+                [
+                  "label" => "Reporte de producción",
+                  "href" => "/reporte_produccion",
+                  "permiso" => [
+                    "ver_reporte_produccion"
+                    ]
+                  ]
+                  ]
+                ],
       /*
     [
       'label' => 'Contabilidad',
@@ -560,7 +628,7 @@ $navItems = [
             ]
         ]
       ]
-    ],
+    ],*/
     [
       'label' => 'Talento Humano',
       'icon' => 'bi bi-person-lines-fill',
@@ -628,7 +696,7 @@ $navItems = [
             ]
         ]
       ]
-    ],  */
+    ],  
     [
       'label' => 'Catálogos',
       'icon' => 'bi bi-card-list',
@@ -697,6 +765,16 @@ $navItems = [
                 "editar_categorias",
                 "ver_categorias",
                 "eliminar_categorias"
+                ]
+            ],
+            [
+              "label" => "Mermas",
+              "href" => "/mermas",
+              "permiso" => [
+                "crear_mermas",
+                "editar_mermas",
+                "ver_mermas",
+                "eliminar_mermas"
                 ]
             ],
             [
@@ -814,6 +892,16 @@ $navItems = [
                 "editar_almacenes",
                 "ver_almacenes",
                 "eliminar_almacenes"
+                ]
+            ],
+            [
+              "label" => "Locaciones de almacen",
+              "href" => "/locaciones",
+              "permiso" => [
+                "crear_locaciones",
+                "editar_locaciones",
+                "ver_locaciones",
+                "eliminar_locaciones"
                 ]
             ],
             [

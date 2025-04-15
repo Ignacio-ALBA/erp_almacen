@@ -8,21 +8,23 @@
 ?>
 
 
-  <div class="pagetitle">
+<!-- Begin Page Title -->
+<div class="pagetitle">
     <h1><?php echo $PageSection; ?></h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
         <li class="breadcrumb-item">Compras</li>
         <li class="breadcrumb-item active" ><?php echo $PageSection; ?></li>
       </ol>
     </nav>
-  </div><!-- End Page Title -->
-<?php 
+</div>
+<!-- End Page Title -->
 
+<?php 
   $id = 'listas_compras';
-  $ButtonAddLabel = "Nuevo Lista";
-  $titulos = ['ID', 'Orden','Lista','Proyecto','Cuenta Bancaria','Estado','La Creo','La Autorizo','Fecha de creación'];
+  $ButtonAddLabel = "Nueva lista de compras";
+  $titulos = ['ID', 'Orden','Lista','Estado','La Creo','La Autorizo','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
     [
@@ -38,10 +40,13 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Lista de Compra','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
-      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','required' => '','class'=>'OnEditReadOnly'],$proyectos),
-      CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','required' => '','class'=>'OnEditReadOnly'],$cuentas_bancarias),
-      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus)
+      CreateInput(['type'=>'number','id'=>'num_articulos','etiqueta'=>'Número de Artículos','required' => '','min'=>'1']),
+      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
+      CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','class'=>'OnEditReadOnly'],$cuentas_bancarias),
+      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
+    '<div id="articulos_container"></div>' // Container for dynamic articles
     ]);
+
 
     $id='detalles_listas_compras';
     $ButtonAddLabel = "Nuevo Detalle";
@@ -66,6 +71,38 @@
     $detailsTableOutput
   ],
   ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+  
+  // Agregar botón para ver detalles en la tabla principal
+  $modalCRUD = 'detalles_listas_compras';
+  $nuevo_boton = '
+      <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>
+  ';
+  $data_script['botones_acciones'] = array();
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+array_push($data_script['botones_acciones'], $nuevo_boton);
+  $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+  $optionkey = 'NewAdd3';
+  $data_script[$optionkey] =['data_list_column'=>[]];
 
   CreateModalForm(
   [

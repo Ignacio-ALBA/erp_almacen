@@ -104,17 +104,20 @@ if($resultado){
             $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
             // Construcción de la consulta
             $consultaselect = "SELECT 
-                lc.id_lista_compra,
-                lc.orden,
-                lc.lista_compra,
-                (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = lc.kid_proyecto LIMIT 1) AS kid_proyecto,
-                (SELECT cuenta_bancaria FROM cuentas_bancarias cb WHERE cb.id_cuenta_bancaria = lc.kid_cuenta_bancaria LIMIT 1) AS kid_cuenta_bancaria,
-                $caseEstatus,
-                (SELECT email FROM colaboradores u WHERE u.id_colaborador = lc.kid_creacion LIMIT 1) AS kid_creacion,
-                COALESCE((SELECT email FROM colaboradores u2 WHERE u2.id_colaborador = lc.kid_autorizo LIMIT 1), 'Sin Autorizar') AS kid_autorizo,
-                lc.fecha_creacion
-            FROM listas_compras lc
-            WHERE lc.kid_estatus != 3;";
+            lc.id_lista_compra,
+            lc.orden,
+            CASE 
+                WHEN lc.lista_compra = 'Default' AND (lc.kid_proyecto IS NOT NULL OR lc.kid_cuenta_bancaria IS NOT NULL) THEN NULL
+                ELSE lc.lista_compra 
+            END as lista_compra,
+            $caseEstatus,
+            (SELECT email FROM colaboradores u WHERE u.id_colaborador = lc.kid_creacion LIMIT 1) AS kid_creacion,
+            COALESCE((SELECT email FROM colaboradores u2 WHERE u2.id_colaborador = lc.kid_autorizo LIMIT 1), 'Sin Autorizar') AS kid_autorizo,
+            lc.fecha_creacion
+        FROM listas_compras lc
+        WHERE lc.kid_estatus != 3 
+        AND (lc.lista_compra != 'Default' 
+            OR (lc.lista_compra = 'Default' AND (lc.kid_proyecto IS NOT NULL OR lc.kid_cuenta_bancaria IS NOT NULL)))";
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
 
@@ -133,7 +136,8 @@ if($resultado){
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             $optionkey = 'NewAdd3';
             $data_script[$optionkey] =['data_list_column'=>[]];
-
+            $data['list_js_scripts']['../vistas/compras/lista_compras_script'] =['data'=> $data_script];
+            $data['list_styles']['../vistas/compras/lista_compras_styles'] = [];
             break;
         case 'detalles_listas_compras':
             $vista = 'detalles_listas_compras';
@@ -160,12 +164,13 @@ if($resultado){
             break;
         case 'cotizaciones_compras':
             $vista = 'cotizaciones_compras';
-            
+            $estatus = GetEstatusLabels();
+            $estatus_name = GetEstatusList();
+   
             $consultaselect = "SELECT 
                 cc.id_cotizacion_compra,
                 cc.cotizacion_compras,
                 cc.grupo,
-                (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = cc.kid_proyecto LIMIT 1) AS kid_proyecto,
                 (SELECT razon_social FROM proveedores prov WHERE prov.id_proveedor = cc.kid_proveedor LIMIT 1) AS kid_proveedor,
                 cc.kid_estatus,
                 (SELECT email FROM colaboradores u WHERE u.id_colaborador = cc.kid_creacion LIMIT 1) AS kid_creacion,
@@ -272,64 +277,148 @@ if($resultado){
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             
             break;
-        case 'ordenes_compras':
-            $vista = 'ordenes_compras';
-            $estatus = GetEstatusLabels();
-            $estatus_name = GetEstatusList();
-            $consultaselect = "SELECT oc.id_orden_compras,
-                oc.orden_compras,
-                oc.codigo_externo,
-                oc.grupo_cotizacion,
-                (SELECT proyecto FROM proyectos p WHERE p.id_proyecto =oc.kid_proyecto LIMIT 1) AS kid_proyecto,
-                (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
-                oc.monto_total,
-                oc.monto_neto,
-                oc.kid_estatus,
-                oc.fecha_creacion
-            FROM ordenes_compras oc
-            LEFT JOIN proyectos p ON oc.kid_proyecto = p.id_proyecto
-            LEFT JOIN proveedores prov ON oc.kid_proveedor = prov.id_proveedor
-            WHERE oc.kid_estatus !=3";
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->execute();
-            $data_query = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-            $data_query = array_map(function ($row) {
-                global $data_script, $estatus, $estatus_name;
-                $botones_acciones = $data_script['botones_acciones'];
-
-                $bloque = 'compras';
-                $modalCRUD =  'update_estatus_ordenes_compras';
-                if(!in_array($row['kid_estatus'], [5,6,9])){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }else if($row['kid_estatus'] == 6){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }if($row['kid_estatus'] == 5){
-                    $nuevo_boton = '<button class="ModalSetData btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[9].'" modalCRUD="recepciones_compras"><i class="bi bi-check2-circle"></i> Comprar</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }
-                
-                $hashed_id = codificar($row['id_orden_compras']);
-                $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                array_push($botones_acciones, $nuevo_boton);
-                $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                array_push($botones_acciones, $nuevo_boton);
-                $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
-                $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                return $row;
-            }, $data_query);
-
-
-            $data['data_show']['data'] = $data_query;
-            $data['data_show']['cotizaciones'] = GetCotizacionesListForSelect();
-            $data['data_show']['articulos'] = GetArticulosListForSelect();
-            $data['data_show']['estatus'] = GetEstatusListForSelect();
-            $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
-            $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
-
-            break;
+            case 'recepcion_orden':
+                $vista = 'recepcion_orden';
+                $estatus = GetEstatusLabels();
+                $estatus_name = GetEstatusList();
+            
+                // Consulta inicial
+                $consultaselect = "SELECT oc.id_orden_compras,
+                    oc.orden_compras,
+                    oc.codigo_externo,
+                    oc.grupo_cotizacion,
+                    (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = oc.kid_proyecto LIMIT 1) AS kid_proyecto,
+                    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
+                    oc.monto_total,
+                    oc.monto_neto,
+                    oc.kid_estatus,
+                    oc.fecha_creacion
+                FROM ordenes_compras oc
+                WHERE oc.kid_estatus != 3";
+            
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $ordenes_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            
+                // Mapear los datos y agregar botones
+                $ordenes_compras = array_map(function ($row) {
+                    global $data_script, $estatus, $estatus_name;
+                    $botones_acciones = $data_script['botones_acciones'];
+            
+                    $bloque = 'compras';
+                    $modalCRUD = 'update_estatus_ordenes_compras';
+            
+                    // Agregar botones según el estado
+                    if(!in_array($row['kid_estatus'], [5,6,9])) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    } else if($row['kid_estatus'] == 6) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    }
+            
+                    // Agregar botones de contenido y reporte
+                    $hashed_id = codificar($row['id_orden_compras']);
+                    $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id='.$hashed_id.'" class="btn btn-secondary"><i class="bi bi-journal-text"></i> Contenido</a>';
+                    array_push($botones_acciones, $nuevo_boton);
+                    
+                    $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="ordenes_compras_reporte" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Generar PDF</button>';
+                    array_push($botones_acciones, $nuevo_boton);
+            
+                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'ordenes_compras');
+                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
+                    return $row;
+                }, $ordenes_compras);
+            
+                // Configurar data_show
+                $data['data_show'] = [
+                    'data' => $ordenes_compras,
+                    'AllowADDButton' => true,
+                    'proyectos' => GetProyectosListForSelect(),
+                    'proveedores' => GetProvedoresListForSelect(),
+                    'estatus' => GetEstatusListForSelect(),
+                    'tiempos_entrega' => GetTiemposEntregaListForSelect(),
+                    'tipos_pago' => GetTiposPagoListForSelect(),
+                    'colaboradores' => GetUsuariosListForSelect(),
+                    'almacenes' => GetAlmacenesListForSelect(), // Agregar esta línea
+                    'botones_acciones' => $data_script['botones_acciones']
+                ];
+            
+                // Configurar NewAdd3 si es necesario
+                $optionkey = 'NewAdd3';
+                $data_script[$optionkey] = ['data_list_column'=>[]];
+                break;
+            case 'ordenes_compras':
+                $vista = 'ordenes_compras';
+                $estatus = GetEstatusLabels();
+                $estatus_name = GetEstatusList();
+            
+                // Consulta inicial
+                $consultaselect = "SELECT oc.id_orden_compras,
+                    oc.orden_compras,
+                    oc.codigo_externo,
+                    oc.grupo_cotizacion,
+                    (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = oc.kid_proyecto LIMIT 1) AS kid_proyecto,
+                    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
+                    oc.monto_total,
+                    oc.monto_neto,
+                    oc.kid_estatus,
+                    oc.fecha_creacion
+                FROM ordenes_compras oc
+                WHERE oc.kid_estatus != 3";
+            
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $ordenes_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            
+                // Mapear los datos y agregar botones
+                $ordenes_compras = array_map(function ($row) {
+                    global $data_script, $estatus, $estatus_name;
+                    $botones_acciones = $data_script['botones_acciones'];
+            
+                    $bloque = 'compras';
+                    $modalCRUD = 'update_estatus_ordenes_compras';
+            
+                    // Agregar botones según el estado
+                    if(!in_array($row['kid_estatus'], [5,6,9])) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    } else if($row['kid_estatus'] == 6) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    }
+            
+                    // Agregar botones de contenido y reporte
+                    $hashed_id = codificar($row['id_orden_compras']);
+                    $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id='.$hashed_id.'" class="btn btn-secondary"><i class="bi bi-journal-text"></i> Contenido</a>';
+                    array_push($botones_acciones, $nuevo_boton);
+                    
+                    $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="ordenes_compras_reporte" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Generar PDF</button>';
+                    array_push($botones_acciones, $nuevo_boton);
+            
+                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'ordenes_compras');
+                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
+                    return $row;
+                }, $ordenes_compras);
+            
+                // Configurar data_show
+                $data['data_show'] = [
+                    'data' => $ordenes_compras,
+                    'AllowADDButton' => true,
+                    'proyectos' => GetProyectosListForSelect(),
+                    'proveedores' => GetProvedoresListForSelect(),
+                    'estatus' => GetEstatusListForSelect(),
+                    'tiempos_entrega' => GetTiemposEntregaListForSelect(),
+                    'tipos_pago' => GetTiposPagoListForSelect(),
+                    'colaboradores' => GetUsuariosListForSelect(),
+                    'almacenes' => GetAlmacenesListForSelect(), // Agregar esta línea
+                    'botones_acciones' => $data_script['botones_acciones']
+                ];
+            
+                // Configurar NewAdd3 si es necesario
+                $optionkey = 'NewAdd3';
+                $data_script[$optionkey] = ['data_list_column'=>[]];
+                break;
         case 'detalles_ordenes_compras':
             $vista = 'detalles_ordenes_compras';
             if ($id != null) {
@@ -425,6 +514,45 @@ if($resultado){
             $data_script[$optionkey] =['data_list_column'=>[]];
 
             break;
+
+            case 'recepciones_pedidos':
+                $vista = 'recepciones_pedidos';
+                $estatus = GetEstatusLabels();
+                $caseEstatus = "CASE \n";
+                foreach ($estatus as $key => $value) {
+                    $caseEstatus .= "    WHEN rc.kid_estatus = $key THEN '$value'\n";
+                }
+                $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
+                $consultaselect = "SELECT rc.id_recepcion_compras,
+                    rc.recepcion_compras,
+                    rc.codigo_externo,
+                    (SELECT proyecto FROM proyectos p WHERE p.id_proyecto =rc.kid_proyecto LIMIT 1) AS kid_proyecto,
+                    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = rc.kid_proveedor LIMIT 1) AS kid_proveedor,
+                    (SELECT almacen FROM almacenes alm WHERE alm.id_almacen  = rc.kid_almacen LIMIT 1) AS kid_almacen,
+                    (SELECT orden_compras FROM ordenes_compras oc WHERE oc.id_orden_compras  = rc.kid_orden_compras LIMIT 1) AS kid_orden_compras,
+                    $caseEstatus,
+                    fecha_creacion
+                FROM recepciones_compras rc
+                WHERE rc.kid_estatus !=3";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+    
+                $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
+                $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
+                
+                $modalCRUD = 'detalles_recepciones_compras';
+                $nuevo_boton = '
+                    <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
+                //array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
+                array_push($data_script['botones_acciones'], $nuevo_boton);
+                $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+                $optionkey = 'NewAdd3';
+                $data_script[$optionkey] =['data_list_column'=>[]];
+    
+                $data_script[$optionkey] =['data_list_column'=>[]];
+    
+                break;
         case 'detalles_recepciones_compras':
             $vista = 'detalles_recepciones_compras';
             $consultaselect = "SELECT drc.id_detalle_recepcion_compras,

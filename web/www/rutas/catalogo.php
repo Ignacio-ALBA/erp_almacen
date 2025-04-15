@@ -70,6 +70,12 @@ if($resultado){
         case 'almacenes':
             $vista = 'almacenes';
             break;
+            case 'mermas':
+                $vista = 'mermas';
+                break;
+                case 'locaciones':
+                    $vista = 'locaciones';
+                    break;
         case 'detalles_almacenes':
             $vista = 'detalles_almacenes';
             $modalCRUD = 'comentarios_almacenes';

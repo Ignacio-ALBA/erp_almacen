@@ -76,12 +76,11 @@ function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $Ale
     return [$resultados, $checkdata]; // Retorna los resultados y el estado de verificación
 }
 
-
 $data = []; // Inicializa la variable $data
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = null;
-    $checkdata = null;
+    $checkdata = null;    
     if (isset($_POST['modalCRUD']) && isset($_POST['opcion']) && isset($_POST['formDataJson'])) {
         $modalCRUD = $_POST['modalCRUD'];
         $opcion = $_POST['opcion'];

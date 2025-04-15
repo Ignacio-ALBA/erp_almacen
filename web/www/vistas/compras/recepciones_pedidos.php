@@ -84,7 +84,7 @@
     </style>
 
 <?php 
-    $PageSection = "Recepciones de compras";
+    $PageSection = "Recepciones de pedidos";
 ?> 
 
 
@@ -100,19 +100,22 @@
   </div><!-- End Page Title -->
 <?php 
 
-  $id = 'recepciones_compras';
-  $ButtonAddLabel = "Nueva materia prima";
+  $id = 'recepciones_pedidos';
+  $ButtonAddLabel = "Nueva recepción";
   echo '<div class="card" style="margin-bottom: 20px;">
   <div class="card-body">
       <div class="row align-items-end">
-          <div class="col-md-3">'; // Reduced from col-md-4
-              echo CreateWeightLabel(['id' => 'peso_bascula', 'etiqueta' => 'Peso en Báscula']);
-              echo CreateWeightInput([
-                  'id' => 'peso_bascula',
-                  'readonly' => 'readonly',
-                  'value' => '0.00'
+          <div class="col-md-3">'; 
+              echo CreateInput([
+                  'type' => 'text',
+                  'id' => 'codigo_qr',
+                  'etiqueta' => 'Código QR',
+                  'class' => 'form-control form-control-sm bg-green text-dark fw-bold',
+                  'placeholder' => 'Escanee el código QR aquí',
+                  'autofocus' => 'true'
               ]);
           echo '</div>
+         
           <div class="col-md-3">'; // Reduced from col-md-4
               echo CreateInput([ 
                   'type' => 'text',
@@ -154,7 +157,7 @@
                   'id' => 'btn_guardar_materia',
                   'type' => 'button',
                   'class' => 'btn btn-primary',
-                  'text' => '<i class="bi bi-save2-fill"></i> Registrar peso',
+                  'text' => '<i class="bi bi-save2-fill"></i> Recibir pedido',
                   'html' => true
               ]);
           echo '</div>

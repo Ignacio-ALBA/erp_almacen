@@ -1,63 +1,12 @@
 <?php
-//$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
-//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-//$dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
-//$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
-//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-//$dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
-
-// 1. Definir rutas base y rutas de imágenes 
-if (!defined('SERVERURL')) {
-    define('SERVERURL', 'http://' . $_SERVER['HTTP_HOST']);
-}
-
-// Intentar obtener las imágenes desde URL primero
-try {
-    // Procesar logo superior (logot2.JPG)
-    $path = SERVERURL.'/assets/img/logot2.JPG';
-    $imageData = @file_get_contents($path);
-    if ($imageData !== false) {
-        $imageType = pathinfo($path, PATHINFO_EXTENSION);
-        $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-    } else {
-        // Si falla la URL, intentar con ruta del sistema de archivos
-        $logo_top_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logot2.JPG';
-        if (file_exists($logo_top_path)) {
-            $imageData = file_get_contents($logo_top_path);
-            $imageType = pathinfo($logo_top_path, PATHINFO_EXTENSION);
-            $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-        } else {
-            error_log("No se pudo cargar logot2.JPG ni por URL ni por sistema de archivos");
-            $dataUrl2 = ''; // O asignar una imagen por defecto en base64
-        }
-    }
-
-    // Procesar logo izquierdo (logoi.JPG)
-    $path = SERVERURL.'/assets/img/logoi.JPG';
-    $imageData = @file_get_contents($path);
-    if ($imageData !== false) {
-        $imageType = pathinfo($path, PATHINFO_EXTENSION);
-        $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-    } else {
-        // Si falla la URL, intentar con ruta del sistema de archivos
-        $logo_izq_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logoi.JPG';
-        if (file_exists($logo_izq_path)) {
-            $imageData = file_get_contents($logo_izq_path);
-            $imageType = pathinfo($logo_izq_path, PATHINFO_EXTENSION);
-            $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-        } else {
-            error_log("No se pudo cargar logoi.JPG ni por URL ni por sistema de archivos");
-            $dataUrl1 = ''; // O asignar una imagen por defecto en base64
-        }
-    }
-} catch (Exception $e) {
-    error_log("Error al procesar las imágenes: " . $e->getMessage());
-    // Imágenes por defecto en caso de error
-    $dataUrl1 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
-    $dataUrl2 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
-}
+$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
+$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+$dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
+$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+$dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
 ?>
 <script nonce="<?php echo $nonce; ?>">
     now_editing = null;
@@ -690,9 +639,11 @@ $(document).ready(function() {
         
         if(data.length < numColumnas && !$(`#${tableId}`).hasClass('PrimaryTable') && !$(`#${tableId}`).hasClass('StaticButtons')){
             data.push(`<div class="btn-group" role="group" style="width:100%;">
-            <button type="button" class="ModalDataView btn btn-primary primary" modalCRUD='${modalCRUD}'><i class="bi bi-eye"></i> Ver</button>
-            <button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD='${modalCRUD}'><i class="bi bi-pencil"></i> Editar</button>
-            <button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD='${modalCRUD}'><i class="bi bi-trash"></i> Eliminar</button>
+            <?php
+                if (checkPerms("ver_".$id,true)) echo '<button type="button" class="ModalDataView btn btn-primary primary" modalCRUD=\'${modalCRUD}\'><i class="bi bi-eye"></i> Ver</button>';
+                if (checkPerms("editar_".$id,true)) echo '<button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=\'${modalCRUD}\'><i class="bi bi-pencil"></i> Editar</button>';
+                if (checkPerms("eliminar_".$id,true)) echo '<button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD=\'${modalCRUD}\'><i class="bi bi-trash"></i> Eliminar</button>';
+            ?>
         </div>`)
         console.log("Botones 1");
         
@@ -747,9 +698,11 @@ $(document).ready(function() {
         let botones
         if(data.length < numColumnas && !$(`#${tableId}`).hasClass('PrimaryTable') && !$(`#${tableId}`).hasClass('StaticButtons')){
             data.push(`<div class="btn-group" role="group" style="width:100%;">
-            <button type="button" class="ModalDataView btn btn-primary primary" modalCRUD='${modalCRUD}'><i class="bi bi-eye"></i> Ver</button>
-            <button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD='${modalCRUD}'><i class="bi bi-pencil"></i> Editar</button>
-            <button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD='${modalCRUD}'><i class="bi bi-trash"></i> Eliminar</button>
+            <?php
+                if (checkPerms("ver_".$id,true)) echo '<button type="button" class="ModalDataView btn btn-primary primary" modalCRUD=\'${modalCRUD}\'><i class="bi bi-eye"></i> Ver</button>';
+                if (checkPerms("editar_".$id,true)) echo '<button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=\'${modalCRUD}\'><i class="bi bi-pencil"></i> Editar</button>';
+                if (checkPerms("eliminar_".$id,true)) echo '<button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD=\'${modalCRUD}\'><i class="bi bi-trash"></i> Eliminar</button>';
+            ?>
         </div>`)
         console.log("Botones 1");
         
@@ -914,27 +867,52 @@ $(document).ready(function() {
                 processData: false,   // No procesar los datos
                 contentType: false,
                 dataType: "json",
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
-                    
-                    // Si la respuesta es exitosa, cerramos el modal
-                    if (response.status === 'success') {
-                        $(`#modalCRUD${modalCRUD}`).modal('hide');
+                    if(response.status == "error"){
+                        if(response.checkdata){
+                            checkdata = response.checkdata;
+                            
+                            
+                            if(checkdata.DataExist){
+                                DataExist = checkdata.DataExist
+                                console.log(DataExist);
+                                for (const id of DataExist) {
+                                    
+                                    subfix = '-SetData';
+                                    if(!$(`#${id}`)){
+                                        subfix = '-SetData';
+                                    }
+                                    console.log($(`#${id+subfix}`));
+                                    
+                                    valor = $(`#${id+subfix}`).val();
+                                    $(`#${id+subfix}`).val("");
+                                    $(`#error_${id+subfix}`).text(`El valor "${valor}" ya existe.`);
+                                    $(`#form${modalCRUD}`).removeAttr('alertdatasimilar');
+                                }
+                            }
+
+                            if(checkdata.DataSimilar){
+                                DataSimilar = checkdata.DataSimilar
+                                for (const id in DataSimilar) {
+                                    data = DataSimilar[id];
+
+                                    subfix = '-SetData';
+                                    if(!$(`#${id}`)){
+                                        subfix = '-SetData';
+                                    }
+                                    valor = $(`#${id+subfix}`).val();
+                                    //$(`#${id}`).val("");
+                                    $(`#validate_${id+subfix}`).text(`Elementos similares: ${data.join(", ")}`);
+                                    $(`#alertmsg_${modalCRUD}`).text(`Ya existen elementos similares registrados, si deseas agregar el elemento actual vuelve a guardarlo.`);
+                                    $(`#alert_${modalCRUD}`).show();
+                                    $(`#form${modalCRUD}`).attr('alertdatasimilar',true);
+                                }
+                            }
                         
-                        // Solo intentamos agregar una fila si hay datos para agregar
-                        if (response.data) {
-                            const data = Object.values(response.data);
-                            AddRow(modalCRUD, data);
                         }
-                        
-                        // Mostrar mensaje de éxito
-                        if (response.message) {
-                            alert('Éxito: ' + response.message);
-                        }
+                    }else{
+                        $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
+                        //window.location.reload();
                     }
                 },
                 error: function(xhr, status, error) {
@@ -966,12 +944,7 @@ $(document).ready(function() {
             type: "POST",
             data: additionalData,
             dataType: "json",
-            beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
             success: function(response) {
-                console.log('Respuesta recibida:', response);
                 if(response.status == "error"){
                     if(response.checkdata){
                         checkdata = response.checkdata;
@@ -1009,8 +982,11 @@ $(document).ready(function() {
                         addAlert(response.message);
                     }
                 }else{
-                    data = Object.values(response.data);    
-                    UpdateRow(tablemodalCRUD,row,data)
+                    if(response.data != 'NoChanges'){
+                        data = Object.values(response.data);    
+                        UpdateRow(tablemodalCRUD,row,data)
+                    }
+                    
                     //window.location.reload();
                 }
             },
@@ -1344,12 +1320,7 @@ $(document).ready(function() {
                 type: "POST",
                 dataType: "json",
                 data: additionalData,
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
                     if(response.status == "error"){
                         console.log('Respuesta error 1 del servidor:', response);
                         if(response.checkdata){
@@ -1411,8 +1382,11 @@ $(document).ready(function() {
                         return;
                     }else{
                         console.log('Respuesta 1 del servidor:', response);
-                        data = Object.values(response.data);
-                        UpdateRow(modalCRUD.split('-')[0],row,data)
+                        if(response.data != 'NoChanges'){
+                            data = Object.values(response.data);
+                            UpdateRow(modalCRUD.split('-')[0],row,data)
+                        }
+                        
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
                 },
@@ -1568,27 +1542,58 @@ $(document).ready(function() {
                 processData: false,   // No procesar los datos
                 contentType: false,
                 dataType: "json",
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
-                    
-                    // Si la respuesta es exitosa, cerramos el modal
-                    if (response.status === 'success') {
-                        $(`#modalCRUD${modalCRUD}`).modal('hide');
+                    if(response.status == "error"){
+                        if(response.checkdata){
+                            checkdata = response.checkdata;
+                            console.log(checkdata);
+                            
+                            if(checkdata.DataExist){
+                                DataExist = checkdata.DataExist
+                                for (const id of DataExist) {
+                                    
+                                    valor = $(`#${id}`).val();
+                                    $(`#${id}`).val("");
+                                    $(`#error_${id}`).text(`El valor "${valor}" ya existe.`);
+                                    $(`#form${modalCRUD}`).removeAttr('alertdatasimilar');
+                                }
+                            }
+
+                            if(checkdata.DataSimilar){
+                                DataSimilar = checkdata.DataSimilar
+                                for (const id in DataSimilar) {
+                                    data = DataSimilar[id];
+
+                                    
+                                    valor = $(`#${id}`).val();
+                                    //$(`#${id}`).val("");
+                                    $(`#validate_${id}`).text(`Elementos similares: ${data.join(", ")}`);
+                                    $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
+                                        return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
+                                    });
+                                    var tipoalerta = 'warning';
+                                    $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
+                                    $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
+                                    $(`#alertmsg_${modalCRUD}`).text(`Ya existen elementos similares registrados, si deseas agregar el elemento actual vuelve a guardarlo.`);
+                                    $(`#alert_${modalCRUD}`).show();
+                                    $(`#form${modalCRUD}`).attr('alertdatasimilar',true);
+                                }
+                            }
                         
-                        // Solo intentamos agregar una fila si hay datos para agregar
-                        if (response.data) {
-                            const data = Object.values(response.data);
-                            AddRow(modalCRUD, data);
+                        }else{
+                            $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
+                                return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
+                            });
+                            var tipoalerta = 'danger';
+                            $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
+                            $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
+                            $(`#alertmsg_${modalCRUD}`).text(response.message);
+                            $(`#alert_${modalCRUD}`).show();
                         }
-                        
-                        // Mostrar mensaje de éxito
-                        if (response.message) {
-                            alert('Éxito: ' + response.message);
-                        }
+                    }else{
+                        data = Object.values(response.data);
+                        AddRow(modalCRUD,data)
+                        $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
                 },
                 error: function(xhr, status, error) {
@@ -1707,12 +1712,7 @@ $(document).ready(function() {
                 type: "POST",
                 data: additionalData,
                 dataType: "json",
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
                     if(response.status == "error"){
                         if(response.checkdata){
                             checkdata = response.checkdata;
@@ -1908,12 +1908,7 @@ $(document).ready(function() {
                 type: "POST",
                 dataType: "json",
                 data: additionalData,
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
                     if(response.status == "error"){
                         if(response.checkdata){
                             checkdata = response.checkdata;
@@ -1966,18 +1961,10 @@ $(document).ready(function() {
     <?php if(isset($NewAdd3) && $NewAdd3):?>
     $(document).on('click', '.ModalNewAdd3', function() {
         var modalCRUD = $(this).attr('modalCRUD');
-        console.log('Botón clickeado. modalCRUD:', modalCRUD);
+        
         console.log(modalCRUD);
         
-        // Verificar si el modal existe en el DOM
-    var modalElement = $(`#modalCRUD${modalCRUD}-View`);
-    if (modalElement.length === 0) {
-        console.error('Modal no encontrado:', `#modalCRUD${modalCRUD}-View`);
-        return;
-    }
-
-    console.log('Modal encontrado. Inicializando...');
-
+        
         ClearForm(modalCRUD);
         $(`#modalTitle2${modalCRUD}-View`).hide();
         $(`#modalTitle1${modalCRUD}-View`).show();
@@ -1992,8 +1979,7 @@ $(document).ready(function() {
         $(`#form${modalCRUD}-View input[type="checkbox"]`).prop('disabled', false);
         const row = $(this).closest('tr');
         var firstColumnValue = row.find('td:first').text();
- console.log('Mostrando modal:', `#modalCRUD${modalCRUD}-View`);
-    modalElement.modal('show');
+
         <?php 
         // Supongamos que $NewAdd3['data_list_column'] es un array que contiene los IDs de los inputs y los índices de las columnas de la tabla.
         foreach($NewAdd3['data_list_column'] as $data_list_column => $value) {
@@ -2021,12 +2007,7 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: data,
-            beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
-            success: function(response) { 
-                console.log('Respuesta recibida:', response); 
+            success: function(response) {  
                 const tableId1 = $(row).closest("table").attr("id");
                 tabla1 = dataTableInstances[tableId1]
                 const rowIndex1 = tabla1.row(row).index();
@@ -2157,12 +2138,8 @@ $(document).ready(function() {
                 type: "POST",
                 data: additionalData,
                 dataType: "json",
-                beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
                 success: function(response) {
-                    console.log('Respuesta recibida:', response);
+                    
                     data = Object.values(response.data);
                     AddRow(modalCRUD,data)
                     $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
@@ -2207,12 +2184,7 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: additionalData,
-            beforeSend: function() {
-        console.log('Preparando solicitud AJAX...');
-        console.log('Datos enviados:', additionalData);
-    },
             success: function(response) {
-                
                 console.log('Respuesta del servidor:', response);
                 if(response.data){
                     DeleteRow(modalCRUD,row)
@@ -2849,6 +2821,18 @@ function actualizarResultadosPorClases(clases) {
 
     });
 
+
+    $(document).ready(function() {
+        $('input[type="number"][maxlength]').on('input', function() {
+            
+            var maxLength = parseInt($(this).attr('maxlength'));
+            var valorActual = $(this).val();
+            if (valorActual.length > maxLength) {
+            $(this).val(valorActual.slice(0, -1));
+            }
+            console.log($(this).val());
+        });
+    });
     
     
 
