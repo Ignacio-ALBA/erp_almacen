@@ -230,6 +230,7 @@ $navItems = [
         ]
       ]
     ],
+    /*
     [
       'label' => 'Tiempo Real',
       'icon' => 'bi bi-clock',
@@ -246,7 +247,7 @@ $navItems = [
             ]
         ],
         ]
-      ],
+      ],*/
     [
       'label' => 'Central de servicios',
       'icon' => 'bi bi-table',
@@ -461,7 +462,7 @@ $navItems = [
             ]
         ]
       ]
-    ],
+    ],/*
     [
       'label' => 'Ventas',
       'icon' => 'bi bi-cart',
@@ -489,7 +490,7 @@ $navItems = [
               ]
             ]
             ]
-          ],
+          ],*/
           [
             'label' => 'Producción',
             'icon' => 'bi bi-gear',

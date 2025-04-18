@@ -67,7 +67,7 @@ function GetIDProveedorByName($valor){
 
 function GetIDTiempoEntregaByName($valor){
     global $conexion;
-    $consult = "SELECT id_tiempo_entrega FROM tiempos_entregas WHERE kid_estatus != 3 AND tiempo_entrega =:valor";
+    $consult = "SELECT id_tiempo_entrega  FROM tiempos_entregas WHERE kid_estatus != 3 AND tiempo_entrega =:valor";
     $resultado = $conexion->prepare($consult);
     $resultado->bindParam(':valor', $valor);
     $resultado->execute();
@@ -1014,44 +1014,30 @@ function GetEstatusList($condiciones  = []){
     return $data;
 }
 
-function GetTiemposEntregaListForSelect($condiciones = []) {
+function GetTiemposEntregaListForSelect($condiciones  = []){
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);
-    $consulta = "SELECT 
-        id_tiempo_entrega as valor,
-        tiempo_entrega as text 
-        FROM tiempos_entrega 
-        WHERE kid_estatus != 3 
-        $condiciones_str 
-        ORDER BY tiempo_entrega ASC";
-    
+    $consulta = "SELECT tiempo_entrega, pordefecto  FROM tiempos_entregas WHERE kid_estatus != 3 $condiciones_str ORDER BY tiempo_entrega ASC;";
     $resultado = $conexion->prepare($consulta);
     $resultado->execute();
     $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
     $data = array_map(fn($item) => [
-        'valor' => $item['valor'],
-        'text' => $item['text']
+        'valor'=> $item['tiempo_entrega'],
+        'pordefecto' => $item['pordefecto']
     ], $data);
     return $data;
 }
 
-function GetTiposPagoListForSelect($condiciones = []) {
+function GetTiposPagoListForSelect($condiciones  = []){
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);
-    $consulta = "SELECT 
-        id_tipo_pago as valor,
-        tipo_pago as text 
-        FROM tipos_pago 
-        WHERE kid_estatus != 3 
-        $condiciones_str 
-        ORDER BY tipo_pago ASC";
-    
+    $consulta = "SELECT tipo_pago, pordefecto  FROM tipos_pagos WHERE kid_estatus != 3 $condiciones_str ORDER BY tipo_pago ASC;";
     $resultado = $conexion->prepare($consulta);
     $resultado->execute();
     $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
     $data = array_map(fn($item) => [
-        'valor' => $item['valor'],
-        'text' => $item['text']
+        'valor'=> $item['tipo_pago'],
+        'pordefecto' => $item['pordefecto']
     ], $data);
     return $data;
 }
@@ -1228,7 +1214,7 @@ function GetPermsListByModulos($condiciones  = []){
     FROM permisos p
     INNER JOIN tablas t ON p.kid_tabla = t.id_tabla
     INNER JOIN modulos m ON t.kid_modulo = m.id_modulo
-    WHERE p.kid_estatus != 3
+    WHERE p.kid_estatus NOT IN (3, 12) AND t.kid_estatus = 1 AND m.kid_estatus = 1
     ORDER BY m.modulo, t.tablas;";
     $resultado = $conexion->prepare($consulta);
     $resultado->execute();
@@ -1256,7 +1242,7 @@ function GetPermsListByModulos($condiciones  = []){
                         'tabla' => $tabla,
                         'permisos' => [
                             [
-                                'permiso' => $permiso,
+                                'id' => $permiso,
                                 'etiqueta' => $etiqueta
                             ]
                         ]
@@ -1273,7 +1259,7 @@ function GetPermsListByModulos($condiciones  = []){
                     'tabla' => $tabla,
                     'permisos' => [
                         [
-                            'permiso' => $permiso,
+                            'id' => $permiso,
                             'etiqueta' => $etiqueta
                         ]
                     ]
@@ -1281,7 +1267,7 @@ function GetPermsListByModulos($condiciones  = []){
             } else {
                 // Si la tabla ya existe, solo agregamos el permiso
                 $result[$moduloIndex]['tablas'][$tablaIndex]['permisos'][] = [
-                    'permiso' => $permiso,
+                    'id' => $permiso,
                     'etiqueta' => $etiqueta
                 ];
             }
@@ -1290,4 +1276,25 @@ function GetPermsListByModulos($condiciones  = []){
 
     return $result;
 }
+
+
+function  GetAllowPermsList($kid_tipo_usuario, $condiciones  = []){
+    global $conexion;
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
+    $consulta = "SELECT 
+    p.permiso
+    FROM tipos_usuarios_permisos tup
+    INNER JOIN permisos p ON tup.kid_permiso = p.id_permiso
+    INNER JOIN tablas t ON p.kid_tabla = t.id_tabla
+    INNER JOIN modulos m ON t.kid_modulo = m.id_modulo
+    WHERE tup.kid_estatus NOT IN (3, 12,0) AND tup.kid_tipo_usuario = $kid_tipo_usuario AND p.kid_estatus NOT IN (3, 12,0) AND t.kid_estatus = 1 AND m.kid_estatus = 1
+    ORDER BY m.modulo, t.tablas;";
+
+   // $consulta = "SELECT tipo_reporte_cb, pordefecto FROM tipos_reportes_cb WHERE kid_estatus != 3 $condiciones_str ORDER BY tipo_reporte_cb ASC, orden ASC, pordefecto DESC;";
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute();
+    $data_perms_allow = $resultado->fetchAll(PDO::FETCH_COLUMN);
+    return $data_perms_allow;
+}
+
 ?>

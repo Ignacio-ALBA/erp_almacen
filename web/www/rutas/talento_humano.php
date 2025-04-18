@@ -27,6 +27,20 @@ if($resultado){
 
     switch ($pathResult) {
         case 'colaboradores':
+            $perms = [
+                "crear_usuarios",
+              "editar_usuarios",
+              "ver_usuarios",
+              "eliminar_usuarios"
+             ];
+  
+              checkPerms($perms);
+              $acciones = ['ver_', 'editar_', 'eliminar_'];
+              foreach ($acciones as $index => $accion) {
+                  if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                      unset($data_script['botones_acciones'][$index]);
+                  }
+              }
             $vista = 'colaboradores';
             $consultaselect = "SELECT u.id_colaborador, 
                 CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) AS nombre,
@@ -68,6 +82,20 @@ if($resultado){
 
 
         case 'ocupaciones_talento_humano':
+            $perms = [
+                "crear_ocupaciones_th",
+                "editar_ocupaciones_th",
+                "ver_ocupaciones_th",
+                "eliminar_ocupaciones_th"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'ocupaciones_talento_humano';
             $consultaselect = "SELECT o.id_ocupacion_th , 
                 CONCAT(c.nombre, ' ', c.apellido_paterno, ' ', c.apellido_materno) AS kid_colaborador,
@@ -105,6 +133,20 @@ if($resultado){
 
 
         case 'asistencias_talento_humano':
+            $perms = [
+                "crear_asistencias_th",
+               "editar_asistencias_th",
+               "ver_asistencias_th",
+               "eliminar_asistencias_th"
+              ];
+   
+               checkPerms($perms);
+               $acciones = ['ver_', 'editar_', 'eliminar_'];
+               foreach ($acciones as $index => $accion) {
+                   if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                       unset($data_script['botones_acciones'][$index]);
+                   }
+               }
             $vista = 'asistencias_talento_humano';
             $consultaselect = "SELECT a.id_asistencia_th, 
                 CONCAT(c.nombre, ' ', c.apellido_paterno, ' ', c.apellido_materno) AS kid_colaborador,
@@ -141,6 +183,20 @@ if($resultado){
 
 
         case 'adicionales_asistencias_talento_humano':
+            $perms = [
+                "crear_adicionales_asistencias_th",
+                 "editar_adicionales_asistencias_th",
+                 "ver_adicionales_asistencias_th",
+                 "eliminar_adicionales_asistencias_th"
+                ];
+     
+                 checkPerms($perms);
+                 $acciones = ['ver_', 'editar_', 'eliminar_'];
+                 foreach ($acciones as $index => $accion) {
+                     if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                         unset($data_script['botones_acciones'][$index]);
+                     }
+                 }
             $vista = 'adicionales_asistencias_talento_humano';
             $consultaselect = "SELECT aa.id_asistencia_th, 
                 CONCAT(c.nombre, ' ', c.apellido_paterno, ' ', c.apellido_materno) AS kid_colaborador,
@@ -170,6 +226,22 @@ if($resultado){
 
 
         case 'tipos_adicionales':
+            $perms = [
+                "crear_tipos_adicionales_th",
+                "editar_tipos_adicionales_th",
+                "ver_tipos_adicionales_th",
+                "eliminar_tipos_adicionales_th"
+            ];
+
+            checkPerms($perms);
+            
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+
             $vista = 'tipos_adicionales';
             $consultaselect = "SELECT id_tipo_adicional_th,
                 orden,
@@ -186,6 +258,50 @@ if($resultado){
             $resultado->execute();
 
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            break;
+
+        case 'tipos_usuario':
+            $perms = [
+                "crear_tipos_usuario",
+                "editar_tipos_usuario",
+                "ver_tipos_usuario",
+                "eliminar_tipos_usuario",
+                "asignar_permisos_tipos_usuario"
+            ];
+
+            checkPerms($perms);
+            
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            
+            $vista = 'tipos_usuario';
+            $consultaselect = "SELECT id_tipo_usuario,
+                tipo_usuario,
+                descripcion,
+                CASE 
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS pordefecto,
+                CASE 
+                    WHEN login = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS login,
+                fecha_creacion
+            FROM tipos_usuario
+            WHERE kid_estatus != 3 AND id_tipo_usuario != 1";
+
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            if (checkPerms("asignar_permisos_tipos_usuario",true)) $data_script['botones_acciones'][] = '<button class="ModalDataEdit btn btn-success success" modalCRUD="asignar_permisos"><i class="bi bi-shield-check"></i> Asignar Permisos</button>';
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+            $data['data_show']['lista_permisos'] = GetPermsListByModulos();
             break;
     
 

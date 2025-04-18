@@ -1,8 +1,15 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
 
+    include '../helpers/vistas_funciones.php';
 
-    
+    // Validar permisos para acceder a esta vista
+    checkPerms(['ver_listas_compras']);
+
+    // Validar permisos adicionales para acciones específicas
+    $canCreate = checkPerms(['crear_listas_compras'], true);
+    $canEdit = checkPerms(['editar_listas_compras'], true);
+    $canDelete = checkPerms(['eliminar_listas_compras'], true);
 
     $PageSection = "Listas de Compras";
 ?>
@@ -103,6 +110,15 @@ array_push($data_script['botones_acciones'], $nuevo_boton);
   $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
   $optionkey = 'NewAdd3';
   $data_script[$optionkey] =['data_list_column'=>[]];
+
+  // Ajustar botones de acción según los permisos
+  $data_script['botones_acciones'] = [];
+  if ($canEdit) {
+      $data_script['botones_acciones'][] = '<button class="ModalDataEdit btn btn-warning warning" modalCRUD="${modalCRUD}"><i class="bi bi-pencil"></i> Editar</button>';
+  }
+  if ($canDelete) {
+      $data_script['botones_acciones'][] = '<button class="ModalDataDelete btn btn-danger danger" modalCRUD="${modalCRUD}"><i class="bi bi-trash"></i> Eliminar</button>';
+  }
 
   CreateModalForm(
   [

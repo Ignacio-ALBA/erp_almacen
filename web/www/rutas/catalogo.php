@@ -29,6 +29,20 @@ if($resultado){
             $vista = 'colaboradores';
             break;
         case 'marcas':
+            $perms = [
+                "crear_marcas",
+                    "editar_marcas",
+                    "ver_marcas",
+                    "eliminar_marcas"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'marcas';
             break;
         case 'categorias':

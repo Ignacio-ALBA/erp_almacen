@@ -334,6 +334,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 break;
 
+            case 'tipos_usuario':
+                $tabla = 'tipos_usuario';
+                $idcolumn= "id_tipo_usuario";
+                $editformDataJson = CleanJson($formDataJson);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+
+                $consultaselect = "SELECT id_tipo_usuario,
+                tipo_usuario,
+                descripcion,
+                CASE 
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS pordefecto,
+                CASE 
+                    WHEN login = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS login,
+                fecha_creacion
+                FROM tipos_usuario
+                WHERE kid_estatus != 3 AND id_tipo_usuario != 1 and ".$idcolumn." = :".$idcolumn;
+
+
+                $ColumnsCheck = [
+                    ['column'=>"tipo_usuario","check_similar"=>true]
+                ];
+
+                $text_colums_edit = [];
+
+                break;
+
+            case 'asignar_permisos':
+                $editformDataJson = CleanJson($formDataJson);
+                $kid_tipo_usuario = $_POST['firstColumnValue'];
+
+                $consultaselect = "SELECT p.permiso, tup.kid_estatus
+                FROM tipos_usuarios_permisos tup
+                LEFT JOIN permisos p ON p.id_permiso = tup.kid_permiso
+                WHERE tup.kid_estatus != 3 AND tup.kid_tipo_usuario != 1 AND tup.kid_tipo_usuario = :id";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $kid_tipo_usuario);
+                $resultado->execute();
+                $permisos_registrados = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                $permisos_array = array_column($permisos_registrados, 'kid_estatus', 'permiso');
+
+                $consultaselect = "SELECT permiso, id_permiso
+                FROM permisos WHERE kid_estatus != 3";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $permisos_id= $resultado->fetchAll(PDO::FETCH_ASSOC);
+                $permisos_id = array_column($permisos_id, 'id_permiso', 'permiso');
+                
+                try {
+                    // Iniciar transacción
+                    $conexion->beginTransaction();
+                    
+                    foreach ($editformDataJson as $clave => $valor) {
+                        if (isset($permisos_array[$clave])) {
+                            if($permisos_array[$clave] != 1 && $valor == 1){
+                                // Activar permiso
+                                $stmt = $conexion->prepare("UPDATE tipos_usuarios_permisos 
+                                SET kid_estatus = 1 WHERE kid_permiso = :kid_permiso AND kid_tipo_usuario = :kid_tipo_usuario");
+                                $stmt->bindParam(':kid_permiso', $permisos_id[$clave]);
+                                $stmt->bindParam(':kid_tipo_usuario', $kid_tipo_usuario);
+                                $stmt->execute();
+                            }else if($permisos_array[$clave] == 1 && $valor == 0){
+                                // Desactivar permiso
+                                $stmt = $conexion->prepare("UPDATE tipos_usuarios_permisos 
+                                SET kid_estatus = 0 WHERE kid_permiso = :kid_permiso AND kid_tipo_usuario = :kid_tipo_usuario");
+                                $stmt->bindParam(':kid_permiso', $permisos_id[$clave]);
+                                $stmt->bindParam(':kid_tipo_usuario', $kid_tipo_usuario);
+                                $stmt->execute();
+                            }
+                        } else if($valor == 1){
+                            // Agregar permiso a la tabla
+                            $stmt = $conexion->prepare("INSERT INTO tipos_usuarios_permisos 
+                            (kid_tipo_usuario, kid_permiso, kid_creacion, fecha_creacion, kid_estatus) 
+                            VALUES (:kid_tipo_usuario, :kid_permiso, :kid_creacion, :fecha_creacion, 1)");
+
+                            $stmt->bindParam(':kid_tipo_usuario', $kid_tipo_usuario, PDO::PARAM_INT);
+                            $stmt->bindParam(':kid_permiso', $permisos_id[$clave], PDO::PARAM_STR);
+                            $stmt->bindParam(':kid_creacion', $_SESSION["s_id"], PDO::PARAM_INT);
+                            $stmt->bindValue(':fecha_creacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+                            $stmt->execute();
+
+                        }
+                    }
+                    
+                    // Confirmar transacción
+                    $conexion->commit();
+                } catch (Exception $e) {
+                    // Rechazar transacción en caso de error
+                    $conexion->rollBack();
+                    $data_return = ['status' => 'error', 'message' => "Error al realizar movimientos en la DB: " . $e->getMessage()];
+                }
+                
+                $data_return = ['status' => 'success', 'data' => 'NoChanges'];
+
+                $ColumnsCheck = [
+                    ['column'=>"tipo_usuario","check_similar"=>true]
+                ];
+
+                $text_colums_edit = [];
+
+                break;
+
             default:
             $data_return = ['status' => 'error', 'message' => 'Operación no válida'];
                 break;

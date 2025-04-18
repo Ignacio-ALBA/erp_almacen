@@ -836,4 +836,58 @@ function CreateWeightLabel($atributos = []) {
         '</label>
     </div>';
 }
+
+function CreateAccordion($atributos = [], $elements = []){
+    $id = isset($atributos['id']) ? $atributos['id'] : null;
+    unset($atributos['id']);
+    $class = isset($atributos['class']) ? $atributos['class'] : null;
+    unset($atributos['class']);
+
+    $html = '<div class="accordion '.$class.'" id="accordion'.$id .'">';
+
+    foreach($elements as $index => $element){
+        $html .= '<div class="accordion-item">
+                  <h2 class="accordion-header" id="heading'.$id.$index.'">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'.$id.$index.'" aria-expanded="true" aria-controls="collapseOne">
+                      '.$element['title'].'
+                    </button>
+                  </h2>
+                  <div id="collapse'.$id.$index.'" class="accordion-collapse collapse" aria-labelledby="heading'.$id.$index.'" data-bs-parent="#accordion'.$id.$index.'" style="">
+                    <div class="accordion-body">
+                    '.$element['body'].'
+                    </div>
+                  </div>
+                </div>';
+    }
+
+    
+
+    $html .= '</div>';
+    return $html;
+}
+
+function CreateList($atributos = [], $elements = []){
+    $html = '<ul class="list-group">';
+    $input = isset($atributos['input']) ? true : false;
+    unset($atributos['input']);
+    $span = isset($atributos['span']) ? true : false;
+    unset($atributos['span']);
+    foreach($elements as $index => $element){
+        $html .= '<li class="list-group-item">';
+                    if ($span) $html .= '<span class="badge bg-primary rounded-pill">14</span>';
+                    if ($input) {
+                        $html .= '<input ' . 
+                            (isset($element['id']) ? 'id="' . $element['id'] . '" ' : '') . 
+                            'class="form-check-input me-1" ' . 
+                            'type="' . (isset($atributos['type']) ? $atributos['type'] : '') . '" ' . 
+                            'value="">';
+                    }
+                    
+                    $html .= $element['etiqueta'];
+        $html .= '</li>';
+    }
+    $html .= '</ul>';
+
+    return $html;
+}
 ?>

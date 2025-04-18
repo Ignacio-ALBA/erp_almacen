@@ -42,7 +42,8 @@ if($resultado->rowCount() >= 1){
 	    $_SESSION["s_id_tipoUsuario"] = $data[0]['kid_tipo_usuario'];
 		$_SESSION["s_usuario"] = $data[0]['email'];
 	    $_SESSION["s_tipo_usuario"] = $tipo_usuario["tipo_usuario"];
-		$_SESSION["permisos"] = ["all"];
+		
+		$_SESSION["permisos"] =  $_SESSION["s_id_tipoUsuario"] == 1 ? ["all"] : GetAllowPermsList($_SESSION["s_id_tipoUsuario"]) ;
 		$nombre = $data[0]['nombre'];
 		if($data[0]['apellido_paterno']){$nombre .= " ".$data[0]['apellido_paterno'];}
 		if($data[0]['apellido_materno']){$nombre .= " ".$data[0]['apellido_materno'];}

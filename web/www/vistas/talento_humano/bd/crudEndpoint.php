@@ -146,6 +146,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
+            case 'tipos_usuario':
+                $consultaselect = "SELECT tipo_usuario,
+                    descripcion, 
+                    pordefecto,
+                    login
+                FROM tipos_usuario
+                WHERE kid_estatus != 3 AND id_tipo_usuario != 1 AND id_tipo_usuario = :id";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
+            case 'asignar_permisos':
+
+                $data = GetAllowPermsList($elementID);
+
+                $data = array_fill_keys($data, 1);
+                if(!$data){
+                    $data['empty'] = [];
+                }
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
             default:
                 print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
                 break;

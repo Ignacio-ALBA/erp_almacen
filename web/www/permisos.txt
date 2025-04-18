@@ -1,0 +1,396 @@
+SELECT * FROM `permisos`;
+
+
+id_permiso	permiso	etiqueta	descripcion	kid_tabla	kid_creacion	fecha_creacion	kid_estatus	
+1	crear_clientes	Crear Clientes	Permiso para Crear Clientes	1	1	2025-03-14 13:16:28	1	
+2	editar_clientes	Editar Clientes	Permiso para Editar Clientes	1	1	2025-03-14 13:16:28	1	
+3	ver_clientes	Ver Clientes	Permiso para Ver Clientes	1	1	2025-03-14 13:16:28	1	
+4	eliminar_clientes	Eliminar Clientes	Permiso para Eliminar Clientes	1	1	2025-03-14 13:16:28	1	
+5	crear_planeaciones_compras	Crear Planeaciones Compras	Permiso para Crear Planeaciones Compras	2	1	2025-03-14 13:16:28	1	
+6	editar_planeaciones_compras	Editar Planeaciones Compras	Permiso para Editar Planeaciones Compras	2	1	2025-03-14 13:16:28	1	
+7	ver_planeaciones_compras	Ver Planeaciones Compras	Permiso para Ver Planeaciones Compras	2	1	2025-03-14 13:16:28	1	
+8	eliminar_planeaciones_compras	Eliminar Planeaciones Compras	Permiso para Eliminar Planeaciones Compras	2	1	2025-03-14 13:16:28	1	
+9	crear_almacen_mhe	Crear Almacen Mhe	Permiso para Crear Almacen Mhe	3	1	2025-03-14 13:16:28	1	
+10	editar_almacen_mhe	Editar Almacen Mhe	Permiso para Editar Almacen Mhe	3	1	2025-03-14 13:16:28	1	
+11	ver_almacen_mhe	Ver Almacen Mhe	Permiso para Ver Almacen Mhe	3	1	2025-03-14 13:16:28	1	
+12	eliminar_almacen_mhe	Eliminar Almacen Mhe	Permiso para Eliminar Almacen Mhe	3	1	2025-03-14 13:16:28	1	
+13	crear_articulos	Crear Articulos	Permiso para Crear Articulos	4	1	2025-03-14 13:16:28	1	
+14	editar_articulos	Editar Articulos	Permiso para Editar Articulos	4	1	2025-03-14 13:16:28	1	
+15	ver_articulos	Ver Articulos	Permiso para Ver Articulos	4	1	2025-03-14 13:16:28	1	
+16	eliminar_articulos	Eliminar Articulos	Permiso para Eliminar Articulos	4	1	2025-03-14 13:16:28	1	
+17	crear_bancos	Crear Bancos	Permiso para Crear Bancos	5	1	2025-03-14 13:16:28	1	
+18	editar_bancos	Editar Bancos	Permiso para Editar Bancos	5	1	2025-03-14 13:16:28	1	
+19	ver_bancos	Ver Bancos	Permiso para Ver Bancos	5	1	2025-03-14 13:16:28	1	
+20	eliminar_bancos	Eliminar Bancos	Permiso para Eliminar Bancos	5	1	2025-03-14 13:16:28	1	
+21	crear_bolsas_proyectos	Crear Bolsas Proyectos	Permiso para Crear Bolsas Proyectos	6	1	2025-03-14 13:16:28	1	
+22	editar_bolsas_proyectos	Editar Bolsas Proyectos	Permiso para Editar Bolsas Proyectos	6	1	2025-03-14 13:16:28	1	
+23	ver_bolsas_proyectos	Ver Bolsas Proyectos	Permiso para Ver Bolsas Proyectos	6	1	2025-03-14 13:16:28	1	
+24	eliminar_bolsas_proyectos	Eliminar Bolsas Proyectos	Permiso para Eliminar Bolsas Proyectos	6	1	2025-03-14 13:16:28	1	
+25	crear_cambios_planeaciones_compras	Crear Cambios Planeaciones Compras	Permiso para Crear Cambios Planeaciones Compras	7	1	2025-03-14 13:16:28	1	
+26	editar_cambios_planeaciones_compras	Editar Cambios Planeaciones Compras	Permiso para Editar Cambios Planeaciones Compras	7	1	2025-03-14 13:16:28	1	
+27	ver_cambios_planeaciones_compras	Ver Cambios Planeaciones Compras	Permiso para Ver Cambios Planeaciones Compras	7	1	2025-03-14 13:16:28	1	
+28	eliminar_cambios_planeaciones_compras	Eliminar Cambios Planeaciones Compras	Permiso para Eliminar Cambios Planeaciones Compras	7	1	2025-03-14 13:16:28	1	
+29	crear_categorias	Crear Categorias	Permiso para Crear Categorias	8	1	2025-03-14 13:16:28	1	
+30	editar_categorias	Editar Categorias	Permiso para Editar Categorias	8	1	2025-03-14 13:16:28	1	
+31	ver_categorias	Ver Categorias	Permiso para Ver Categorias	8	1	2025-03-14 13:16:28	1	
+32	eliminar_categorias	Eliminar Categorias	Permiso para Eliminar Categorias	8	1	2025-03-14 13:16:28	1	
+33	crear_colonias	Crear Colonias	Permiso para Crear Colonias	9	1	2025-03-14 13:16:28	1	
+34	editar_colonias	Editar Colonias	Permiso para Editar Colonias	9	1	2025-03-14 13:16:28	1	
+35	ver_colonias	Ver Colonias	Permiso para Ver Colonias	9	1	2025-03-14 13:16:28	1	
+36	eliminar_colonias	Eliminar Colonias	Permiso para Eliminar Colonias	9	1	2025-03-14 13:16:28	1	
+37	crear_colores_interfaz	Crear Colores Interfaz	Permiso para Crear Colores Interfaz	10	1	2025-03-14 13:16:28	1	
+38	editar_colores_interfaz	Editar Colores Interfaz	Permiso para Editar Colores Interfaz	10	1	2025-03-14 13:16:28	1	
+39	ver_colores_interfaz	Ver Colores Interfaz	Permiso para Ver Colores Interfaz	10	1	2025-03-14 13:16:28	1	
+40	eliminar_colores_interfaz	Eliminar Colores Interfaz	Permiso para Eliminar Colores Interfaz	10	1	2025-03-14 13:16:28	1	
+41	crear_comentarios_almacenes	Crear Comentarios Almacenes	Permiso para Crear Comentarios Almacenes	11	1	2025-03-14 13:16:28	1	
+42	editar_comentarios_almacenes	Editar Comentarios Almacenes	Permiso para Editar Comentarios Almacenes	11	1	2025-03-14 13:16:28	1	
+43	ver_comentarios_almacenes	Ver Comentarios Almacenes	Permiso para Ver Comentarios Almacenes	11	1	2025-03-14 13:16:28	1	
+44	eliminar_comentarios_almacenes	Eliminar Comentarios Almacenes	Permiso para Eliminar Comentarios Almacenes	11	1	2025-03-14 13:16:28	1	
+45	crear_comentarios_recepciones	Crear Comentarios Recepciones	Permiso para Crear Comentarios Recepciones	12	1	2025-03-14 13:16:28	1	
+46	editar_comentarios_recepciones	Editar Comentarios Recepciones	Permiso para Editar Comentarios Recepciones	12	1	2025-03-14 13:16:28	1	
+47	ver_comentarios_recepciones	Ver Comentarios Recepciones	Permiso para Ver Comentarios Recepciones	12	1	2025-03-14 13:16:28	1	
+48	eliminar_comentarios_recepciones	Eliminar Comentarios Recepciones	Permiso para Eliminar Comentarios Recepciones	12	1	2025-03-14 13:16:28	1	
+49	crear_compras_cuentas_bancarias	Crear Compras Cuentas Bancarias	Permiso para Crear Compras Cuentas Bancarias	13	1	2025-03-14 13:16:28	1	
+50	editar_compras_cuentas_bancarias	Editar Compras Cuentas Bancarias	Permiso para Editar Compras Cuentas Bancarias	13	1	2025-03-14 13:16:28	1	
+51	ver_compras_cuentas_bancarias	Ver Compras Cuentas Bancarias	Permiso para Ver Compras Cuentas Bancarias	13	1	2025-03-14 13:16:28	1	
+52	eliminar_compras_cuentas_bancarias	Eliminar Compras Cuentas Bancarias	Permiso para Eliminar Compras Cuentas Bancarias	13	1	2025-03-14 13:16:28	1	
+53	crear_conceptos	Crear Conceptos	Permiso para Crear Conceptos	14	1	2025-03-14 13:16:28	1	
+54	editar_conceptos	Editar Conceptos	Permiso para Editar Conceptos	14	1	2025-03-14 13:16:28	1	
+55	ver_conceptos	Ver Conceptos	Permiso para Ver Conceptos	14	1	2025-03-14 13:16:28	1	
+56	eliminar_conceptos	Eliminar Conceptos	Permiso para Eliminar Conceptos	14	1	2025-03-14 13:16:28	1	
+57	crear_configuraciones	Crear Configuraciones	Permiso para Crear Configuraciones	15	1	2025-03-14 13:16:28	1	
+58	editar_configuraciones	Editar Configuraciones	Permiso para Editar Configuraciones	15	1	2025-03-14 13:16:28	1	
+59	ver_configuraciones	Ver Configuraciones	Permiso para Ver Configuraciones	15	1	2025-03-14 13:16:28	1	
+60	eliminar_configuraciones	Eliminar Configuraciones	Permiso para Eliminar Configuraciones	15	1	2025-03-14 13:16:28	1	
+61	crear_cotizaciones_compras	Crear Cotizaciones Compras	Permiso para Crear Cotizaciones Compras	16	1	2025-03-14 13:16:28	1	
+62	editar_cotizaciones_compras	Editar Cotizaciones Compras	Permiso para Editar Cotizaciones Compras	16	1	2025-03-14 13:16:28	1	
+63	ver_cotizaciones_compras	Ver Cotizaciones Compras	Permiso para Ver Cotizaciones Compras	16	1	2025-03-14 13:16:28	1	
+64	eliminar_cotizaciones_compras	Eliminar Cotizaciones Compras	Permiso para Eliminar Cotizaciones Compras	16	1	2025-03-14 13:16:28	1	
+65	crear_cuentas_bancarias	Crear Cuentas Bancarias	Permiso para Crear Cuentas Bancarias	17	1	2025-03-14 13:16:28	1	
+66	editar_cuentas_bancarias	Editar Cuentas Bancarias	Permiso para Editar Cuentas Bancarias	17	1	2025-03-14 13:16:28	1	
+67	ver_cuentas_bancarias	Ver Cuentas Bancarias	Permiso para Ver Cuentas Bancarias	17	1	2025-03-14 13:16:28	1	
+68	eliminar_cuentas_bancarias	Eliminar Cuentas Bancarias	Permiso para Eliminar Cuentas Bancarias	17	1	2025-03-14 13:16:28	1	
+69	crear_detalles_almacenes	Crear Detalles Almacenes	Permiso para Crear Detalles Almacenes	18	1	2025-03-14 13:16:28	1	
+70	editar_detalles_almacenes	Editar Detalles Almacenes	Permiso para Editar Detalles Almacenes	18	1	2025-03-14 13:16:28	1	
+71	ver_detalles_almacenes	Ver Detalles Almacenes	Permiso para Ver Detalles Almacenes	18	1	2025-03-14 13:16:28	1	
+72	eliminar_detalles_almacenes	Eliminar Detalles Almacenes	Permiso para Eliminar Detalles Almacenes	18	1	2025-03-14 13:16:28	1	
+73	crear_detalles_cotizaciones_compras	Crear Detalles Cotizaciones Compras	Permiso para Crear Detalles Cotizaciones Compras	19	1	2025-03-14 13:16:28	1	
+74	editar_detalles_cotizaciones_compras	Editar Detalles Cotizaciones Compras	Permiso para Editar Detalles Cotizaciones Compras	19	1	2025-03-14 13:16:28	1	
+75	ver_detalles_cotizaciones_compras	Ver Detalles Cotizaciones Compras	Permiso para Ver Detalles Cotizaciones Compras	19	1	2025-03-14 13:16:28	1	
+76	eliminar_detalles_cotizaciones_compras	Eliminar Detalles Cotizaciones Compras	Permiso para Eliminar Detalles Cotizaciones Compra...	19	1	2025-03-14 13:16:28	1	
+77	crear_detalles_cuentas_bancarias	Crear Detalles Cuentas Bancarias	Permiso para Crear Detalles Cuentas Bancarias	20	1	2025-03-14 13:16:28	1	
+78	editar_detalles_cuentas_bancarias	Editar Detalles Cuentas Bancarias	Permiso para Editar Detalles Cuentas Bancarias	20	1	2025-03-14 13:16:28	1	
+79	ver_detalles_cuentas_bancarias	Ver Detalles Cuentas Bancarias	Permiso para Ver Detalles Cuentas Bancarias	20	1	2025-03-14 13:16:28	1	
+80	eliminar_detalles_cuentas_bancarias	Eliminar Detalles Cuentas Bancarias	Permiso para Eliminar Detalles Cuentas Bancarias	20	1	2025-03-14 13:16:28	1	
+81	crear_detalles_listas_compras	Crear Detalles Listas Compras	Permiso para Crear Detalles Listas Compras	21	1	2025-03-14 13:16:28	1	
+82	editar_detalles_listas_compras	Editar Detalles Listas Compras	Permiso para Editar Detalles Listas Compras	21	1	2025-03-14 13:16:28	1	
+83	ver_detalles_listas_compras	Ver Detalles Listas Compras	Permiso para Ver Detalles Listas Compras	21	1	2025-03-14 13:16:28	1	
+84	eliminar_detalles_listas_compras	Eliminar Detalles Listas Compras	Permiso para Eliminar Detalles Listas Compras	21	1	2025-03-14 13:16:28	1	
+85	crear_detalles_ordenes_compras	Crear Detalles Ordenes Compras	Permiso para Crear Detalles Ordenes Compras	22	1	2025-03-14 13:16:28	1	
+86	editar_detalles_ordenes_compras	Editar Detalles Ordenes Compras	Permiso para Editar Detalles Ordenes Compras	22	1	2025-03-14 13:16:28	1	
+87	ver_detalles_ordenes_compras	Ver Detalles Ordenes Compras	Permiso para Ver Detalles Ordenes Compras	22	1	2025-03-14 13:16:28	1	
+88	eliminar_detalles_ordenes_compras	Eliminar Detalles Ordenes Compras	Permiso para Eliminar Detalles Ordenes Compras	22	1	2025-03-14 13:16:28	1	
+89	crear_detalles_planeaciones_actividades	Crear Detalles Planeaciones Actividades	Permiso para Crear Detalles Planeaciones Actividad...	23	1	2025-03-14 13:16:28	1	
+90	editar_detalles_planeaciones_actividades	Editar Detalles Planeaciones Actividades	Permiso para Editar Detalles Planeaciones Activida...	23	1	2025-03-14 13:16:28	1	
+91	ver_detalles_planeaciones_actividades	Ver Detalles Planeaciones Actividades	Permiso para Ver Detalles Planeaciones Actividades	23	1	2025-03-14 13:16:28	1	
+92	eliminar_detalles_planeaciones_actividades	Eliminar Detalles Planeaciones Actividades	Permiso para Eliminar Detalles Planeaciones Activi...	23	1	2025-03-14 13:16:28	1	
+93	crear_detalles_planeaciones_compras	Crear Detalles Planeaciones Compras	Permiso para Crear Detalles Planeaciones Compras	24	1	2025-03-14 13:16:28	1	
+94	editar_detalles_planeaciones_compras	Editar Detalles Planeaciones Compras	Permiso para Editar Detalles Planeaciones Compras	24	1	2025-03-14 13:16:28	1	
+95	ver_detalles_planeaciones_compras	Ver Detalles Planeaciones Compras	Permiso para Ver Detalles Planeaciones Compras	24	1	2025-03-14 13:16:28	1	
+96	eliminar_detalles_planeaciones_compras	Eliminar Detalles Planeaciones Compras	Permiso para Eliminar Detalles Planeaciones Compra...	24	1	2025-03-14 13:16:28	1	
+97	crear_detalles_planeaciones_rrhh	Crear Detalles Planeaciones Rrhh	Permiso para Crear Detalles Planeaciones Rrhh	25	1	2025-03-14 13:16:28	1	
+98	editar_detalles_planeaciones_rrhh	Editar Detalles Planeaciones Rrhh	Permiso para Editar Detalles Planeaciones Rrhh	25	1	2025-03-14 13:16:28	1	
+99	ver_detalles_planeaciones_rrhh	Ver Detalles Planeaciones Rrhh	Permiso para Ver Detalles Planeaciones Rrhh	25	1	2025-03-14 13:16:28	1	
+100	eliminar_detalles_planeaciones_rrhh	Eliminar Detalles Planeaciones Rrhh	Permiso para Eliminar Detalles Planeaciones Rrhh	25	1	2025-03-14 13:16:28	1	
+
+101	crear_detalles_proyectos	Crear Detalles Proyectos	Permiso para Crear Detalles Proyectos	26	1	2025-03-14 13:16:28	1	
+102	editar_detalles_proyectos	Editar Detalles Proyectos	Permiso para Editar Detalles Proyectos	26	1	2025-03-14 13:16:28	1	
+103	ver_detalles_proyectos	Ver Detalles Proyectos	Permiso para Ver Detalles Proyectos	26	1	2025-03-14 13:16:28	1	
+104	eliminar_detalles_proyectos	Eliminar Detalles Proyectos	Permiso para Eliminar Detalles Proyectos	26	1	2025-03-14 13:16:28	1	
+105	crear_detalles_recepciones_compras	Crear Detalles Recepciones Compras	Permiso para Crear Detalles Recepciones Compras	27	1	2025-03-14 13:16:28	1	
+106	editar_detalles_recepciones_compras	Editar Detalles Recepciones Compras	Permiso para Editar Detalles Recepciones Compras	27	1	2025-03-14 13:16:28	1	
+107	ver_detalles_recepciones_compras	Ver Detalles Recepciones Compras	Permiso para Ver Detalles Recepciones Compras	27	1	2025-03-14 13:16:28	1	
+108	eliminar_detalles_recepciones_compras	Eliminar Detalles Recepciones Compras	Permiso para Eliminar Detalles Recepciones Compras	27	1	2025-03-14 13:16:28	1	
+109	crear_dimensiones	Crear Dimensiones	Permiso para Crear Dimensiones	28	1	2025-03-14 13:16:28	1	
+110	editar_dimensiones	Editar Dimensiones	Permiso para Editar Dimensiones	28	1	2025-03-14 13:16:28	1	
+111	ver_dimensiones	Ver Dimensiones	Permiso para Ver Dimensiones	28	1	2025-03-14 13:16:28	1	
+112	eliminar_dimensiones	Eliminar Dimensiones	Permiso para Eliminar Dimensiones	28	1	2025-03-14 13:16:28	1	
+113	crear_empresas	Crear Empresas	Permiso para Crear Empresas	29	1	2025-03-14 13:16:28	1	
+114	editar_empresas	Editar Empresas	Permiso para Editar Empresas	29	1	2025-03-14 13:16:28	1	
+115	ver_empresas	Ver Empresas	Permiso para Ver Empresas	29	1	2025-03-14 13:16:28	1	
+116	eliminar_empresas	Eliminar Empresas	Permiso para Eliminar Empresas	29	1	2025-03-14 13:16:28	1	
+117	crear_estados	Crear Estados	Permiso para Crear Estados	30	1	2025-03-14 13:16:28	1	
+118	editar_estados	Editar Estados	Permiso para Editar Estados	30	1	2025-03-14 13:16:28	1	
+119	ver_estados	Ver Estados	Permiso para Ver Estados	30	1	2025-03-14 13:16:28	1	
+120	eliminar_estados	Eliminar Estados	Permiso para Eliminar Estados	30	1	2025-03-14 13:16:28	1	
+121	crear_estatus	Crear Estatus	Permiso para Crear Estatus	31	1	2025-03-14 13:16:28	1	
+122	editar_estatus	Editar Estatus	Permiso para Editar Estatus	31	1	2025-03-14 13:16:28	1	
+123	ver_estatus	Ver Estatus	Permiso para Ver Estatus	31	1	2025-03-14 13:16:28	1	
+124	eliminar_estatus	Eliminar Estatus	Permiso para Eliminar Estatus	31	1	2025-03-14 13:16:28	1	
+125	crear_formatos	Crear Formatos	Permiso para Crear Formatos	32	1	2025-03-14 13:16:28	1	
+126	editar_formatos	Editar Formatos	Permiso para Editar Formatos	32	1	2025-03-14 13:16:28	1	
+127	ver_formatos	Ver Formatos	Permiso para Ver Formatos	32	1	2025-03-14 13:16:28	1	
+128	eliminar_formatos	Eliminar Formatos	Permiso para Eliminar Formatos	32	1	2025-03-14 13:16:28	1	
+129	crear_formatos_reportes	Crear Formatos Reportes	Permiso para Crear Formatos Reportes	33	1	2025-03-14 13:16:28	1	
+130	editar_formatos_reportes	Editar Formatos Reportes	Permiso para Editar Formatos Reportes	33	1	2025-03-14 13:16:28	1	
+131	ver_formatos_reportes	Ver Formatos Reportes	Permiso para Ver Formatos Reportes	33	1	2025-03-14 13:16:28	1	
+132	eliminar_formatos_reportes	Eliminar Formatos Reportes	Permiso para Eliminar Formatos Reportes	33	1	2025-03-14 13:16:28	1	
+133	crear_internos_externos	Crear Internos Externos	Permiso para Crear Internos Externos	34	1	2025-03-14 13:16:28	1	
+134	editar_internos_externos	Editar Internos Externos	Permiso para Editar Internos Externos	34	1	2025-03-14 13:16:28	1	
+135	ver_internos_externos	Ver Internos Externos	Permiso para Ver Internos Externos	34	1	2025-03-14 13:16:28	1	
+136	eliminar_internos_externos	Eliminar Internos Externos	Permiso para Eliminar Internos Externos	34	1	2025-03-14 13:16:28	1	
+137	crear_listas_compras	Crear Listas Compras	Permiso para Crear Listas Compras	35	1	2025-03-14 13:16:28	1	
+138	editar_listas_compras	Editar Listas Compras	Permiso para Editar Listas Compras	35	1	2025-03-14 13:16:28	1	
+139	ver_listas_compras	Ver Listas Compras	Permiso para Ver Listas Compras	35	1	2025-03-14 13:16:28	1	
+140	eliminar_listas_compras	Eliminar Listas Compras	Permiso para Eliminar Listas Compras	35	1	2025-03-14 13:16:28	1	
+141	crear_marcas	Crear Marcas	Permiso para Crear Marcas	36	1	2025-03-14 13:16:28	1	
+142	editar_marcas	Editar Marcas	Permiso para Editar Marcas	36	1	2025-03-14 13:16:28	1	
+143	ver_marcas	Ver Marcas	Permiso para Ver Marcas	36	1	2025-03-14 13:16:28	1	
+144	eliminar_marcas	Eliminar Marcas	Permiso para Eliminar Marcas	36	1	2025-03-14 13:16:28	1	
+145	crear_modulos	Crear Modulos	Permiso para Crear Modulos	37	1	2025-03-14 13:16:28	1	
+146	editar_modulos	Editar Modulos	Permiso para Editar Modulos	37	1	2025-03-14 13:16:28	1	
+147	ver_modulos	Ver Modulos	Permiso para Ver Modulos	37	1	2025-03-14 13:16:28	1	
+148	eliminar_modulos	Eliminar Modulos	Permiso para Eliminar Modulos	37	1	2025-03-14 13:16:28	1	
+149	crear_municipios	Crear Municipios	Permiso para Crear Municipios	38	1	2025-03-14 13:16:28	1	
+150	editar_municipios	Editar Municipios	Permiso para Editar Municipios	38	1	2025-03-14 13:16:28	1	
+151	ver_municipios	Ver Municipios	Permiso para Ver Municipios	38	1	2025-03-14 13:16:28	1	
+152	eliminar_municipios	Eliminar Municipios	Permiso para Eliminar Municipios	38	1	2025-03-14 13:16:28	1	
+153	crear_ordenes_compras	Crear Ordenes Compras	Permiso para Crear Ordenes Compras	39	1	2025-03-14 13:16:28	1	
+154	editar_ordenes_compras	Editar Ordenes Compras	Permiso para Editar Ordenes Compras	39	1	2025-03-14 13:16:28	1	
+155	ver_ordenes_compras	Ver Ordenes Compras	Permiso para Ver Ordenes Compras	39	1	2025-03-14 13:16:28	1	
+156	eliminar_ordenes_compras	Eliminar Ordenes Compras	Permiso para Eliminar Ordenes Compras	39	1	2025-03-14 13:16:28	1	
+157	crear_paises	Crear Paises	Permiso para Crear Paises	40	1	2025-03-14 13:16:28	1	
+158	editar_paises	Editar Paises	Permiso para Editar Paises	40	1	2025-03-14 13:16:28	1	
+159	ver_paises	Ver Paises	Permiso para Ver Paises	40	1	2025-03-14 13:16:28	1	
+160	eliminar_paises	Eliminar Paises	Permiso para Eliminar Paises	40	1	2025-03-14 13:16:28	1	
+161	crear_planeaciones_actividades	Crear Planeaciones Actividades	Permiso para Crear Planeaciones Actividades	41	1	2025-03-14 13:16:28	1	
+162	editar_planeaciones_actividades	Editar Planeaciones Actividades	Permiso para Editar Planeaciones Actividades	41	1	2025-03-14 13:16:28	1	
+163	ver_planeaciones_actividades	Ver Planeaciones Actividades	Permiso para Ver Planeaciones Actividades	41	1	2025-03-14 13:16:28	1	
+164	eliminar_planeaciones_actividades	Eliminar Planeaciones Actividades	Permiso para Eliminar Planeaciones Actividades	41	1	2025-03-14 13:16:28	1	
+165	crear_planeaciones_rrhh	Crear Planeaciones Rrhh	Permiso para Crear Planeaciones Rrhh	42	1	2025-03-14 13:16:28	1	
+166	editar_planeaciones_rrhh	Editar Planeaciones Rrhh	Permiso para Editar Planeaciones Rrhh	42	1	2025-03-14 13:16:28	1	
+167	ver_planeaciones_rrhh	Ver Planeaciones Rrhh	Permiso para Ver Planeaciones Rrhh	42	1	2025-03-14 13:16:28	1	
+168	eliminar_planeaciones_rrhh	Eliminar Planeaciones Rrhh	Permiso para Eliminar Planeaciones Rrhh	42	1	2025-03-14 13:16:28	1	
+169	crear_presentaciones	Crear Presentaciones	Permiso para Crear Presentaciones	43	1	2025-03-14 13:16:28	1	
+170	editar_presentaciones	Editar Presentaciones	Permiso para Editar Presentaciones	43	1	2025-03-14 13:16:28	1	
+171	ver_presentaciones	Ver Presentaciones	Permiso para Ver Presentaciones	43	1	2025-03-14 13:16:28	1	
+172	eliminar_presentaciones	Eliminar Presentaciones	Permiso para Eliminar Presentaciones	43	1	2025-03-14 13:16:28	1	
+173	crear_proveedores	Crear Proveedores	Permiso para Crear Proveedores	44	1	2025-03-14 13:16:28	1	
+174	editar_proveedores	Editar Proveedores	Permiso para Editar Proveedores	44	1	2025-03-14 13:16:28	1	
+175	ver_proveedores	Ver Proveedores	Permiso para Ver Proveedores	44	1	2025-03-14 13:16:28	1	
+176	eliminar_proveedores	Eliminar Proveedores	Permiso para Eliminar Proveedores	44	1	2025-03-14 13:16:28	1	
+177	crear_proyectos	Crear Proyectos	Permiso para Crear Proyectos	45	1	2025-03-14 13:16:28	1	
+178	editar_proyectos	Editar Proyectos	Permiso para Editar Proyectos	45	1	2025-03-14 13:16:28	1	
+179	ver_proyectos	Ver Proyectos	Permiso para Ver Proyectos	45	1	2025-03-14 13:16:28	1	
+180	eliminar_proyectos	Eliminar Proyectos	Permiso para Eliminar Proyectos	45	1	2025-03-14 13:16:28	1	
+181	crear_recepciones_compras	Crear Recepciones Compras	Permiso para Crear Recepciones Compras	46	1	2025-03-14 13:16:28	1	
+182	editar_recepciones_compras	Editar Recepciones Compras	Permiso para Editar Recepciones Compras	46	1	2025-03-14 13:16:28	1	
+183	ver_recepciones_compras	Ver Recepciones Compras	Permiso para Ver Recepciones Compras	46	1	2025-03-14 13:16:28	1	
+184	eliminar_recepciones_compras	Eliminar Recepciones Compras	Permiso para Eliminar Recepciones Compras	46	1	2025-03-14 13:16:28	1	
+185	crear_regimenes_fiscales	Crear Regimenes Fiscales	Permiso para Crear Regimenes Fiscales	47	1	2025-03-14 13:16:28	1	
+186	editar_regimenes_fiscales	Editar Regimenes Fiscales	Permiso para Editar Regimenes Fiscales	47	1	2025-03-14 13:16:28	1	
+187	ver_regimenes_fiscales	Ver Regimenes Fiscales	Permiso para Ver Regimenes Fiscales	47	1	2025-03-14 13:16:28	1	
+188	eliminar_regimenes_fiscales	Eliminar Regimenes Fiscales	Permiso para Eliminar Regimenes Fiscales	47	1	2025-03-14 13:16:28	1	
+189	crear_sitios	Crear Sitios	Permiso para Crear Sitios	48	1	2025-03-14 13:16:28	1	
+190	editar_sitios	Editar Sitios	Permiso para Editar Sitios	48	1	2025-03-14 13:16:28	1	
+191	ver_sitios	Ver Sitios	Permiso para Ver Sitios	48	1	2025-03-14 13:16:28	1	
+192	eliminar_sitios	Eliminar Sitios	Permiso para Eliminar Sitios	48	1	2025-03-14 13:16:28	1	
+193	crear_subcategorias	Crear Subcategorias	Permiso para Crear Subcategorias	49	1	2025-03-14 13:16:28	1	
+194	editar_subcategorias	Editar Subcategorias	Permiso para Editar Subcategorias	49	1	2025-03-14 13:16:28	1	
+195	ver_subcategorias	Ver Subcategorias	Permiso para Ver Subcategorias	49	1	2025-03-14 13:16:28	1	
+196	eliminar_subcategorias	Eliminar Subcategorias	Permiso para Eliminar Subcategorias	49	1	2025-03-14 13:16:28	1	
+197	crear_sucursales	Crear Sucursales	Permiso para Crear Sucursales	50	1	2025-03-14 13:16:28	1	
+198	editar_sucursales	Editar Sucursales	Permiso para Editar Sucursales	50	1	2025-03-14 13:16:28	1	
+199	ver_sucursales	Ver Sucursales	Permiso para Ver Sucursales	50	1	2025-03-14 13:16:28	1	
+200	eliminar_sucursales	Eliminar Sucursales	Permiso para Eliminar Sucursales	50	1	2025-03-14 13:16:28	1	
+
+201	crear_tablas	Crear Tablas	Permiso para Crear Tablas	51	1	2025-03-14 13:16:28	1	
+202	editar_tablas	Editar Tablas	Permiso para Editar Tablas	51	1	2025-03-14 13:16:28	1	
+203	ver_tablas	Ver Tablas	Permiso para Ver Tablas	51	1	2025-03-14 13:16:28	1	
+204	eliminar_tablas	Eliminar Tablas	Permiso para Eliminar Tablas	51	1	2025-03-14 13:16:28	1	
+205	crear_tipos_comentarios	Crear Tipos Comentarios	Permiso para Crear Tipos Comentarios	52	1	2025-03-14 13:16:28	1	
+206	editar_tipos_comentarios	Editar Tipos Comentarios	Permiso para Editar Tipos Comentarios	52	1	2025-03-14 13:16:28	1	
+207	ver_tipos_comentarios	Ver Tipos Comentarios	Permiso para Ver Tipos Comentarios	52	1	2025-03-14 13:16:28	1	
+208	eliminar_tipos_comentarios	Eliminar Tipos Comentarios	Permiso para Eliminar Tipos Comentarios	52	1	2025-03-14 13:16:28	1	
+209	crear_tipos_costo	Crear Tipos Costo	Permiso para Crear Tipos Costo	53	1	2025-03-14 13:16:28	1	
+210	editar_tipos_costo	Editar Tipos Costo	Permiso para Editar Tipos Costo	53	1	2025-03-14 13:16:28	1	
+211	ver_tipos_costo	Ver Tipos Costo	Permiso para Ver Tipos Costo	53	1	2025-03-14 13:16:28	1	
+212	eliminar_tipos_costo	Eliminar Tipos Costo	Permiso para Eliminar Tipos Costo	53	1	2025-03-14 13:16:28	1	
+213	crear_tipos_cuentas_bancarias	Crear Tipos Cuentas Bancarias	Permiso para Crear Tipos Cuentas Bancarias	54	1	2025-03-14 13:16:28	1	
+214	editar_tipos_cuentas_bancarias	Editar Tipos Cuentas Bancarias	Permiso para Editar Tipos Cuentas Bancarias	54	1	2025-03-14 13:16:28	1	
+215	ver_tipos_cuentas_bancarias	Ver Tipos Cuentas Bancarias	Permiso para Ver Tipos Cuentas Bancarias	54	1	2025-03-14 13:16:28	1	
+216	eliminar_tipos_cuentas_bancarias	Eliminar Tipos Cuentas Bancarias	Permiso para Eliminar Tipos Cuentas Bancarias	54	1	2025-03-14 13:16:28	1	
+217	crear_tipos_precio_venta	Crear Tipos Precio Venta	Permiso para Crear Tipos Precio Venta	55	1	2025-03-14 13:16:28	1	
+218	editar_tipos_precio_venta	Editar Tipos Precio Venta	Permiso para Editar Tipos Precio Venta	55	1	2025-03-14 13:16:28	1	
+219	ver_tipos_precio_venta	Ver Tipos Precio Venta	Permiso para Ver Tipos Precio Venta	55	1	2025-03-14 13:16:28	1	
+220	eliminar_tipos_precio_venta	Eliminar Tipos Precio Venta	Permiso para Eliminar Tipos Precio Venta	55	1	2025-03-14 13:16:28	1	
+221	crear_tipos_usuario	Crear Tipos Usuario	Permiso para Crear Tipos Usuario	56	1	2025-03-14 13:16:28	1	
+222	editar_tipos_usuario	Editar Tipos Usuario	Permiso para Editar Tipos Usuario	56	1	2025-03-14 13:16:28	1	
+223	ver_tipos_usuario	Ver Tipos Usuario	Permiso para Ver Tipos Usuario	56	1	2025-03-14 13:16:28	1	
+224	eliminar_tipos_usuario	Eliminar Tipos Usuario	Permiso para Eliminar Tipos Usuario	56	1	2025-03-14 13:16:28	1	
+225	crear_unidades	Crear Unidades	Permiso para Crear Unidades	57	1	2025-03-14 13:16:28	1	
+226	editar_unidades	Editar Unidades	Permiso para Editar Unidades	57	1	2025-03-14 13:16:28	1	
+227	ver_unidades	Ver Unidades	Permiso para Ver Unidades	57	1	2025-03-14 13:16:28	1	
+228	eliminar_unidades	Eliminar Unidades	Permiso para Eliminar Unidades	57	1	2025-03-14 13:16:28	1	
+229	crear_usuarios	Crear Usuarios	Permiso para Crear Usuarios	58	1	2025-03-14 13:16:28	1	
+230	editar_usuarios	Editar Usuarios	Permiso para Editar Usuarios	58	1	2025-03-14 13:16:28	1	
+231	ver_usuarios	Ver Usuarios	Permiso para Ver Usuarios	58	1	2025-03-14 13:16:28	1	
+232	eliminar_usuarios	Eliminar Usuarios	Permiso para Eliminar Usuarios	58	1	2025-03-14 13:16:28	1	
+233	crear_vinculos	Crear Vinculos	Permiso para Crear Vinculos	59	1	2025-03-14 13:16:28	1	
+234	editar_vinculos	Editar Vinculos	Permiso para Editar Vinculos	59	1	2025-03-14 13:16:28	1	
+235	ver_vinculos	Ver Vinculos	Permiso para Ver Vinculos	59	1	2025-03-14 13:16:28	1	
+236	eliminar_vinculos	Eliminar Vinculos	Permiso para Eliminar Vinculos	59	1	2025-03-14 13:16:28	1	
+237	crear_actividades	Crear Actividades	Permiso para Crear Actividades	60	1	2025-03-14 13:16:28	1	
+238	editar_actividades	Editar Actividades	Permiso para Editar Actividades	60	1	2025-03-14 13:16:28	1	
+239	ver_actividades	Ver Actividades	Permiso para Ver Actividades	60	1	2025-03-14 13:16:28	1	
+240	eliminar_actividades	Eliminar Actividades	Permiso para Eliminar Actividades	60	1	2025-03-14 13:16:28	1	
+241	crear_detalles_actividades	Crear Detalles Actividades	Permiso para Crear Detalles Actividades	61	1	2025-03-14 13:16:28	1	
+242	editar_detalles_actividades	Editar Detalles Actividades	Permiso para Editar Detalles Actividades	61	1	2025-03-14 13:16:28	1	
+243	ver_detalles_actividades	Ver Detalles Actividades	Permiso para Ver Detalles Actividades	61	1	2025-03-14 13:16:28	1	
+244	eliminar_detalles_actividades	Eliminar Detalles Actividades	Permiso para Eliminar Detalles Actividades	61	1	2025-03-14 13:16:28	1	
+245	crear_justificaciones_actividades	Crear Justificaciones Actividades	Permiso para Crear Justificaciones Actividades	62	1	2025-03-14 13:16:28	1	
+246	editar_justificaciones_actividades	Editar Justificaciones Actividades	Permiso para Editar Justificaciones Actividades	62	1	2025-03-14 13:16:28	1	
+247	ver_justificaciones_actividades	Ver Justificaciones Actividades	Permiso para Ver Justificaciones Actividades	62	1	2025-03-14 13:16:28	1	
+248	eliminar_justificaciones_actividades	Eliminar Justificaciones Actividades	Permiso para Eliminar Justificaciones Actividades	62	1	2025-03-14 13:16:28	1	
+249	crear_evidencia_actividades	Crear Evidencia Actividades	Permiso para Crear Evidencia Actividades	63	1	2025-03-14 13:16:28	1	
+250	editar_evidencia_actividades	Editar Evidencia Actividades	Permiso para Editar Evidencia Actividades	63	1	2025-03-14 13:16:28	1	
+251	ver_evidencia_actividades	Ver Evidencia Actividades	Permiso para Ver Evidencia Actividades	63	1	2025-03-14 13:16:28	1	
+252	eliminar_evidencia_actividades	Eliminar Evidencia Actividades	Permiso para Eliminar Evidencia Actividades	63	1	2025-03-14 13:16:28	1	
+253	crear_comentarios_proveedores	Crear Comentarios Proveedores	Permiso para Crear Comentarios Proveedores	64	1	2025-03-14 13:16:28	1	
+254	editar_comentarios_proveedores	Editar Comentarios Proveedores	Permiso para Editar Comentarios Proveedores	64	1	2025-03-14 13:16:28	1	
+255	ver_comentarios_proveedores	Ver Comentarios Proveedores	Permiso para Ver Comentarios Proveedores	64	1	2025-03-14 13:16:28	1	
+256	eliminar_comentarios_proveedores	Eliminar Comentarios Proveedores	Permiso para Eliminar Comentarios Proveedores	64	1	2025-03-14 13:16:28	1	
+257	crear_asignacion_viaticos	Crear Asignacion Viaticos	Permiso para Crear Asignacion Viaticos	65	1	2025-03-14 13:16:28	1	
+258	editar_asignacion_viaticos	Editar Asignacion Viaticos	Permiso para Editar Asignacion Viaticos	65	1	2025-03-14 13:16:28	1	
+259	ver_asignacion_viaticos	Ver Asignacion Viaticos	Permiso para Ver Asignacion Viaticos	65	1	2025-03-14 13:16:28	1	
+260	eliminar_asignacion_viaticos	Eliminar Asignacion Viaticos	Permiso para Eliminar Asignacion Viaticos	65	1	2025-03-14 13:16:28	1	
+261	crear_tipos_viaticos	Crear Tipos Viaticos	Permiso para Crear Tipos Viaticos	66	1	2025-03-14 13:16:28	1	
+262	editar_tipos_viaticos	Editar Tipos Viaticos	Permiso para Editar Tipos Viaticos	66	1	2025-03-14 13:16:28	1	
+263	ver_tipos_viaticos	Ver Tipos Viaticos	Permiso para Ver Tipos Viaticos	66	1	2025-03-14 13:16:28	1	
+264	eliminar_tipos_viaticos	Eliminar Tipos Viaticos	Permiso para Eliminar Tipos Viaticos	66	1	2025-03-14 13:16:28	1	
+265	crear_tiempos_entregas	Crear Tiempos Entregas	Permiso para Crear Tiempos Entregas	67	1	2025-03-14 13:16:28	1	
+266	editar_tiempos_entregas	Editar Tiempos Entregas	Permiso para Editar Tiempos Entregas	67	1	2025-03-14 13:16:28	1	
+267	ver_tiempos_entregas	Ver Tiempos Entregas	Permiso para Ver Tiempos Entregas	67	1	2025-03-14 13:16:28	1	
+268	eliminar_tiempos_entregas	Eliminar Tiempos Entregas	Permiso para Eliminar Tiempos Entregas	67	1	2025-03-14 13:16:28	1	
+269	crear_tipos_pagos	Crear Tipos Pagos	Permiso para Crear Tipos Pagos	68	1	2025-03-14 13:16:28	1	
+270	editar_tipos_pagos	Editar Tipos Pagos	Permiso para Editar Tipos Pagos	68	1	2025-03-14 13:16:28	1	
+271	ver_tipos_pagos	Ver Tipos Pagos	Permiso para Ver Tipos Pagos	68	1	2025-03-14 13:16:28	1	
+272	eliminar_tipos_pagos	Eliminar Tipos Pagos	Permiso para Eliminar Tipos Pagos	68	1	2025-03-14 13:16:28	1	
+273	crear_facturas_clientes	Crear Facturas Clientes	Permiso para Crear Facturas Clientes	69	1	2025-03-14 13:16:28	1	
+274	editar_facturas_clientes	Editar Facturas Clientes	Permiso para Editar Facturas Clientes	69	1	2025-03-14 13:16:28	1	
+275	ver_facturas_clientes	Ver Facturas Clientes	Permiso para Ver Facturas Clientes	69	1	2025-03-14 13:16:28	1	
+276	eliminar_facturas_clientes	Eliminar Facturas Clientes	Permiso para Eliminar Facturas Clientes	69	1	2025-03-14 13:16:28	1	
+277	crear_reportes_cuentas_bancarias	Crear Reportes Cuentas Bancarias	Permiso para Crear Reportes Cuentas Bancarias	70	1	2025-03-14 13:16:28	1	
+278	editar_reportes_cuentas_bancarias	Editar Reportes Cuentas Bancarias	Permiso para Editar Reportes Cuentas Bancarias	70	1	2025-03-14 13:16:28	1	
+279	ver_reportes_cuentas_bancarias	Ver Reportes Cuentas Bancarias	Permiso para Ver Reportes Cuentas Bancarias	70	1	2025-03-14 13:16:28	1	
+280	eliminar_reportes_cuentas_bancarias	Eliminar Reportes Cuentas Bancarias	Permiso para Eliminar Reportes Cuentas Bancarias	70	1	2025-03-14 13:16:28	1	
+281	crear_monedas	Crear Monedas	Permiso para Crear Monedas	71	1	2025-03-14 13:16:28	1	
+282	editar_monedas	Editar Monedas	Permiso para Editar Monedas	71	1	2025-03-14 13:16:28	1	
+283	ver_monedas	Ver Monedas	Permiso para Ver Monedas	71	1	2025-03-14 13:16:28	1	
+284	eliminar_monedas	Eliminar Monedas	Permiso para Eliminar Monedas	71	1	2025-03-14 13:16:28	1	
+285	crear_detalles_reportes_cb	Crear Detalles Reportes Cb	Permiso para Crear Detalles Reportes Cb	72	1	2025-03-14 13:16:28	1	
+286	editar_detalles_reportes_cb	Editar Detalles Reportes Cb	Permiso para Editar Detalles Reportes Cb	72	1	2025-03-14 13:16:28	1	
+287	ver_detalles_reportes_cb	Ver Detalles Reportes Cb	Permiso para Ver Detalles Reportes Cb	72	1	2025-03-14 13:16:28	1	
+288	eliminar_detalles_reportes_cb	Eliminar Detalles Reportes Cb	Permiso para Eliminar Detalles Reportes Cb	72	1	2025-03-14 13:16:28	1	
+289	crear_tipos_reportes_cb	Crear Tipos Reportes Cb	Permiso para Crear Tipos Reportes Cb	73	1	2025-03-14 13:16:28	1	
+290	editar_tipos_reportes_cb	Editar Tipos Reportes Cb	Permiso para Editar Tipos Reportes Cb	73	1	2025-03-14 13:16:28	1	
+291	ver_tipos_reportes_cb	Ver Tipos Reportes Cb	Permiso para Ver Tipos Reportes Cb	73	1	2025-03-14 13:16:28	1	
+292	eliminar_tipos_reportes_cb	Eliminar Tipos Reportes Cb	Permiso para Eliminar Tipos Reportes Cb	73	1	2025-03-14 13:16:28	1	
+293	crear_observaciones_reportes_cb	Crear Observaciones Reportes Cb	Permiso para Crear Observaciones Reportes Cb	74	1	2025-03-14 13:16:28	1	
+294	editar_observaciones_reportes_cb	Editar Observaciones Reportes Cb	Permiso para Editar Observaciones Reportes Cb	74	1	2025-03-14 13:16:28	1	
+295	ver_observaciones_reportes_cb	Ver Observaciones Reportes Cb	Permiso para Ver Observaciones Reportes Cb	74	1	2025-03-14 13:16:28	1	
+296	eliminar_observaciones_reportes_cb	Eliminar Observaciones Reportes Cb	Permiso para Eliminar Observaciones Reportes Cb	74	1	2025-03-14 13:16:28	1	
+297	crear_ocupaciones_th	Crear Ocupaciones Th	Permiso para Crear Ocupaciones Th	75	1	2025-03-14 13:16:28	1	
+298	editar_ocupaciones_th	Editar Ocupaciones Th	Permiso para Editar Ocupaciones Th	75	1	2025-03-14 13:16:28	1	
+299	ver_ocupaciones_th	Ver Ocupaciones Th	Permiso para Ver Ocupaciones Th	75	1	2025-03-14 13:16:28	1	
+300	eliminar_ocupaciones_th	Eliminar Ocupaciones Th	Permiso para Eliminar Ocupaciones Th	75	1	2025-03-14 13:16:28	1	
+
+301	crear_adicionales_asistencias_th	Crear Adicionales Asistencias Th	Permiso para Crear Adicionales Asistencias Th	76	1	2025-03-14 13:16:28	1	
+302	editar_adicionales_asistencias_th	Editar Adicionales Asistencias Th	Permiso para Editar Adicionales Asistencias Th	76	1	2025-03-14 13:16:28	1	
+303	ver_adicionales_asistencias_th	Ver Adicionales Asistencias Th	Permiso para Ver Adicionales Asistencias Th	76	1	2025-03-14 13:16:28	1	
+304	eliminar_adicionales_asistencias_th	Eliminar Adicionales Asistencias Th	Permiso para Eliminar Adicionales Asistencias Th	76	1	2025-03-14 13:16:28	1	
+305	crear_tipos_adicionales_th	Crear Tipos Adicionales Th	Permiso para Crear Tipos Adicionales Th	77	1	2025-03-14 13:16:28	1	
+306	editar_tipos_adicionales_th	Editar Tipos Adicionales Th	Permiso para Editar Tipos Adicionales Th	77	1	2025-03-14 13:16:28	1	
+307	ver_tipos_adicionales_th	Ver Tipos Adicionales Th	Permiso para Ver Tipos Adicionales Th	77	1	2025-03-14 13:16:28	1	
+308	eliminar_tipos_adicionales_th	Eliminar Tipos Adicionales Th	Permiso para Eliminar Tipos Adicionales Th	77	1	2025-03-14 13:16:28	1	
+309	crear_roles	Crear Roles	Permiso para Crear Roles	78	1	2025-03-14 13:16:28	1	
+310	editar_roles	Editar Roles	Permiso para Editar Roles	78	1	2025-03-14 13:16:28	1	
+311	ver_roles	Ver Roles	Permiso para Ver Roles	78	1	2025-03-14 13:16:28	1	
+312	eliminar_roles	Eliminar Roles	Permiso para Eliminar Roles	78	1	2025-03-14 13:16:28	1	
+313	crear_almacenes	Crear Almacenes	Permiso para Crear Almacenes	79	1	2025-03-14 13:16:28	1	
+314	editar_almacenes	Editar Almacenes	Permiso para Editar Almacenes	79	1	2025-03-14 13:16:28	1	
+315	ver_almacenes	Ver Almacenes	Permiso para Ver Almacenes	79	1	2025-03-14 13:16:28	1	
+316	eliminar_almacenes	Eliminar Almacenes	Permiso para Eliminar Almacenes	79	1	2025-03-14 13:16:28	1	
+317	crear_asistencias_th	Crear Asistencias Th	Permiso para Crear Asistencias Th	80	1	2025-03-14 13:16:28	1	
+318	editar_asistencias_th	Editar Asistencias Th	Permiso para Editar Asistencias Th	80	1	2025-03-14 13:16:28	1	
+319	ver_asistencias_th	Ver Asistencias Th	Permiso para Ver Asistencias Th	80	1	2025-03-14 13:16:28	1	
+320	eliminar_asistencias_th	Eliminar Asistencias Th	Permiso para Eliminar Asistencias Th	80	1	2025-03-14 13:16:28	1	
+321	crear_tipos_usuario	Crear Tipos de Usuario	Crear Tipos de Usuario	82	1	2025-03-23 17:28:43	1	
+322	editar_tipos_usuario	Editar Tipos de Usuario	Editar Tipos de Usuario	82	1	2025-03-23 17:28:43	1	
+323	ver_tipos_usuario	Ver Tipos de Usuario	Ver Tipos de Usuario	82	1	2025-03-23 17:28:43	1	
+324	eliminar_tipos_usuario	Elimnar Tipos de Usuario	Elimnar Tipos de Usuario	82	1	2025-03-23 17:28:43	1	
+325	asignar_permisos_tipos_usuario	Asignar Permisos de Tipos de Usuaio	Asignar Permisos de Tipos de Usuaio	82	1	2025-03-23 17:28:43	1	
+326	crear_planeaciones_rrhh	Crear Planeaciones RRHH	Permiso para Crear Planeaciones de Recursos Humano...	86	1	2025-04-15 14:39:06	1	
+327	editar_planeaciones_rrhh	Editar Planeaciones RRHH	Permiso para Editar Planeaciones de Recursos Human...	86	1	2025-04-15 14:39:06	1	
+328	ver_planeaciones_rrhh	Ver Planeaciones RRHH	Permiso para Ver Planeaciones de Recursos Humanos	86	1	2025-04-15 14:39:06	1	
+329	eliminar_planeaciones_rrhh	Eliminar Planeaciones RRHH	Permiso para Eliminar Planeaciones de Recursos Hum...	86	1	2025-04-15 14:39:06	1	
+330	crear_detalles_planeaciones_rrhh	Crear Detalles Planeaciones RRHH	Permiso para Crear Detalles de Planeaciones de Rec...	84	1	2025-04-15 14:39:06	1	
+331	editar_detalles_planeaciones_rrhh	Editar Detalles Planeaciones RRHH	Permiso para Editar Detalles de Planeaciones de Re...	84	1	2025-04-15 14:39:06	1	
+332	ver_detalles_planeaciones_rrhh	Ver Detalles Planeaciones RRHH	Permiso para Ver Detalles de Planeaciones de Recur...	84	1	2025-04-15 14:39:06	1	
+333	eliminar_detalles_planeaciones_rrhh	Eliminar Detalles Planeaciones RRHH	Permiso para Eliminar Detalles de Planeaciones de ...	84	1	2025-04-15 14:39:06	1	
+334	crear_internos_externos	Crear Internos Externos	Permiso para Crear Trabajadores Internos y Externo...	87	1	2025-04-15 14:39:06	1	
+335	editar_internos_externos	Editar Internos Externos	Permiso para Editar Trabajadores Internos y Extern...	87	1	2025-04-15 14:39:06	1	
+336	ver_internos_externos	Ver Internos Externos	Permiso para Ver Trabajadores Internos y Externos	87	1	2025-04-15 14:39:06	1	
+337	eliminar_internos_externos	Eliminar Internos Externos	Permiso para Eliminar Trabajadores Internos y Exte...	87	1	2025-04-15 14:39:06	1	
+338	crear_tipos_costo	Crear Tipos de Costo	Permiso para Crear Tipos de Costos por Trabajo	88	1	2025-04-15 14:39:06	1	
+339	editar_tipos_costo	Editar Tipos de Costo	Permiso para Editar Tipos de Costos por Trabajo	88	1	2025-04-15 14:39:06	1	
+340	ver_tipos_costo	Ver Tipos de Costo	Permiso para Ver Tipos de Costos por Trabajo	88	1	2025-04-15 14:39:06	1	
+341	eliminar_tipos_costo	Eliminar Tipos de Costo	Permiso para Eliminar Tipos de Costos por Trabajo	88	1	2025-04-15 14:39:06	1	
+342	crear_registro_eventos	Crear Registro de Eventos	Permiso para Crear Registro de Eventos	89	1	2025-04-15 14:39:06	1	
+343	editar_registro_eventos	Editar Registro de Eventos	Permiso para Editar Registro de Eventos	89	1	2025-04-15 14:39:06	1	
+344	ver_registro_eventos	Ver Registro de Eventos	Permiso para Ver Registro de Eventos	89	1	2025-04-15 14:39:06	1	
+345	eliminar_registro_eventos	Eliminar Registro de Eventos	Permiso para Eliminar Registro de Eventos	89	1	2025-04-15 14:39:06	1	
+346	crear_tiempo_real	Crear Tiempo Real	Permiso para Crear Tiempo Real	90	1	2025-04-15 14:39:06	1	
+347	editar_tiempo_real	Editar Tiempo Real	Permiso para Editar Tiempo Real	90	1	2025-04-15 14:39:06	1	
+348	ver_tiempo_real	Ver Tiempo Real	Permiso para Ver Tiempo Real	90	1	2025-04-15 14:39:06	1	
+349	eliminar_tiempo_real	Eliminar Tiempo Real	Permiso para Eliminar Tiempo Real	90	1	2025-04-15 14:39:06	1	
+350	crear_materia_prima	Crear Materia Prima	Permiso para Crear Materia Prima	91	1	2025-04-15 14:39:06	1	
+351	editar_materia_prima	Editar Materia Prima	Permiso para Editar Materia Prima	91	1	2025-04-15 14:39:06	1	
+352	ver_materia_prima	Ver Materia Prima	Permiso para Ver Materia Prima	91	1	2025-04-15 14:39:06	1	
+353	eliminar_materia_prima	Eliminar Materia Prima	Permiso para Eliminar Materia Prima	91	1	2025-04-15 14:39:06	1	
+354	crear_pedidos_materia_prima	Crear Pedidos Materia Prima	Permiso para Crear Pedidos de Materia Prima	92	1	2025-04-15 14:39:06	1	
+355	editar_pedidos_materia_prima	Editar Pedidos Materia Prima	Permiso para Editar Pedidos de Materia Prima	92	1	2025-04-15 14:39:06	1	
+356	ver_pedidos_materia_prima	Ver Pedidos Materia Prima	Permiso para Ver Pedidos de Materia Prima	92	1	2025-04-15 14:39:06	1	
+357	eliminar_pedidos_materia_prima	Eliminar Pedidos Materia Prima	Permiso para Eliminar Pedidos de Materia Prima	92	1	2025-04-15 14:39:06	1	
+358	crear_central_productos	Crear Central Productos	Permiso para Crear Central de Productos	93	1	2025-04-15 14:39:06	1	
+359	editar_central_productos	Editar Central Productos	Permiso para Editar Central de Productos	93	1	2025-04-15 14:39:06	1	
+360	ver_central_productos	Ver Central Productos	Permiso para Ver Central de Productos	93	1	2025-04-15 14:39:06	1	
+361	eliminar_central_productos	Eliminar Central Productos	Permiso para Eliminar Central de Productos	93	1	2025-04-15 14:39:06	1	
+362	ver_capturar_produccion	Ver Capturar Producción	Permiso para Ver Capturar Producción	94	1	2025-04-15 14:39:06	1	
+363	ver_reporte_produccion	Ver Reporte Producción	Permiso para Ver Reporte de Producción	95	1	2025-04-15 14:39:06	1	
+364	crear_capturar_produccion	Crear Capturar Producción	Permiso para Crear Capturar Producción	94	1	2025-04-15 14:39:06	1	
+365	editar_capturar_produccion	Editar Capturar Producción	Permiso para Editar Capturar Producción	94	1	2025-04-15 14:39:06	1	
+366	eliminar_capturar_produccion	Eliminar Capturar Producción	Permiso para Eliminar Capturar Producción	94	1	2025-04-15 14:39:06	1	
+367	crear_reporte_produccion	Crear Reporte Producción	Permiso para Crear Reporte de Producción	95	1	2025-04-15 14:39:06	1	
+368	editar_reporte_produccion	Editar Reporte Producción	Permiso para Editar Reporte de Producción	95	1	2025-04-15 14:39:06	1	
+369	eliminar_reporte_produccion	Eliminar Reporte Producción	Permiso para Eliminar Reporte de Producción	95	1	2025-04-15 14:39:06	1	
+370	crear_capturar_ventas	Crear Capturar Ventas	Permiso para Crear Capturar Ventas	96	1	2025-04-15 14:39:06	1	
+371	ver_capturar_ventas	Ver Capturar Ventas	Permiso para Ver Capturar Ventas	96	1	2025-04-15 14:39:06	1	
+372	editar_capturar_ventas	Editar Capturar Ventas	Permiso para Editar Capturar Ventas	96	1	2025-04-15 14:39:06	1	
+373	eliminar_capturar_ventas	Eliminar Capturar Ventas	Permiso para Eliminar Capturar Ventas	96	1	2025-04-15 14:39:06	1	
+374	crear_reporte_ventas	Crear Reporte Ventas	Permiso para Crear Reporte de Ventas	97	1	2025-04-15 14:39:06	1	
+375	ver_reporte_ventas	Ver Reporte Ventas	Permiso para Ver Reporte de Ventas	97	1	2025-04-15 14:39:06	1	
+376	editar_reporte_ventas	Editar Reporte Ventas	Permiso para Editar Reporte de Ventas	97	1	2025-04-15 14:39:06	1	
+377	eliminar_reporte_ventas	Eliminar Reporte Ventas	Permiso para Eliminar Reporte de Ventas	97	1	2025-04-15 14:39:06	1	
+378	crear_locaciones_almacen	Crear Locaciones de almacen	Permiso para Crear Locaciones de almacen	98	1	2025-04-15 22:37:11	1	
+379	ver_locaciones_almacen	Ver Locaciones de almacen	Permiso para Ver Locaciones de almacen	98	1	2025-04-15 22:37:11	1	
+380	editar_locaciones_almacen	Editar Locaciones de almacen	Permiso para Editar Locaciones de almacen	98	1	2025-04-15 22:37:11	1	
+381	eliminar_locaciones_almacen	Eliminar Locaciones de almacen	Permiso para Eliminar Locaciones de almacen	98	1	2025-04-15 22:37:11	1	
+382	ver_mermas	Ver mermas	Permite visualizar las mermas registradas.	83	1	2025-04-15 22:57:10	1	
+383	editar_mermas	Editar mermas	Permite editar las mermas registradas.	83	1	2025-04-15 22:57:10	1	
+384	crear_mermas	Crear mermas	Permite registrar nuevas mermas.	83	1	2025-04-15 22:57:10	1	
+385	eliminar_mermas	Eliminar mermas	Permite eliminar mermas registradas.	83	1	2025-04-15 22:57:10	1	
+386	ver_comentarios_clientes	Ver comentarios de clientes	Permite visualizar los comentarios hechos por clie...	85	1	2025-04-15 22:57:21	1	
+387	editar_comentarios_clientes	Editar comentarios de clientes	Permite editar los comentarios de clientes.	85	1	2025-04-15 22:57:21	1	
+388	crear_comentarios_clientes	Crear comentarios de clientes	Permite registrar comentarios de clientes.	85	1	2025-04-15 22:57:21	1	
+389	eliminar_comentarios_clientes	Eliminar comentarios de clientes	Permite eliminar los comentarios de clientes.	85	1	2025-04-15 22:57:21	1	
