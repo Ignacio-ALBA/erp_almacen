@@ -9,7 +9,7 @@
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item"><?php echo $nombre_modulo; ?></li>
+        <li class="breadcrumb-item">Catálogo</li>
         <li class="breadcrumb-item active" ><?php echo $PageSection; ?></li>
       </ol>
     </nav>
@@ -30,7 +30,7 @@
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
-      'bloque'=>'planeacion'
+      'bloque'=>'catalogo'
     ],
     [
       CreateInput(['type'=>'text','id'=>'codigo','etiqueta'=>'Código','required' => '']),
@@ -178,7 +178,7 @@
       'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
-      'bloque'=>'planeacion'
+      'bloque'=>'catalogo'
     ],
     [
       $detailsTableOutput
@@ -195,7 +195,7 @@
         'ModalType'=>'modal-dialog-scrollable', 
         'method'=>'POST',
         'action'=>'bd/crudSummit.php',
-        'bloque'=>'planeacion',
+        'bloque'=>'catalogo',
         'data-select-column'=>'[2]',
         'data-input-fill'=>'[kid_cliente]'
       ],

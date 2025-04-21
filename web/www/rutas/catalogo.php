@@ -185,18 +185,18 @@ if($resultado){
                         }
                     }
                 $vista = 'comentarios_clientes';
-                $consultaselect = "SELECT cc.id_comentario , 
+                $consultaselect = "SELECT cc.id_comentario_cliente , 
                     c.nombre AS kid_cliente, 
                     cc.comentario_cliente,
                     tc.tipo_comentario AS kid_tipo_comentario,
-                    cp.fecha_creacion
+                    cc.fecha_creacion
                 FROM 
                     comentarios_clientes cc
                 LEFT JOIN 
                     clientes c ON cc.kid_cliente = c.id_cliente
                 LEFT JOIN 
                     tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
-                WHERE cp.kid_estatus !=3";
+                WHERE cc.kid_estatus !=3";
                 $resultado = $conexion->prepare($consultaselect);
                 $resultado->execute();
     

@@ -11,7 +11,7 @@
                       LEFT JOIN 
                           clientes c ON cc.kid_cliente = c.id_cliente
                       LEFT JOIN 
-                          tipos_comentarios tc ON ca.kid_tipo_comentario = tc.id_tipo_comentario 
+                          tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario 
                       WHERE 
                           cc.kid_estatus = 1";
 
