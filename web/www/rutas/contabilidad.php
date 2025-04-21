@@ -28,6 +28,20 @@ if($resultado){
 
     switch ($pathResult) {
         case 'bancos':
+            $perms = [
+                "crear_bancos",
+                "editar_bancos",
+                "ver_bancos",
+                "eliminar_bancos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'bancos';
             $consultaselect = "SELECT id_banco,
                 orden,
@@ -45,6 +59,20 @@ if($resultado){
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             break;
         case 'tipos_cuentas_bancarias':
+            $perms = [
+                "crear_tipos_cuentas_bancarias",
+                "editar_tipos_cuentas_bancarias",
+                "ver_tipos_cuentas_bancarias",
+                "eliminar_tipos_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'tipos_cuentas_bancarias';
             $consultaselect = "SELECT id_tipo_cuenta_bancaria,
                 orden,
@@ -64,6 +92,20 @@ if($resultado){
             $data['data_show']['proyectos'] = GetProyectosListForSelect();
             break;
         case 'cuentas_bancarias':
+            $perms = [
+                "crear_cuentas_bancarias",
+                "editar_cuentas_bancarias",
+                "ver_cuentas_bancarias",
+                "eliminar_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'cuentas_bancarias';
             $consultaselect = "SELECT cb.id_cuenta_bancaria,
                 cb.cuenta_bancaria,
@@ -102,6 +144,20 @@ if($resultado){
             break;
 
         case 'detalles_cuentas_bancarias':
+            $perms = [
+                "crear_detalles_cuentas_bancarias",
+                "editar_detalles_cuentas_bancarias",
+                "ver_detalles_cuentas_bancarias",
+                "eliminar_detalles_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'detalles_cuentas_bancarias';
             if($id !=null){
                 $data['data_show']['PageSection'] = "Contenido de Cuenta Bancaria";
@@ -159,6 +215,20 @@ if($resultado){
             break;
 
         case 'compras_cuentas_bancarias':
+            $perms = [
+                "crear_compras_cuentas_bancarias",
+                "editar_compras_cuentas_bancarias",
+                "ver_compras_cuentas_bancarias",
+                "eliminar_compras_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'compras_cuentas_bancarias';
             $consultaselect = "SELECT ccb.id_compra_cuenta_bancaria ,
                 cb.cuenta_bancaria AS kid_cuenta_bancaria,
@@ -180,6 +250,20 @@ if($resultado){
             break;
 
         case 'facturas_clientes':
+            $perms = [
+                "crear_facturas_clientes",
+                "editar_facturas_clientes",
+                "ver_facturas_clientes",
+                "eliminar_facturas_clientes"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'facturas_clientes';
             if($id !=null){
                 $consultaselect = "SELECT fc.id_factura_cliente,
@@ -273,6 +357,20 @@ if($resultado){
             break;
 
         case 'reportes_cuentas_bancarias':
+            $perms = [
+                "crear_reportes_cuentas_bancarias",
+                "editar_reportes_cuentas_bancarias",
+                "ver_reportes_cuentas_bancarias",
+                "eliminar_reportes_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'reportes_cuentas_bancarias';
             if($id !=null){
                 $consultaselect = "SELECT
@@ -336,6 +434,20 @@ if($resultado){
             break;
 
         case 'monedas':
+            $perms = [
+                "crear_monedas",
+                "editar_monedas",
+                "ver_monedas",
+                "eliminar_monedas"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'monedas';
             $consultaselect = "SELECT
             id_moneda,
@@ -357,6 +469,20 @@ if($resultado){
 
 
         case 'detalles_reportes_cb':
+            $perms = [
+                "crear_detalles_reportes_cb",
+                "editar_detalles_reportes_cb",
+                "ver_detalles_reportes_cb",
+                "eliminar_detalles_reportes_cb"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'detalles_reportes_cb';
 
             if($id !=null){
@@ -413,6 +539,20 @@ if($resultado){
             break;
 
         case 'tipos_reportes_cb':
+            $perms = [
+                "crear_tipos_reportes_cb",
+                "editar_tipos_reportes_cb",
+                "ver_tipos_reportes_cb",
+                "eliminar_tipos_reportes_cb"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'tipos_reportes_cb';
             $consultaselect = "SELECT
                 id_tipo_reporte_cb,
@@ -434,6 +574,20 @@ if($resultado){
 
 
         case 'observaciones_reportes_cb':
+            $perms = [
+                "crear_observaciones_reportes_cb",
+               "editar_observaciones_reportes_cb",
+               "ver_observaciones_reportes_cb",
+               "eliminar_observaciones_reportes_cb"
+              ];
+   
+               checkPerms($perms);
+               $acciones = ['ver_', 'editar_', 'eliminar_'];
+               foreach ($acciones as $index => $accion) {
+                   if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                       unset($data_script['botones_acciones'][$index]);
+                   }
+               }
             $vista = 'observaciones_reportes_cb';
             if($id !=null){
                 $consultaselect = "SELECT

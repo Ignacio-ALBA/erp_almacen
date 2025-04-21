@@ -26,6 +26,20 @@ if($resultado){
 
     switch ($pathResult) {
         case 'proyectos':
+            $perms = [
+                "crear_bolsas_proyectos",
+            "editar_bolsas_proyectos",
+            "ver_bolsas_proyectos",
+            "eliminar_bolsas_proyectos"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
             $vista = 'proyectos';
             $consultaselect = "SELECT p.id_proyecto , 
                     p.proyecto, 

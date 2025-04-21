@@ -33,6 +33,18 @@ if($resultado){
 
     switch ($pathResult) {
         case 'permisos':
+            $perms = [
+                "ver_permisos",
+              "editar_permisos"
+             ];
+  
+              checkPerms($perms);
+              $acciones = ['ver_', 'editar_', 'eliminar_'];
+              foreach ($acciones as $index => $accion) {
+                  if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                      unset($data_script['botones_acciones'][$index]);
+                  }
+              }
             $vista = 'permisos';
             $consulta = "SELECT 
                 p.permiso,

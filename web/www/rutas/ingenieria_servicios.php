@@ -8,7 +8,6 @@ if($resultado){
     $queryParams = $resultado['queryParams'];
     $hash_id = isset($queryParams['id']) ? $queryParams['id'] : null;
     $id = $hash_id ? decodificar($hash_id) : null;
-
     // Función para cargar la vista correspondiente
 
     // Controlador de vistas
@@ -24,265 +23,617 @@ if($resultado){
 
     $objeto = new Conexion();
     $conexion = $objeto->Conectar();
-    $data['data_show']['nombre_modulo'] = 'Ingeniería de Servicios';
-
+    $data['data_show']['nombre_modulo'] = 'Contabilidad';
+    $data['data_show']['breadcrumb'] = null;
 
     switch ($pathResult) {
-        case 'actividades':
-            $vista = 'actividades';
-            $estatus = GetEstatusLabels();
-            $caseEstatus = "CASE \n";
-            foreach ($estatus as $key => $value) {
-                $caseEstatus .= "    WHEN a.kid_estatus = $key THEN '$value'\n";
-            }
-            $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
-            $consultaselect = "SELECT a.id_actividad, 
-                p.proyecto,
-                bp.bolsa_proyecto,
-                c.nombre,
-                a.cantidad_actividades,
-                a.actividades_finalizadas,
-                a.actividades_pendientes,
-                a.actividades_retrasadas,
-                COALESCE(a.fecha_inicial_real, 'Sin Iniciar') AS fecha_inicial_real,
+        case 'bancos':
+            $perms = [
+                "crear_bancos",
+                "editar_bancos",
+                "ver_bancos",
+                "eliminar_bancos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'bancos';
+            $consultaselect = "SELECT id_banco,
+                orden,
+                banco,
                 CASE 
-                    WHEN a.fecha_inicial_real IS NOT NULL AND a.fecha_final_real IS NULL THEN 'Sin Finalizar'
-                    ELSE COALESCE(a.fecha_final_real, 'Sin Iniciar')
-                END AS fecha_final_real,
-                COALESCE(a.dias_totales_reales, 0) AS dias_totales_reales,
-                COALESCE(a.horas_totales_reales, 0) AS horas_totales_reales,
-                $caseEstatus
-            FROM actividades a
-            LEFT JOIN proyectos p ON a.kid_proyecto = p.id_proyecto
-            LEFT JOIN clientes c ON a.kid_cliente = c.id_cliente
-            LEFT JOIN bolsas_proyectos bp ON a.kid_bolsa_proyecto = bp.id_bolsa_proyecto 
-            WHERE a.kid_estatus != 3";
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END,
+                fecha_creacion
+            FROM bancos
+            WHERE kid_estatus = 1";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            break;
+        case 'tipos_cuentas_bancarias':
+            $perms = [
+                "crear_tipos_cuentas_bancarias",
+                "editar_tipos_cuentas_bancarias",
+                "ver_tipos_cuentas_bancarias",
+                "eliminar_tipos_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'tipos_cuentas_bancarias';
+            $consultaselect = "SELECT id_tipo_cuenta_bancaria,
+                orden,
+                tipo_cuenta_bancaria,
+                CASE 
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END,
+                fecha_creacion
+            FROM tipos_cuentas_bancarias
+            WHERE kid_estatus = 1";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
+            $data['data_show']['proyectos'] = GetProyectosListForSelect();
+            break;
+        case 'cuentas_bancarias':
+            $perms = [
+                "crear_cuentas_bancarias",
+                "editar_cuentas_bancarias",
+                "ver_cuentas_bancarias",
+                "eliminar_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'cuentas_bancarias';
+            $consultaselect = "SELECT cb.id_cuenta_bancaria,
+                cb.cuenta_bancaria,
+                b.banco AS kid_banco,
+                cb.numero_cuenta_bancaria,
+                cb.cable,
+                cb.tarjeta,
+                tcb.tipo_cuenta_bancaria,
+                cb.saldo,
+                cb.deuda,
+                cb.fecha_creacion
+            FROM cuentas_bancarias cb
+            LEFT JOIN bancos b ON cb.kid_banco = b.id_banco
+            LEFT JOIN tipos_cuentas_bancarias tcb ON cb.kid_tipo_cuenta_bancaria = tcb.id_tipo_cuenta_bancaria 
+            WHERE b.kid_estatus = 1";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+            $cuentas = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+            $cuentas = array_map(function ($cuenta) {
+                global $data_script;
+                $botones_acciones = $data_script['botones_acciones'];
+                $hashed_id = codificar($cuenta['id_cuenta_bancaria']);
+                
+                array_push($botones_acciones, '<button class="btn btn-success" modalCRUD="${modalCRUD}"><i class="bi bi-file-earmark-plus"></i> Crear Reporte</button>');
+                array_push($botones_acciones, '<a href="/rutas/contabilidad.php/reportes_cuentas_bancarias?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-journals"></i> Reportes</a>');
+                array_push($botones_acciones, '<a href="/rutas/contabilidad.php/detalles_cuentas_bancarias?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>');
+                $cuenta['botones'] = GenerateCustomsButtons($botones_acciones, 'cuentas_bancarias');
+                return $cuenta;
+            }, $cuentas);
+
+            $data['data_show']['data'] = $cuentas;
+            $data['data_show']['bancos'] = GetBancosListForSelect();
+            $data['data_show']['tipos_cuentas_bancarias'] = GetTiposCuentasBancariasListForSelect();
+
+            break;
+
+        case 'detalles_cuentas_bancarias':
+            $perms = [
+                "crear_detalles_cuentas_bancarias",
+                "editar_detalles_cuentas_bancarias",
+                "ver_detalles_cuentas_bancarias",
+                "eliminar_detalles_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'detalles_cuentas_bancarias';
+            if($id !=null){
+                $data['data_show']['PageSection'] = "Contenido de Cuenta Bancaria";
+
+                $consultaselect = "SELECT dcb.id_detalle_cuenta_bancaria,
+                    dcb.detalle_cuenta_bancaria,
+                    cb.cuenta_bancaria AS kid_cuenta_bancaria,
+                    p.proyecto AS kid_proyecto,
+                    dcb.monto_asignado,
+                    dcb.monto_disponible,
+                    dcb.monto_adeudado,
+                    dcb.monto_gastado,
+                    dcb.fecha_creacion
+                FROM detalles_cuentas_bancarias dcb
+                LEFT JOIN cuentas_bancarias cb ON dcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                LEFT JOIN proyectos p ON dcb.kid_proyecto = p.id_proyecto 
+                WHERE dcb.kid_estatus = 1 AND dcb.kid_cuenta_bancaria = $id";
+
+                $resultado = $conexion->prepare("SELECT cuenta_bancaria FROM cuentas_bancarias WHERE id_cuenta_bancaria = $id");
+                $resultado->execute();
+                $cuenta = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                $breadcrumb = '
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/cuentas_bancarias">Cuentas Bancarias</a></li>
+                <li class="breadcrumb-item active">Contenido '.$cuenta['cuenta_bancaria'].'</li>';
+                $data['data_show']['breadcrumb'] = $breadcrumb;
+                $data['data_show']['AllowADDButton'] = true;
+                $data['data_show']['cuentas_bancarias'] = GetCuentasBancariasListForSelect(['id_cuenta_bancaria'=>$id]);
+            }else{
+                $data['data_show']['PageSection'] = "Contenidos de Cuentas Bancarias";
+                $consultaselect = "SELECT dcb.id_detalle_cuenta_bancaria,
+                    dcb.detalle_cuenta_bancaria,
+                    cb.cuenta_bancaria AS kid_cuenta_bancaria,
+                    p.proyecto AS kid_proyecto,
+                    dcb.monto_asignado,
+                    dcb.monto_disponible,
+                    dcb.monto_adeudado,
+                    dcb.monto_gastado,
+                    dcb.fecha_creacion
+                FROM detalles_cuentas_bancarias dcb
+                LEFT JOIN cuentas_bancarias cb ON dcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                LEFT JOIN proyectos p ON dcb.kid_proyecto = p.id_proyecto 
+                WHERE dcb.kid_estatus = 1";
+                $data['data_show']['AllowADDButton'] = false;
+                $data['data_show']['cuentas_bancarias'] = GetCuentasBancariasListForSelect();
+            }
+            
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['proyectos'] = GetProyectosListForSelect();
+            
+
+            break;
+
+        case 'compras_cuentas_bancarias':
+            $perms = [
+                "crear_compras_cuentas_bancarias",
+                "editar_compras_cuentas_bancarias",
+                "ver_compras_cuentas_bancarias",
+                "eliminar_compras_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'compras_cuentas_bancarias';
+            $consultaselect = "SELECT ccb.id_compra_cuenta_bancaria ,
+                cb.cuenta_bancaria AS kid_cuenta_bancaria,
+                p.proyecto AS kid_proyecto,
+                ccb.monto_total,
+                ccb.monto_neto,
+                ccb.fecha_creacion
+            FROM compras_cuentas_bancarias ccb
+            LEFT JOIN cuentas_bancarias cb ON ccb.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+            LEFT JOIN proyectos p ON ccb.kid_proyecto = p.id_proyecto 
+            WHERE ccb.kid_estatus = 1";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['proyectos'] = GetProyectosListForSelect();
+            $data['data_show']['cuentas_bancarias'] = GetCuentasBancariasListForSelect();
+
+            break;
+
+        case 'facturas_clientes':
+            $perms = [
+                "crear_facturas_clientes",
+                "editar_facturas_clientes",
+                "ver_facturas_clientes",
+                "eliminar_facturas_clientes"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'facturas_clientes';
+            if($id !=null){
+                $consultaselect = "SELECT fc.id_factura_cliente,
+                c.nombre,
+                p.proyecto,
+                cb.cuenta_bancaria,
+                monto_total,
+                monto_neto,
+                CASE
+                    WHEN fc.archivo_pdf IS NOT NULL THEN 
+                        CONCAT(
+                            '<div class=\"btn-group\" role=\"group\" style=\"width:100%;\">',
+                            '<button class=\"ViewDocument btn btn-primary\" href=\"', fc.archivo_pdf, '\"><i class=\"bi bi-file-earmark-fill\"></i> Ver</button>',
+                            '<button class=\"DownloadDocument btn btn-secondary\" href=\"', fc.archivo_pdf, '\"><i class=\"bi bi-file-earmark-arrow-down-fill\"></i> Descargar</button>',
+                            '</div>'
+                        )
+                    ELSE 'Sin Archivo'
+                END AS archivo_pdf,
+                CASE
+                    WHEN fc.archivo_xml IS NOT NULL THEN 
+                        CONCAT(
+                            '<div class=\"btn-group\" role=\"group\" style=\"width:100%;\">',
+                            '<button class=\"ViewDocument btn btn-primary\" href=\"', fc.archivo_xml, '\"><i class=\"bi bi-file-earmark-fill\"></i> Ver</button>',
+                            '<button class=\"DownloadDocument btn btn-secondary\" href=\"', fc.archivo_xml, '\"><i class=\"bi bi-file-earmark-arrow-down-fill\"></i> Descargar</button>',
+                            '</div>'
+                        )
+                    ELSE 'Sin Archivo'
+                END AS archivo_xml,
+                fecha_factura
+                FROM facturas_clientes fc
+                LEFT JOIN proyectos p ON fc.kid_proyecto = p.id_proyecto 
+                LEFT JOIN clientes c ON fc.kid_cliente = c.id_cliente 
+                LEFT JOIN cuentas_bancarias cb ON fc.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                WHERE fc.kid_estatus !=3 AND fc.kid_cliente = $id";
+
+                $resultado = $conexion->prepare("SELECT id_bolsa_proyecto  FROM bolsas_proyectos WHERE kid_cliente = $id");
+                $resultado->execute();
+                $bolsas_proyectos = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                $proyectos = [];
+                $cuentas_bancarias = [];
+                foreach ($bolsas_proyectos as $bolsa_proyecto) {
+                    $proyectos = array_merge($proyectos, GetProyectosListForSelect(["kid_bolsa_proyecto"=>$bolsa_proyecto['id_bolsa_proyecto']]));
+
+                }
+
+                $data['data_show']['clientes'] = GetClientesListForSelect(["id_cliente"=>$id]);
+                $data['data_show']['proyectos'] =  $proyectos;
+                $data['data_show']['cuentas_bancarias'] = GetCuentasBancariasListForSelect();
+            }else{
+                $consultaselect = "SELECT fc.id_factura_cliente,
+                c.nombre,
+                p.proyecto,
+                cb.cuenta_bancaria,
+                monto_total,
+                monto_neto,
+                fecha_factura,
+                CASE
+                    WHEN fc.archivo_pdf IS NOT NULL THEN 
+                        CONCAT(
+                            '<div class=\"btn-group\" role=\"group\" style=\"width:100%;\">',
+                            '<button class=\"ViewDocument btn btn-primary\" href=\"', fc.archivo_pdf, '\"><i class=\"bi bi-file-earmark-fill\"></i> Ver</button>',
+                            '<button class=\"DownloadDocument btn btn-secondary\" href=\"', fc.archivo_pdf, '\"><i class=\"bi bi-file-earmark-arrow-down-fill\"></i> Descargar</button>',
+                            '</div>'
+                        )
+                    ELSE 'Sin Archivo'
+                END AS archivo_pdf,
+                CASE
+                    WHEN fc.archivo_xml IS NOT NULL THEN 
+                        CONCAT(
+                            '<div class=\"btn-group\" role=\"group\" style=\"width:100%;\">',
+                            '<button class=\"ViewDocument btn btn-primary\" href=\"', fc.archivo_xml, '\"><i class=\"bi bi-file-earmark-fill\"></i> Ver</button>',
+                            '<button class=\"DownloadDocument btn btn-secondary\" href=\"', fc.archivo_xml, '\"><i class=\"bi bi-file-earmark-arrow-down-fill\"></i> Descargar</button>',
+                            '</div>'
+                        )
+                    ELSE 'Sin Archivo'
+                END AS archivo_xml
+                FROM facturas_clientes fc
+                LEFT JOIN proyectos p ON fc.kid_proyecto = p.id_proyecto 
+                LEFT JOIN clientes c ON fc.kid_cliente = c.id_cliente 
+                LEFT JOIN cuentas_bancarias cb ON fc.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                WHERE fc.kid_estatus !=3";
+                $data['data_show']['clientes'] = GetClientesListForSelect();
+                $data['data_show']['proyectos'] = GetProyectosListForSelect();
+                $data['data_show']['cuentas_bancarias'] = GetCuentasBancariasListForSelect();
+            }
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            break;
+
+        case 'reportes_cuentas_bancarias':
+            $perms = [
+                "crear_reportes_cuentas_bancarias",
+                "editar_reportes_cuentas_bancarias",
+                "ver_reportes_cuentas_bancarias",
+                "eliminar_reportes_cuentas_bancarias"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'reportes_cuentas_bancarias';
+            if($id !=null){
+                $consultaselect = "SELECT
+                rcb.id_reporte_cuenta_bancaria,
+                cb.cuenta_bancaria,
+                CONCAT(rcb.mes_reporte, ' ', rcb.anno_reporte),
+                CONCAT(rcb.saldo_inicial,' ', m.codigo),
+                CONCAT(rcb.saldo_final,' ', m.codigo),
+                CONCAT(rcb.total_debitos,' ', m.codigo),
+                CONCAT(rcb.total_creditos,' ', m.codigo),
+                rcb.fecha_creacion
+                FROM reportes_cuentas_bancarias rcb
+                LEFT JOIN monedas m ON rcb.kid_moneda = m.id_moneda
+                LEFT JOIN cuentas_bancarias cb ON rcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria 
+                WHERE rcb.kid_estatus != 3 AND rcb.kid_cuenta_bancaria = $id";
+
+                $resultado = $conexion->prepare("SELECT cuenta_bancaria FROM cuentas_bancarias WHERE id_cuenta_bancaria = $id");
+                $resultado->execute();
+                $cuenta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $breadcrumb = '
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/cuentas_bancarias">Cuentas Bancarias</a></li>
+                <li class="breadcrumb-item active">Reporte '.$cuenta['cuenta_bancaria'].'</li>';
+                $data['data_show']['breadcrumb'] = $breadcrumb;
+            }else{
+                $consultaselect = "SELECT
+                rcb.id_reporte_cuenta_bancaria,
+                cb.cuenta_bancaria,
+                CONCAT(rcb.mes_reporte, ' ', rcb.anno_reporte),
+                CONCAT(rcb.saldo_inicial,' ', m.codigo),
+                CONCAT(rcb.saldo_final,' ', m.codigo),
+                CONCAT(rcb.total_debitos,' ', m.codigo),
+                CONCAT(rcb.total_creditos,' ', m.codigo),
+                rcb.fecha_creacion
+                FROM reportes_cuentas_bancarias rcb
+                LEFT JOIN monedas m ON rcb.kid_moneda = m.id_moneda
+                LEFT JOIN cuentas_bancarias cb ON rcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria 
+                WHERE rcb.kid_estatus != 3";
+            }
+            
 
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
-            $data['data_show']['data']=$resultado->fetchAll(PDO::FETCH_ASSOC);
-            $data['data_show']['bolsas_proyectos'] = GetBolsaProyectosListForSelect();
-            $data['data_show']['articulos'] = GetArticulosListForSelect();
-            $data['data_show']['tipos_viaticos'] = GetTiposViaticosListForSelect();
-            $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
 
-            $modalCRUD = 'detalles_planeaciones_compras';
-            $nuevo_boton = '
-                <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Contenido</button>';
-            array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
-            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-            $optionkey = 'NewAdd3';
-            $data_script[$optionkey] = ['data_list_column'=>[]];
-            
+            $reportes = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+            $reportes = array_map(function ($reporte) {
+                global $data_script;
+                $botones_acciones = $data_script['botones_acciones'];
+                $hashed_id = codificar($reporte['id_reporte_cuenta_bancaria']);
+                array_push($botones_acciones, '<a href="/rutas/contabilidad.php/detalles_reportes_cb?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journals"></i>Detalles</a>');
+                array_push($botones_acciones, '<a href="/rutas/contabilidad.php/observaciones_reportes_cb?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-chat-right-text-fill"></i> Observación</a>');
+                $reporte['botones'] = GenerateCustomsButtons($botones_acciones, 'cuentas_bancarias');
+                return $reporte;
+            }, $reportes);
+            $data_script['NewAdd1'] =['data_list_column'=>[
+                'kid_reporte_cuenta_bancaria'=>0,
+                
+            ]];
+
+            $data['data_show']['data'] = $reportes;
             break;
 
-        case 'detalles_actividades':
-            $data['data_show']['permiso'] = 1;
-            $estatus = GetEstatusLabels();
-            $vista = 'detalles_actividades';
-            if ($data['data_show']['permiso'] != 3){
-                $consultaselect = "SELECT da.id_detalle_actividad, 
-                    da.actividad,
-                    da.kid_actividad,
-                    p.proyecto,
-                    CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) as kid_personal_asignado,
-                    da.kid_estatus,
-                    COALESCE(da.fecha_inicial_real, 'Sin Iniciar') AS fecha_inicial_real,
-                    CASE 
-                        WHEN da.fecha_inicial_real IS NOT NULL AND da.fecha_final_real IS NULL THEN 'Sin Finalizar'
-                        ELSE COALESCE(da.fecha_final_real, 'Sin Iniciar')
-                    END AS fecha_final_real,
-                    COALESCE(a.dias_totales_reales, 0) AS dias_totales_reales,
-                    COALESCE(a.horas_totales_reales, 0) AS horas_totales_reales,
-                    da.progreso
-                FROM 
-                    detalles_actividades da
-                LEFT JOIN actividades a ON da.kid_actividad = a.id_actividad 
-                LEFT JOIN proyectos p ON a.kid_proyecto = p.id_proyecto 
-                LEFT JOIN colaboradores u ON da.kid_personal_asignado = u.id_colaborador
-                WHERE da.kid_estatus != 3";
-            
-                $resultado = $conexion->prepare($consultaselect);
-                $resultado->execute();
-                $data_query = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-                if ($data['data_show']['permiso'] == 2){
-
-                    $botones = [
-                        '<button class="ModalDataView btn btn-primary primary" modalCRUD="${modalCRUD}"><i class="bi bi-eye"></i> Ver</button>',
-                        '<button class="ModalDataEdit btn btn-secondary" modalCRUD="${modalCRUD}"><i class="bi bi-person-check"></i></i> Asignar</button>'
-                    ];
-                    $data_query = array_map(function ($row) {
-                        global $botones, $estatus;
-                        $row['buttons'] = GenerateCustomsButtons($botones,'detalles_actividades');
-                        $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                        return $row;
-                    }, $data_query);
-                    
-                }else{
-                    
-                    $data_query = array_map(function ($row) {
-                        global $data_script, $estatus;
-                        $botones = $data_script['botones_acciones'];
-
-                        $modalCRUD = 'update_estatus_detalles_actividades';
-                        if($row['kid_estatus'] == 1){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="ingenieria_servicios" name="iniciar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-play-circle"></i> Iniciar</button>';
-                            array_unshift($botones,$nuevo_boton);
-                            
-                            if($row['kid_personal_asignado'] == ''){
-                                $nuevo_boton = '<button class="ModalDataEdit btn btn-secondary" modalCRUD="detalles_actividades-setpersonal"><i class="bi bi-person-check"></i></i> Asignar</button>';
-                                array_unshift($botones,$nuevo_boton);
-                            }
-                            
-                        }else if($row['kid_estatus'] == 2){
-                            $modalCRUD = 'pausar_reanudar_detalles_actividades';
-                            $nuevo_boton = '<button class="ModalSetData btn btn-success" title="Title2" modalCRUD="'.$modalCRUD.'"><i class="bi bi-play-circle"></i> Reanudar</button>';
-                            array_unshift($botones,$nuevo_boton);
-                        }else if(in_array($row['kid_estatus'],[10,11])){
-                            
-                            
-                            $modalCRUD = 'finalizar_detalles_actividades';
-                            $nuevo_boton = '<button class="ModalSetData btn btn-secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-stop-circle"></i> Finalizar</button>';
-                            array_unshift($botones,$nuevo_boton);
+        case 'monedas':
+            $perms = [
+                "crear_monedas",
+                "editar_monedas",
+                "ver_monedas",
+                "eliminar_monedas"
+               ];
     
-                            $modalCRUD = 'subir_evidencias';
-                            $nuevo_boton = '<button class="ModalSetData btn btn-success" modalCRUD="'.$modalCRUD.'"><i class="bi bi-image"></i> Subir Evidencia</button>';
-                            array_unshift($botones,$nuevo_boton);
-    
-                            $modalCRUD = 'pausar_reanudar_detalles_actividades';
-                            $nuevo_boton = '<button class="ModalSetData btn btn-info" title="Title1" modalCRUD="'.$modalCRUD.'"><i class="bi bi-pause-circle"></i> Pausar</button>';
-                            array_unshift($botones,$nuevo_boton);
-                        }
-                        
-                        $row['buttons'] = GenerateCustomsButtons($botones,'detalles_actividades');
-                        $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                        return $row;
-                    }, $data_query);
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
                 }
-                
-                $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+            $vista = 'monedas';
+            $consultaselect = "SELECT
+            id_moneda,
+            orden,
+            moneda,
+            simbolo,
+            codigo,
+            CASE 
+                WHEN pordefecto = 1 THEN 'SÍ' 
+                ELSE 'NO' 
+            END,
+            fecha_creacion
+            FROM monedas WHERE kid_estatus !=3";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
 
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            break;
+
+
+        case 'detalles_reportes_cb':
+            $perms = [
+                "crear_detalles_reportes_cb",
+                "editar_detalles_reportes_cb",
+                "ver_detalles_reportes_cb",
+                "eliminar_detalles_reportes_cb"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'detalles_reportes_cb';
+
+            if($id !=null){
+                $data['data_show']['PageSection'] = "Contenido de Reporte de Cuenta Bancaria";
+                $consultaselect = "SELECT
+                drcb.id_detalle_reporte_cb,
+                drcb.kid_reporte_cuenta_bancaria,
+                drcb.fecha_transaccion,
+                drcb.descripcion,
+                drcb.numero_referencia,
+                trcb.tipo_reporte_cb,
+                drcb.monto_total,
+                drcb.monto_neto
+                FROM detalles_reportes_cb drcb
+                LEFT JOIN tipos_reportes_cb trcb ON drcb.kid_tipo_reporte_cb = trcb.id_tipo_reporte_cb
+                LEFT JOIN reportes_cuentas_bancarias rcb ON drcb.kid_reporte_cuenta_bancaria = rcb.id_reporte_cuenta_bancaria 
+                WHERE drcb.kid_estatus !=3 AND drcb.kid_reporte_cuenta_bancaria = $id";
+
+                $resultado = $conexion->prepare("SELECT cb.cuenta_bancaria AS cuenta_bancaria
+                FROM reportes_cuentas_bancarias rcb
+                LEFT JOIN cuentas_bancarias cb ON rcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                WHERE id_reporte_cuenta_bancaria = $id");
+                $resultado->execute();
+                $cuenta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $hashed_id = codificar($id);
+
+                $breadcrumb = '
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/cuentas_bancarias">Cuentas Bancarias</a></li>
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/reportes_cuentas_bancarias?id=' . $hashed_id . '">Reporte</a></li>
+                <li class="breadcrumb-item active">Detalle '.$cuenta['cuenta_bancaria'].'</li>';
+                $data['data_show']['breadcrumb'] = $breadcrumb;
 
             }else{
-                $usuario = $_SESSION["s_id"];
-                $consultaselect = "SELECT da.id_detalle_actividad, 
-                    da.actividad,
-                    da.kid_actividad,
-                    p.proyecto,
-                    CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) as kid_personal_asignado,
-                    da.kid_estatus,
-                    COALESCE(da.fecha_inicial_real, 'Sin Iniciar') AS fecha_inicial_real,
-                    CASE 
-                        WHEN da.fecha_inicial_real IS NOT NULL AND da.fecha_final_real IS NULL THEN 'Sin Finalizar'
-                        ELSE COALESCE(da.fecha_final_real, 'Sin Iniciar')
-                    END AS fecha_final_real,
-                    COALESCE(a.dias_totales_reales, 0) AS dias_totales_reales,
-                    COALESCE(a.horas_totales_reales, 0) AS horas_totales_reales,
-                    da.progreso
-                FROM 
-                    detalles_actividades da
-                LEFT JOIN actividades a ON da.kid_actividad = a.id_actividad
-                LEFT JOIN proyectos p ON a.kid_proyecto = p.id_proyecto  
-                LEFT JOIN colaboradores u ON da.kid_personal_asignado = u.id_colaborador
-                WHERE da.kid_estatus != 3 and da.kid_personal_asignado = $usuario";
-            
-                $resultado = $conexion->prepare($consultaselect);
-                $resultado->execute();
-                $data_query = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-                
-                $data_query = array_map(function ($row) {
-                        global $data_script, $estatus;
-                    $botones = [$data_script['botones_acciones'][0]];
-                    //$botones = array_splice($botones, -3);
-    
-                    $modalCRUD = 'update_estatus_detalles_actividades';
-                    if($row['kid_estatus'] == 1){
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success success" bloque="ingenieria_servicios" name="iniciar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-play-circle"></i> Iniciar</button>';
-                        array_splice($botones, 0, 0, $nuevo_boton);
-                    }else if($row['kid_estatus'] == 2){
-                        $modalCRUD = 'pausar_reanudar_detalles_actividades';
-                        $nuevo_boton = '<button class="ModalSetData btn btn-success success" title="Title2" modalCRUD="'.$modalCRUD.'"><i class="bi bi-play-circle"></i> Reanudar</button>';
-                        array_splice($botones, 0, 0, $nuevo_boton);
-                    }else if(in_array($row['kid_estatus'],[10,11])){
-                        
-                        $modalCRUD = 'finalizar_detalles_actividades';
-                        $nuevo_boton = '<button class="ModalSetData btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-stop-circle"></i> Finalizar</button>';
-                        array_splice($botones, 0, 0, $nuevo_boton);
-
-                        $modalCRUD = 'subir_evidencias';
-                        $nuevo_boton = '<button class="ModalSetData btn btn-success success" modalCRUD="'.$modalCRUD.'"><i class="bi bi-image"></i> Subir Evidencia</button>';
-                        array_splice($botones, 0, 0, $nuevo_boton);
-
-                        $modalCRUD = 'pausar_reanudar_detalles_actividades';
-                        $nuevo_boton = '<button class="ModalSetData btn btn-info info" title="Title1" modalCRUD="'.$modalCRUD.'"><i class="bi bi-pause-circle"></i> Pausar</button>';
-                        array_splice($botones, 0, 0, $nuevo_boton);
-                    }
-                    
-                    $row['buttons'] = GenerateCustomsButtons($botones,'detalles_actividades');
-                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                    return $row;
-                }, $data_query);
-                
+                $data['data_show']['PageSection'] = "Contenidos de Reportes de Cuentas Bancarias";
+                $consultaselect = "SELECT
+                drcb.id_detalle_reporte_cb,
+                drcb.kid_reporte_cuenta_bancaria,
+                drcb.fecha_transaccion,
+                drcb.descripcion,
+                drcb.numero_referencia,
+                trcb.tipo_reporte_cb,
+                drcb.monto_total,
+                drcb.monto_neto
+                FROM detalles_reportes_cb drcb
+                LEFT JOIN tipos_reportes_cb trcb ON drcb.kid_tipo_reporte_cb = trcb.id_tipo_reporte_cb
+                LEFT JOIN reportes_cuentas_bancarias rcb ON drcb.kid_reporte_cuenta_bancaria = rcb.id_reporte_cuenta_bancaria
+                WHERE drcb.kid_estatus !=3";
             }
-            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-            //$data['data_show']['data']=$resultado->fetchAll(PDO::FETCH_ASSOC);
-            $data['data_show']['data'] = $data_query;
-            $data['data_show']['personal'] = GetUsuariosListForSelect();
-            break;
-
-        case 'justificaciones_actividades':
-            $estatus = GetEstatusLabels();
-            $vista = 'justificaciones_actividades';
-
-            $consultaselect = "SELECT ja.id_justificacion_actividad, 
-                ja.kid_actividad,
-                da.actividad,
-                CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) as kid_responsable,
-                ja.justificacion,
-                CONCAT(ja.latitud,' ',ja.longitud),
-                ja.fecha_creacion
-            FROM 
-                justificaciones_actividades ja
-            LEFT JOIN detalles_actividades da ON ja.kid_detalle_actividad = da.id_detalle_actividad
-            LEFT JOIN colaboradores u ON ja.kid_responsable = u.id_colaborador
-            WHERE da.kid_estatus != 3";
-        
+            
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
-            $data_query = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            
-            
-            $data['data_show']['data'] = $data_query;
-            $data['data_show']['personal'] = GetUsuariosListForSelect();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             break;
 
-        case 'evidencia_actividades':
-            $vista = 'evidencia_actividades';
-
-            $consultaselect = "SELECT ea.id_evidencia_actividad, 
-                da.actividad,
-                ea.comentario,
-                CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) as kid_responsable,
-                ea.fecha_creacion
-            FROM 
-                evidencia_actividades ea
-            LEFT JOIN detalles_actividades da ON ea.kid_detalle_actividad = da.id_detalle_actividad
-            LEFT JOIN colaboradores u ON da.kid_personal_asignado = u.id_colaborador
-            WHERE da.kid_estatus != 3";
-        
+        case 'tipos_reportes_cb':
+            $perms = [
+                "crear_tipos_reportes_cb",
+                "editar_tipos_reportes_cb",
+                "ver_tipos_reportes_cb",
+                "eliminar_tipos_reportes_cb"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+            $vista = 'tipos_reportes_cb';
+            $consultaselect = "SELECT
+                id_tipo_reporte_cb,
+                orden,
+                tipo_reporte_cb,
+                CASE 
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END,
+                fecha_creacion
+                FROM tipos_reportes_cb WHERE kid_estatus !=3";
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
-            $data_query = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            
-            
-            $data['data_show']['data'] = $data_query;
-            $data['data_show']['personal'] = GetUsuariosListForSelect();
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             break;
 
-            
 
+        case 'observaciones_reportes_cb':
+            $perms = [
+                "crear_observaciones_reportes_cb",
+               "editar_observaciones_reportes_cb",
+               "ver_observaciones_reportes_cb",
+               "eliminar_observaciones_reportes_cb"
+              ];
+   
+               checkPerms($perms);
+               $acciones = ['ver_', 'editar_', 'eliminar_'];
+               foreach ($acciones as $index => $accion) {
+                   if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                       unset($data_script['botones_acciones'][$index]);
+                   }
+               }
+            $vista = 'observaciones_reportes_cb';
+            if($id !=null){
+                $consultaselect = "SELECT
+                id_observacion_reporte_cb,
+                kid_reporte_cuenta_bancaria,
+                observacion,
+                fecha_creacion
+                FROM observaciones_reportes_cb WHERE kid_estatus !=3 AND kid_reporte_cuenta_bancaria = $id";
+                $data['data_show']['AllowADDButton'] = true;
+                $data['data_show']['reporteCB'] = $id;
+
+                $resultado = $conexion->prepare("SELECT cb.cuenta_bancaria, cb.id_cuenta_bancaria
+                FROM reportes_cuentas_bancarias rcb
+                LEFT JOIN cuentas_bancarias cb ON rcb.kid_cuenta_bancaria = cb.id_cuenta_bancaria
+                WHERE id_reporte_cuenta_bancaria = $id");
+                $resultado->execute();
+                $cuenta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $hashed_id = codificar($id);
+
+                $breadcrumb = '
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/cuentas_bancarias">Cuentas Bancarias</a></li>
+                <li class="breadcrumb-item"><a href="/rutas/contabilidad.php/reportes_cuentas_bancarias?id=' . codificar($cuenta['id_cuenta_bancaria']) . '">Reporte</a></li>
+                <li class="breadcrumb-item">'.$cuenta['cuenta_bancaria'].'</li>
+                <li class="breadcrumb-item active">Observaciones de Reporte '.$id.'</li>';
+                $data['data_show']['breadcrumb'] = $breadcrumb;
+
+
+                
+            }else{
+                $consultaselect = "SELECT
+                id_observacion_reporte_cb,
+                kid_reporte_cuenta_bancaria,
+                observacion,
+                fecha_creacion
+                FROM observaciones_reportes_cb WHERE kid_estatus !=3";
+                $data['data_show']['AllowADDButton'] = false;
+                $data['data_show']['reporteCB'] = '';
+            }
+            
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['reportes_cuentas_bancarias'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            
+            break;
         default:
             $vista = '404'; // Vista de error 404 si no se encuentra la ruta
             break;

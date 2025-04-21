@@ -33,7 +33,21 @@ if ($resultado) {
 
 
     switch ($pathResult) {
-        case 'clientes':
+        /* case 'clientes':
+            $perms = [
+                "crear_clientes",
+            "editar_clientes",
+            "ver_clientes",
+            "eliminar_clientes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
             $vista = 'clientes';
             $consultaselect = "SELECT c.id_cliente, 
                         c.codigo, 
@@ -71,8 +85,23 @@ if ($resultado) {
             $data['data_show']['estados'] = GetEstadosListForSelect();
             $data['data_show']['bolsas_proyectos'] = GetBolsaProyectosListForSelect();
             break;
-
+*/
         case 'planeaciones_compras':
+
+            $perms = [
+                "crear_planeaciones_compras",
+            "editar_planeaciones_compras",
+            "ver_planeaciones_compras",
+            "eliminar_planeaciones_compras"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
             $vista = 'planeaciones_compras';
             $estatus = GetEstatusLabels();
             $caseEstatus = "CASE \n";
@@ -149,6 +178,22 @@ if ($resultado) {
             break;
 
         case 'detalles_planeaciones_compras':
+
+            $perms = [
+                "crear_detalles_planeaciones_compras",
+                "editar_detalles_planeaciones_compras",
+                "ver_detalles_planeaciones_compras",
+                "eliminar_detalles_planeaciones_compras"
+                ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+
             $vista = 'detalles_planeaciones_compras';
             if ($id != null) {
                 $consultaselect = "SELECT dpc.id_detalle_planeacion_compras, 
@@ -201,6 +246,20 @@ if ($resultado) {
             break;
 
         case 'cambios_planeaciones_compras':
+            $perms = [
+                "crear_cambios_planeaciones_compras",
+                   "editar_cambios_planeaciones_compras",
+                   "ver_cambios_planeaciones_compras",
+                   "eliminar_cambios_planeaciones_compras"
+                   ];
+       
+                   checkPerms($perms);
+                   $acciones = ['ver_', 'editar_', 'eliminar_'];
+                   foreach ($acciones as $index => $accion) {
+                       if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                           unset($data_script['botones_acciones'][$index]);
+                       }
+                   }
             $vista = 'cambios_planeaciones_compras';
             $consultaselect = "SELECT cpc.id_cambio_recepcion_compras,
             kid_registro_tabla,
@@ -257,6 +316,20 @@ if ($resultado) {
             break;
 
         case 'planeaciones_recursos_humanos':
+            $perms = [
+                "crear_planeaciones_rrhh",
+                    "editar_planeaciones_rrhh",
+                    "ver_planeaciones_rrhh",
+                    "eliminar_planeaciones_rrhh"
+                    ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'planeaciones_recursos_humanos';
             $estatus = GetEstatusLabels();
             $caseEstatus = "CASE \n";
@@ -338,6 +411,20 @@ if ($resultado) {
             break;
 
         case 'detalles_planeaciones_recursos_humanos':
+            $perms = [
+                "crear_detalles_planeaciones_rrhh",
+                "editar_detalles_planeaciones_rrhh",
+                "ver_detalles_planeaciones_rrhh",
+                "eliminar_detalles_planeaciones_rrhh"
+                ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'detalles_planeaciones_recursos_humanos';
             if ($id != null) {
                 $consultaselect = "SELECT dprh.id_detalle_planeaciones_rrhh , 
@@ -402,6 +489,20 @@ if ($resultado) {
             break;
 
         case 'internos_externos':
+            $perms = [
+                "crear_internos_externos",
+                 "editar_internos_externos",
+                 "ver_internos_externos",
+                 "eliminar_internos_externos"
+                 ];
+     
+                 checkPerms($perms);
+                 $acciones = ['ver_', 'editar_', 'eliminar_'];
+                 foreach ($acciones as $index => $accion) {
+                     if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                         unset($data_script['botones_acciones'][$index]);
+                     }
+                 }
             $vista = 'internos_externos';
             $consultaselect = "SELECT id_internos_externos,
             orden,
@@ -419,6 +520,20 @@ if ($resultado) {
             break;
 
         case 'tipos_costos_total':
+            $perms = [
+                "crear_tipos_costo",
+                "editar_tipos_costo",
+                "ver_tipos_costo",
+                "eliminar_tipos_costo"
+                ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'tipos_costo';
             $consultaselect = "SELECT id_tipo_costo,
             orden,
@@ -436,6 +551,20 @@ if ($resultado) {
             break;
 
         case 'planeaciones_actividades':
+            $perms = [
+                "crear_planeaciones_actividades",
+                "editar_planeaciones_actividades",
+                "ver_planeaciones_actividades",
+                "eliminar_planeaciones_actividades"
+                ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'planeaciones_actividades';
             $estatus = GetEstatusLabels();
             if ($id != null){
@@ -518,6 +647,20 @@ if ($resultado) {
             break;
 
         case 'detalles_planeaciones_actividades':
+            $perms = [
+                "crear_detalles_planeaciones_actividades",
+                    "editar_detalles_planeaciones_actividades",
+                    "ver_detalles_planeaciones_actividades",
+                    "eliminar_detalles_planeaciones_actividades"
+                    ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'detalles_planeaciones_actividades';
             if ($id != null) {
                 $consultaselect = "SELECT dpa.id_detalle_planeacion_actividad, 

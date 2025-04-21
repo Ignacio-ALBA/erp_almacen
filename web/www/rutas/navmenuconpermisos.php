@@ -43,7 +43,7 @@ $navItems = [
       'icon' => 'bi bi-laptop',
       'route' =>'/rutas/planeacion.php',
       'subitems' => [
-        [
+        /*[
           "label" => "Clientes",
           "href" => "/clientes",
           "permiso" => [
@@ -52,7 +52,7 @@ $navItems = [
             "agregar_clientes",
             "eliminar_clientes"
           ],
-        ],
+        ],*/
         [
           "label" => "Planeaciónes de Compras",
           "href" => "/planeaciones_compras",

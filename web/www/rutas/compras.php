@@ -31,70 +31,21 @@ if($resultado){
 
 
     switch ($pathResult) {
-        case 'proveedores':
-            $vista = 'proveedores';
-            $consultaselect = "SELECT id_proveedor,
-                orden,
-                codigo,
-                proveedor,
-                CONCAT(calificacion,' <i class=\"bi bi-star-fill\"></i>') AS calificacion,
-                razon_social,
-                rfc,
-                email1,
-                CASE 
-                    WHEN pordefecto = 1 THEN 'SÍ' 
-                    ELSE 'NO' 
-                END AS pordefecto,  -- Se añadió un alias aquí
-                fecha_creacion
-            FROM proveedores
-            WHERE kid_estatus != 3 
-            ORDER BY calificacion DESC";
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->execute();
-            $modalCRUD = 'comentarios_proveedores';
-            $nuevo_boton = '
-                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
-            ';
-            array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
-            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-            
-            $data_script['NewAdd1'] =['data_list_column'=>[
-                'kid_proveedor'=>5,
-                
-            ]];
-
-            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            $data['data_show']['regimenes'] = GetRegimenesListForSelect();
-            $data['data_show']['paises'] = GetPaisesListForSelect();
-            $data['data_show']['estados'] = GetEstadosListForSelect();
-            $data['data_show']['proveedores'] = GetProvedoresListForSelect();
-            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
-
-            break;
-
-        case 'comentarios_proveedores':
-            $vista = 'comentarios_proveedores';
-            $consultaselect = "SELECT cp.id_comentario_proveedor , 
-                p.nombre_comercial AS kid_proveedor, 
-                cp.comentario_proveedor,
-                tc.tipo_comentario AS kid_tipo_comentario,
-                cp.fecha_creacion
-            FROM 
-                comentarios_proveedores cp
-            LEFT JOIN 
-                proveedores p ON cp.kid_proveedor = p.id_proveedor
-            LEFT JOIN 
-                tipos_comentarios tc ON cp.kid_tipo_comentario = tc.id_tipo_comentario
-            WHERE cp.kid_estatus !=3";
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->execute();
-
-            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
-            $data['data_show']['proveedores'] = GetProvedoresListForSelect();
-            break;
-
+       
         case 'listas_compras':
+            $perms = [
+                "crear_listas_compras",
+                    "editar_listas_compras",
+                    "ver_listas_compras",
+                    "eliminar_listas_compras"            ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'listas_compras';
             $estatus = GetEstatusLabels();
             $caseEstatus = "CASE \n";
@@ -163,6 +114,20 @@ if($resultado){
             $data['data_show']['articulos'] = GetArticulosListForSelect();
             break;
         case 'cotizaciones_compras':
+            $perms = [
+                "crear_detalles_listas_compras",
+                    "editar_detalles_listas_compras",
+                    "ver_detalles_listas_compras",
+                    "eliminar_detalles_listas_compras"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'cotizaciones_compras';
             $estatus = GetEstatusLabels();
             $estatus_name = GetEstatusList();
@@ -224,6 +189,20 @@ if($resultado){
             $data_script[$optionkey] =['data_list_column'=>[]];
             break;
         case 'detalles_cotizaciones_compras':
+            $perms = [
+                "crear_detalles_cotizaciones_compras",
+                   "editar_detalles_cotizaciones_compras",
+                   "ver_detalles_cotizaciones_compras",
+                   "eliminar_detalles_cotizaciones_compras"
+                  ];
+       
+                   checkPerms($perms);
+                   $acciones = ['ver_', 'editar_', 'eliminar_'];
+                   foreach ($acciones as $index => $accion) {
+                       if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                           unset($data_script['botones_acciones'][$index]);
+                       }
+                   }
             $vista = 'detalles_cotizaciones_compras';
             if ($id != null) {
                 $consultaselect = "SELECT dcc.id_detalle_cotizacion_compras,
@@ -278,6 +257,7 @@ if($resultado){
             
             break;
             case 'recepcion_orden':
+
                 $vista = 'recepcion_orden';
                 $estatus = GetEstatusLabels();
                 $estatus_name = GetEstatusList();
@@ -349,6 +329,20 @@ if($resultado){
                 $data_script[$optionkey] = ['data_list_column'=>[]];
                 break;
             case 'ordenes_compras':
+                $perms = [
+                    "crear_ordenes_compras",
+                        "editar_ordenes_compras",
+                        "ver_ordenes_compras",
+                        "eliminar_ordenes_compras"
+                       ];
+            
+                        checkPerms($perms);
+                        $acciones = ['ver_', 'editar_', 'eliminar_'];
+                        foreach ($acciones as $index => $accion) {
+                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                                unset($data_script['botones_acciones'][$index]);
+                            }
+                        }
                 $vista = 'ordenes_compras';
                 $estatus = GetEstatusLabels();
                 $estatus_name = GetEstatusList();
@@ -420,6 +414,20 @@ if($resultado){
                 $data_script[$optionkey] = ['data_list_column'=>[]];
                 break;
         case 'detalles_ordenes_compras':
+            $perms = [
+                "crear_detalles_ordenes_compras",
+                    "editar_detalles_ordenes_compras",
+                    "ver_detalles_ordenes_compras",
+                    "eliminar_detalles_ordenes_compras"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'detalles_ordenes_compras';
             if ($id != null) {
                 $consultaselect = "SELECT doc.id_detalle_orden_compra,
@@ -477,6 +485,20 @@ if($resultado){
             $data['data_show']['articulos'] = GetArticulosListForSelect();
             break;
         case 'recepciones_compras':
+            $perms = [
+                "crear_recepciones_compras",
+                "editar_recepciones_compras",
+                "ver_recepciones_compras",
+                "eliminar_recepciones_compras"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'recepciones_compras';
             $estatus = GetEstatusLabels();
             $caseEstatus = "CASE \n";
@@ -554,6 +576,20 @@ if($resultado){
     
                 break;
         case 'detalles_recepciones_compras':
+            $perms = [
+                "crear_detalles_recepciones_compras",
+                    "editar_detalles_recepciones_compras",
+                    "ver_detalles_recepciones_compras",
+                    "eliminar_detalles_recepciones_compras"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'detalles_recepciones_compras';
             $consultaselect = "SELECT drc.id_detalle_recepcion_compras,
                 a.articulo AS kid_articulo,
@@ -589,6 +625,20 @@ if($resultado){
             ]];
             break;
         case 'comentarios_recepciones':
+            $perms = [
+                "crear_comentarios_recepciones",
+                    "editar_comentarios_recepciones",
+                    "ver_comentarios_recepciones",
+                    "eliminar_comentarios_recepciones"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
             $vista = 'comentarios_recepciones';
             $consultaselect = "SELECT cr.id_comentario_recepcion, 
                 rc.recepcion_compras AS kid_recepcion_compras, 
@@ -615,6 +665,20 @@ if($resultado){
             break;
 
         case 'asignacion_viaticos':
+            $perms = [
+                "crear_asignacion_viaticos",
+                "editar_asignacion_viaticos",
+                "ver_asignacion_viaticos",
+                "eliminar_asignacion_viaticos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'asignacion_viaticos';
             $consultaselect = "SELECT av.id_asignacion_viaticos,
                 tv.tipo_viatico,
@@ -645,6 +709,20 @@ if($resultado){
             break;
 
         case 'tipos_viaticos':
+            $perms = [
+                "crear_tipos_viaticos",
+                "editar_tipos_viaticos",
+                "ver_tipos_viaticos",
+                "eliminar_tipos_viaticos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'tipos_viaticos';
             $consultaselect = "SELECT id_tipo_viatico , 
                 tipo_viatico,
@@ -679,6 +757,20 @@ if($resultado){
             break;
 
         case 'tipos_pagos':
+            $perms = [
+                "crear_tipos_pagos",
+                "editar_tipos_pagos",
+                "ver_tipos_pagos",
+                "eliminar_tipos_pagos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'tipos_pagos';
             $consultaselect = "SELECT id_tipo_pago, 
                 tipo_pago,
