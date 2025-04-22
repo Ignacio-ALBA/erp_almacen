@@ -85,11 +85,8 @@
   $id = 'central_mp';
   $ButtonAddLabel = "";
   $titulos = ['ID','Almacén','Artículo','Categoria','Cantidad','Peso','Medida de peso','Existencia','Fecha de creación'];
-  foreach ($data as &$row) {
-    $row['Acciones'] = '<button class="btn btn-success NuevoPedidoBtn" title="Nuevo Pedido"><i class="bi bi-cart-plus"></i> Nuevo pedido</button>';
-}
-unset($row);
-  CreateTable($id, $ButtonAddLabel, $titulos, $data,false, [], $botones_acciones);
+
+  CreateTable($id, $ButtonAddLabel, $titulos, $data,false, []);
 
    CreateModalForm(
     [

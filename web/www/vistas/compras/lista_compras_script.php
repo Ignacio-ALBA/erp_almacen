@@ -304,20 +304,22 @@ function setupCalculations(index) {
         if (cantidad.value && costoUnitarioTotal.value) {
             const cantidadVal = parseFloat(cantidad.value);
             const costoUnitarioTotalVal = parseFloat(costoUnitarioTotal.value);
-            const descuentoVal = parseFloat(porcentajeDescuento.value) / 100;
 
             // Calcular monto total
             const montoTotalVal = cantidadVal * costoUnitarioTotalVal;
             montoTotal.value = montoTotalVal.toFixed(2);
 
-            // Calcular costo unitario neto y monto neto con descuento
-            const costoUnitarioNetoVal = costoUnitarioTotalVal * (1 - descuentoVal);
+            // Calcular costo unitario neto (automático, sin descuento)
+            const costoUnitarioNetoVal = costoUnitarioTotalVal * 1.16;
             costoUnitarioNeto.value = costoUnitarioNetoVal.toFixed(2);
-            montoNeto.value = (cantidadVal * costoUnitarioNetoVal).toFixed(2);
+
+            // Calcular monto neto (automático, sin descuento)
+            const montoNetoVal = montoTotalVal * 1.16;
+            montoNeto.value = montoNetoVal.toFixed(2);
         }
     }
 
-    [cantidad, costoUnitarioTotal, porcentajeDescuento].forEach(el => {
+    [cantidad, costoUnitarioTotal].forEach(el => {
         el.addEventListener('input', calcularMontos);
     });
 }

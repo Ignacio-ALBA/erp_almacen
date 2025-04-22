@@ -42,7 +42,7 @@ if($resultado){
                    }
                }
             $vista = 'central_mp';
-            $modalCRUD = 'comentarios_almacenes';
+       $modalCRUD = 'comentarios_almacenes';
             $nuevo_boton = '
                 <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
             ';
@@ -72,41 +72,17 @@ if($resultado){
                    }
                 $vista = 'central_pedidos_mp';
                   // Consulta para obtener los datos de la tabla `detalles_almacenes`
-            $consultaselect = "SELECT 
-            da.id_detalle_almacen,
-            a.almacen AS kid_almacen,
-            ar.articulo AS kid_articulo,
-            da.cantidad,
-            da.peso,
-            da.lo_lo,
-            da.lo,
-            da.high,
-            da.high_high,
-            CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS kid_creacion,
-            da.fecha_creacion,
-            e.estatus AS kid_estatus
-        FROM detalles_almacenes da
-        LEFT JOIN almacenes a ON da.kid_almacen = a.id_almacen
-        LEFT JOIN articulos ar ON da.kid_articulo = ar.id_articulo
-        LEFT JOIN colaboradores u ON da.kid_creacion = u.id_colaborador
-        LEFT JOIN estatus e ON da.kid_estatus = e.id_estatus
-        WHERE da.kid_estatus != 3";
-
-        $resultado = $conexion->prepare($consultaselect);
-        $resultado->execute();
-
-        $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-        $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
-        $data['data_show']['articulos'] = GetArticulosListForSelect();
-        $data['data_show']['estatus'] = GetEstatusListForSelect();
-
-        // Configuración de los botones de acción
-        $modalCRUD = 'detalles_almacenes';
-        $nuevo_boton = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="' . $modalCRUD . '"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
-        array_push($data_script['botones_acciones'], $nuevo_boton);
-        $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-        $optionkey = 'NewAdd3';
-        $data_script[$optionkey] = ['data_list_column' => []];
+                  $modalCRUD = 'comentarios_almacenes';
+                  $nuevo_boton = '
+                      <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
+                  ';
+                  array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
+                  $data['data_show'] = $data_script;
+      
+                  $data_script['NewAdd1'] =['data_list_column'=>[
+                      'almacen'=>1,
+                      'kid_detalle_almacen'=>0
+                  ]];
                 break;
 
                 case 'central_productos':
@@ -125,42 +101,18 @@ if($resultado){
                            }
                        }
                     $vista = 'central_productos';
-                      // Consulta para obtener los datos de la tabla `detalles_almacenes`
-            $consultaselect = "SELECT 
-            da.id_detalle_almacen,
-            a.almacen AS kid_almacen,
-            ar.articulo AS kid_articulo,
-            da.cantidad,
-            da.peso,
-            da.lo_lo,
-            da.lo,
-            da.high,
-            da.high_high,
-            CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) AS kid_creacion,
-            da.fecha_creacion,
-            e.estatus AS kid_estatus
-        FROM detalles_almacenes da
-        LEFT JOIN almacenes a ON da.kid_almacen = a.id_almacen
-        LEFT JOIN articulos ar ON da.kid_articulo = ar.id_articulo
-        LEFT JOIN colaboradores u ON da.kid_creacion = u.id_colaborador
-        LEFT JOIN estatus e ON da.kid_estatus = e.id_estatus
-        WHERE da.kid_estatus != 3";
-
-        $resultado = $conexion->prepare($consultaselect);
-        $resultado->execute();
-
-        $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-        $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
-        $data['data_show']['articulos'] = GetArticulosListForSelect();
-        $data['data_show']['estatus'] = GetEstatusListForSelect();
-
-        // Configuración de los botones de acción
-        $modalCRUD = 'detalles_almacenes';
-        $nuevo_boton = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="' . $modalCRUD . '"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
-        array_push($data_script['botones_acciones'], $nuevo_boton);
-        $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-        $optionkey = 'NewAdd3';
-        $data_script[$optionkey] = ['data_list_column' => []];
+                 
+                 $modalCRUD = 'comentarios_almacenes';
+                 $nuevo_boton = '
+                     <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
+                 ';
+                 array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
+                 $data['data_show'] = $data_script;
+     
+                 $data_script['NewAdd1'] =['data_list_column'=>[
+                     'almacen'=>1,
+                     'kid_detalle_almacen'=>0
+                 ]];
                     break;
         default:
             $vista = '404'; // Vista de error 404 si no se encuentra la ruta

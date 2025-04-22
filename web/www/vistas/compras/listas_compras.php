@@ -68,47 +68,6 @@
     $detailsTableOutput
   ],
   ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
-  
-  // Agregar botón para ver detalles en la tabla principal
-  $modalCRUD = 'detalles_listas_compras';
-  $nuevo_boton = '
-      <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>
-  ';
-  $data_script['botones_acciones'] = array();
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-array_push($data_script['botones_acciones'], $nuevo_boton);
-  $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-  $optionkey = 'NewAdd3';
-  $data_script[$optionkey] =['data_list_column'=>[]];
-
-  // Ajustar botones de acción según los permisos
-  $data_script['botones_acciones'] = [];
-  if ($canEdit) {
-      $data_script['botones_acciones'][] = '<button class="ModalDataEdit btn btn-warning warning" modalCRUD="${modalCRUD}"><i class="bi bi-pencil"></i> Editar</button>';
-  }
-  if ($canDelete) {
-      $data_script['botones_acciones'][] = '<button class="ModalDataDelete btn btn-danger danger" modalCRUD="${modalCRUD}"><i class="bi bi-trash"></i> Eliminar</button>';
-  }
 
   CreateModalForm(
   [
