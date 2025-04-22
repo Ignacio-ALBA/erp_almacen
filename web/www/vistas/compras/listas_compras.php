@@ -1,16 +1,6 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
 
-    include '../helpers/vistas_funciones.php';
-
-    // Validar permisos para acceder a esta vista
-    checkPerms(['ver_listas_compras']);
-
-    // Validar permisos adicionales para acciones específicas
-    $canCreate = checkPerms(['crear_listas_compras'], true);
-    $canEdit = checkPerms(['editar_listas_compras'], true);
-    $canDelete = checkPerms(['eliminar_listas_compras'], true);
-
     $PageSection = "Listas de Compras";
 ?>
 

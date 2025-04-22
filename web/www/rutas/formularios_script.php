@@ -1,12 +1,63 @@
 <?php
-$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
-$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-$dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
-$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
-$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-$dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+//$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
+//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+//$dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+//$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
+//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+//$dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+
+// 1. Definir rutas base y rutas de imágenes 
+if (!defined('SERVERURL')) {
+    define('SERVERURL', 'http://' . $_SERVER['HTTP_HOST']);
+}
+
+// Intentar obtener las imágenes desde URL primero
+try {
+    // Procesar logo superior (logot2.JPG)
+    $path = SERVERURL.'/assets/img/logot2.JPG';
+    $imageData = @file_get_contents($path);
+    if ($imageData !== false) {
+        $imageType = pathinfo($path, PATHINFO_EXTENSION);
+        $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+    } else {
+        // Si falla la URL, intentar con ruta del sistema de archivos
+        $logo_top_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logot2.JPG';
+        if (file_exists($logo_top_path)) {
+            $imageData = file_get_contents($logo_top_path);
+            $imageType = pathinfo($logo_top_path, PATHINFO_EXTENSION);
+            $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+        } else {
+            error_log("No se pudo cargar logot2.JPG ni por URL ni por sistema de archivos");
+            $dataUrl2 = ''; // O asignar una imagen por defecto en base64
+        }
+    }
+
+    // Procesar logo izquierdo (logoi.JPG)
+    $path = SERVERURL.'/assets/img/logoi.JPG';
+    $imageData = @file_get_contents($path);
+    if ($imageData !== false) {
+        $imageType = pathinfo($path, PATHINFO_EXTENSION);
+        $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+    } else {
+        // Si falla la URL, intentar con ruta del sistema de archivos
+        $logo_izq_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logoi.JPG';
+        if (file_exists($logo_izq_path)) {
+            $imageData = file_get_contents($logo_izq_path);
+            $imageType = pathinfo($logo_izq_path, PATHINFO_EXTENSION);
+            $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+        } else {
+            error_log("No se pudo cargar logoi.JPG ni por URL ni por sistema de archivos");
+            $dataUrl1 = ''; // O asignar una imagen por defecto en base64
+        }
+    }
+} catch (Exception $e) {
+    error_log("Error al procesar las imágenes: " . $e->getMessage());
+    // Imágenes por defecto en caso de error
+    $dataUrl1 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
+    $dataUrl2 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
+}
 ?>
 <script nonce="<?php echo $nonce; ?>">
     now_editing = null;

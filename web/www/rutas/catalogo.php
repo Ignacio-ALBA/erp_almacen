@@ -432,36 +432,7 @@ if($resultado){
                 case 'locaciones':
                     $vista = 'locaciones';
                     break;
-        case 'detalles_almacenes':
-            $perms = [
-                "crear_detalles_almacenes",
-                    "editar_detalles_almacenes",
-                    "ver_detalles_almacenes",
-                    "eliminar_detalles_almacenes"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
-                }
-            $vista = 'detalles_almacenes';
-            $modalCRUD = 'comentarios_almacenes';
-            $nuevo_boton = '
-                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
-            ';
-            array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
-            $data['data_show'] = $data_script;
-
-            $data_script['NewAdd1'] =['data_list_column'=>[
-                'almacen'=>1,
-                'kid_detalle_almacen'=>0
-                
-            ]];
-
-            break;
+      
         case 'comentarios_almacenes':
             $perms = [
                 "crear_comentarios_almacenes",

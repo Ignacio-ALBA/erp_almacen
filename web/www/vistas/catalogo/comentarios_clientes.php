@@ -49,7 +49,7 @@
   $id = 'comentarios_clientes';
   $ButtonAddLabel = "Nuevo Comentario";
   $titulos = ['ID','Cliente','Comentario de cliente', 'Tipo de Comentario','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data,false, []);
+  CreateTable($id, $ButtonAddLabel, $titulos, $data,true, []);
   CreateModalForm(
     [
       'id'=> $id, 

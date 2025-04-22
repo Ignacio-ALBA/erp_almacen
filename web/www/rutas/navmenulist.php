@@ -257,30 +257,30 @@ $navItems = [
           "label" => "Central de materia prima",
           "href" => "/central_mp",
           "permiso" => [
-            "crear_materia_prima",
-            "editar_materia_prima",
-            "ver_materia_prima",
-            "eliminar_materia_prima"
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
             ]
         ],
         [
           "label" => "Central de pedidos de materia prima",
           "href" => "/central_pedidos_mp",
           "permiso" => [
-            "crear_pedidos_materia_prima",
-            "editar_pedidos_materia_prima",
-            "ver_pedidos_materia_prima",
-            "eliminar_pedidos_materia_prima"
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
             ]
         ],
         [
           "label" => "Central de productos",
           "href" => "/central_productos",
           "permiso" => [
-            "crear_central_productos",
-            "editar_central_productos",
-            "ver_central_productos",
-            "eliminar_central_productos"
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
             ]
         ],
         ]
@@ -644,7 +644,7 @@ $navItems = [
             "ver_usuarios",
             "eliminar_usuarios"
             ]
-        ],
+        ],/*
         [
           "label" => "Ocupaciones",
           "href" => "/ocupaciones_talento_humano",
@@ -684,7 +684,7 @@ $navItems = [
             "ver_tipos_adicionales_th",
             "eliminar_tipos_adicionales_th"
             ]
-        ],
+        ],*/
         [
           "label" => "Tipos de Colaboradores",
           "href" => "/tipos_usuario",
