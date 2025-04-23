@@ -3,19 +3,12 @@
   $consultaselect = "SELECT a.id_articulo  , 
                         a.codigo_interno, 
                         a.articulo, 
-                        m.marca as kid_marca,
                         c.categoria as kid_categoria,
-                        s.subcategoria as kid_subcategoria,
-                        a.cantidad_formato,
-                        f.formato as kid_formato,
                         p.presentacion as kid_presentacion,
                         d.dimension as kid_dimension,
                         a.fecha_creacion
                   FROM articulos a
-                  LEFT JOIN marcas m ON a.kid_marca = m.id_marca
                   LEFT JOIN categorias c ON a.kid_categoria = c.id_categoria
-                  LEFT JOIN subcategorias s ON a.kid_subcategoria = s.id_subcategoria
-                  LEFT JOIN formatos f ON a.kid_formato = f.id_formato
                   LEFT JOIN presentaciones p ON a.kid_presentacion = p.id_presentacion 
                   LEFT JOIN dimensiones d ON a.kid_dimension = d.id_dimension  -- Suponiendo que tienes una relación con la tabla dimensiones
                   WHERE a.kid_estatus = 1";
@@ -54,7 +47,7 @@
     [
       'id'=> $id, 
       'Title'=>$ButtonAddLabel,
-      'Title2'=>'Editar Artículo',
+      'Title2'=>'Editar Artículo',1
       'Title3'=>'Ver Artículo',
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',

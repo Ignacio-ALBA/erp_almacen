@@ -262,7 +262,7 @@ $navItems = [
             "ver_detalles_almacenes",
             "eliminar_detalles_almacenes"
             ]
-        ],
+        ],/*
         [
           "label" => "Central de pedidos de materia prima",
           "href" => "/central_pedidos_mp",
@@ -272,7 +272,7 @@ $navItems = [
             "ver_detalles_almacenes",
             "eliminar_detalles_almacenes"
             ]
-        ],
+        ],*/
         [
           "label" => "Central de productos",
           "href" => "/central_productos",

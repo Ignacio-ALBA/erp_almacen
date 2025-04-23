@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Crear el contenido del grupo de artículos
             articleGroup.innerHTML = `
-                <h5 class="text-primary">Artículo ${i}</h5>
+                <h5 class="text-primary">Insumo ${i}</h5>
                 ${createSelectHTML({
                     id: `kid_articulo_${i}`,
                     etiqueta: `Artículo ${i}`,
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${createInputHTML({
                     type: 'number',
                     id: `cantidad_${i}`,
-                    etiqueta: `Cantidad ${i}`,
+                    etiqueta: `Cantidad De Supersacos ${i}`,
                     required: true,
                     className: `MUL-1-${i} MUL-2-${i}`
                 })}
@@ -151,11 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Datos enviados:', formData);
             // Validar que haya al menos un artículo
             if (formDataObj.articulos.length === 0 && numArticulos > 0) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Debe completar al menos un artículo con todos sus datos',
-                    icon: 'error'
-                });
+                alert('Debe completar al menos un artículo con todos sus datos');
                 return;
             }
             $.ajax({
@@ -163,32 +159,44 @@ document.addEventListener('DOMContentLoaded', function() {
     type: 'POST',
     data: formData,
     success: function(response) {
+        let jsonResponse;
         try {
             // Verificar si la respuesta parece HTML
             if (response.trim().startsWith('<')) {
                 console.error('Error: Respuesta HTML inesperada:', response);
-                Swal.fire('Error', 'El servidor respondió con un error. Contacte al administrador.', 'error');
+                alert('El servidor respondió con un error. Contacte al administrador.');
                 return;
             }
-
-            // Intentar parsear la respuesta como JSON
-            const jsonResponse = JSON.parse(response);
-
+            jsonResponse = typeof response === 'object' ? response : JSON.parse(response);
             if (jsonResponse.status === 'success') {
-                // Procesar la respuesta exitosa
-                console.log('Respuesta exitosa:', jsonResponse);
+                // Cerrar el modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDlistas_compras'));
+                if (modal) modal.hide();
+                alert('¡Lista creada con éxito! La lista y sus artículos han sido guardados correctamente.');
+                // Recargar la tabla principal
+                $('#tablalistas_compras').DataTable().ajax.reload();
             } else {
-                Swal.fire('Error', jsonResponse.message || 'Error al procesar la solicitud', 'error');
+                alert(jsonResponse.message || 'Error al crear la lista');
             }
         } catch (e) {
             console.error('Error al parsear respuesta:', e);
             console.error('Respuesta del servidor:', response);
-            Swal.fire('Error', 'Error al procesar la respuesta del servidor: ' + e.message, 'error');
+            alert('Error al procesar la respuesta del servidor: ' + e.message);
+            return;
+        }
+        // Si la respuesta fue exitosa pero hay un error concurrente en AddRow, lo ignoramos y cerramos el modal
+        if (jsonResponse && jsonResponse.status === 'success') {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDlistas_compras'));
+            if (modal) modal.hide();
+            setTimeout(function() {
+                $('#tablalistas_compras').DataTable().ajax.reload(null, false);
+            }, 500);
         }
     },
     error: function(xhr, status, error) {
         console.error('Error en la solicitud:', error);
-        console.error('Detalles:', xhr.responseText);
+        console.error('Respuesta del servidor:', xhr.responseText);
+        alert('Error al comunicarse con el servidor: ' + error);
     }
 });
             // Enviar datos al servidor
@@ -202,95 +210,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     formDataJson: JSON.stringify(formDataObj)
                 },
                 success: function(response) {
+                    let jsonResponse;
                     try {
-                        // Verificar si la respuesta parece HTML
-                        if (response.trim().startsWith('<')) {
-                            console.error('Error: Respuesta HTML inesperada:', response);
-                            Swal.fire('Error', 'El servidor respondió con un error. Contacte al administrador.', 'error');
-                            return;
-                        }
-                        
-                        // Intentar parsear la respuesta como JSON
-                        const jsonResponse = JSON.parse(response);
-                        
-                        if (jsonResponse.status === 'success') {
-                            // Cerrar el modal
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDlistas_compras'));
-                            modal.hide();
-
-                            // Mostrar mensaje de éxito
-                            Swal.fire({
-                                title: '¡Lista creada con éxito!',
-                                text: 'La lista y sus artículos han sido guardados correctamente.',
-                                icon: 'success',
-                                showCancelButton: true,
-                                confirmButtonText: 'Ver detalles',
-                                cancelButtonText: 'Cerrar'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Abrir modal de detalles
-                                    const detailsModal = new bootstrap.Modal(document.getElementById('detalles_listas_compras-View'));
-                                    
-        
-
-                                    // Cargar los detalles
-                                    $.ajax({
-                                        url: 'bd/crudEndpoint.php',
-                                        type: 'POST',
-                                        dataType: 'text', // Cambiado a text para ver la respuesta completa
-                                        data: {
-                                            modalCRUD: 'detalles_listas_compras',
-                                            firstColumnValue: jsonResponse.id_lista_compra,
-                                            opcion: '4'
-                                        },
-                                        success: function(detailsResponse) {
-                                            try {
-                                                const detailsJsonResponse = JSON.parse(detailsResponse);
-                                                if (detailsJsonResponse.status === 'success' && detailsJsonResponse.data) {
-                                                    const tablaDetalles = $('#detalles_listas_compras').DataTable();
-                                                    tablaDetalles.clear();
-                                                    
-                                                    if (detailsJsonResponse.data.length > 0) {
-                                                        tablaDetalles.rows.add(detailsJsonResponse.data).draw();
-                                                    }
-                                                    
-                                                    detailsModal.show();
-                                                }
-                                            } catch (e) {
-                                                console.error('Error al parsear respuesta de detalles:', e);
-                                                console.error('Respuesta del servidor:', detailsResponse);
-                                                Swal.fire('Error', 'Error al procesar la respuesta del servidor: ' + e.message, 'error');
-                                            }
-                                        },
-                                        error: function(xhr, status, error) {
-                                            console.error('Error al cargar detalles:', error);
-                                            console.error('Respuesta del servidor:', xhr.responseText);
-                                            Swal.fire('Error', 'No se pudieron cargar los detalles: ' + error, 'error');
-                                        }
-                                    });
-                                }
-                            });
-
-                            // Recargar la tabla principal
-                            $('#tablalistas_compras').DataTable().ajax.reload();
-                        } else {
-                            Swal.fire('Error', jsonResponse.message || 'Error al crear la lista', 'error');
-                        }
+                        jsonResponse = typeof response === 'object' ? response : JSON.parse(response);
                     } catch (e) {
-                        console.error('Error al parsear respuesta:', e);
-                        console.error('Respuesta del servidor:', response);
-                        Swal.fire('Error', 'Error al procesar la respuesta del servidor: ' + e.message, 'error');
+                        return;
+                    }
+                    if (jsonResponse && jsonResponse.status === 'success') {
+                        // Cerrar el modal correctamente
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDlistas_compras'));
+                        if (modal) modal.hide();
+                        // No recargar la tabla aquí
+                    } else {
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error en la solicitud:', error);
-                    console.error('Respuesta del servidor:', xhr.responseText);
-                    Swal.fire('Error', 'Error al comunicarse con el servidor: ' + error, 'error');
                 }
             });
         });
     }
 
+    // Validar solo campos visibles y habilitados
+    let valid = true;
+    $(this).find(':input[required]').each(function() {
+        if ($(this).is(':hidden') || $(this).is(':disabled') || $(this).css('display') === 'none') return;
+        if (!$(this).val()) valid = false;
+    });
+    if (!valid) {
+        alert('Por favor, complete todos los campos requeridos visibles.');
+        return;
+    }
 
 function setupCalculations(index) {
     const cantidad = document.getElementById(`cantidad_${index}`);
@@ -299,30 +248,35 @@ function setupCalculations(index) {
     const montoTotal = document.getElementById(`monto_total_${index}`);
     const montoNeto = document.getElementById(`monto_neto_${index}`);
     const porcentajeDescuento = document.getElementById(`porcentaje_descuento_${index}`);
-
-    function calcularMontos() {
-        if (cantidad.value && costoUnitarioTotal.value) {
-            const cantidadVal = parseFloat(cantidad.value);
-            const costoUnitarioTotalVal = parseFloat(costoUnitarioTotal.value);
-
-            // Calcular monto total
-            const montoTotalVal = cantidadVal * costoUnitarioTotalVal;
-            montoTotal.value = montoTotalVal.toFixed(2);
-
-            // Calcular costo unitario neto (automático, sin descuento)
-            const costoUnitarioNetoVal = costoUnitarioTotalVal * 1.16;
-            costoUnitarioNeto.value = costoUnitarioNetoVal.toFixed(2);
-
-            // Calcular monto neto (automático, sin descuento)
-            const montoNetoVal = montoTotalVal * 1.16;
-            montoNeto.value = montoNetoVal.toFixed(2);
-        }
+    if (!cantidad || !costoUnitarioTotal || !costoUnitarioNeto || !montoTotal || !montoNeto || !porcentajeDescuento) {
+        console.warn(`Algún input no existe para el índice ${index}`);
+        return;
     }
-
-    [cantidad, costoUnitarioTotal].forEach(el => {
+    function calcularMontos() {
+        const cantidadVal = parseFloat(cantidad.value) || 0;
+        const costoUnitarioTotalVal = parseFloat(costoUnitarioTotal.value) || 0;
+        const descuentoVal = parseFloat(porcentajeDescuento.value) || 0;
+        // Calcular monto total
+        const montoTotalVal = cantidadVal * costoUnitarioTotalVal;
+        montoTotal.value = montoTotalVal.toFixed(2);
+        // Calcular costo unitario neto con IVA y descuento
+        let costoUnitarioNetoVal = costoUnitarioTotalVal * 1.16;
+        if (descuentoVal > 0) {
+            costoUnitarioNetoVal = costoUnitarioNetoVal * (1 - descuentoVal / 100);
+        }
+        costoUnitarioNeto.value = costoUnitarioNetoVal.toFixed(2);
+        // Calcular monto neto con IVA y descuento
+        let montoNetoVal = montoTotalVal * 1.16;
+        if (descuentoVal > 0) {
+            montoNetoVal = montoNetoVal * (1 - descuentoVal / 100);
+        }
+        montoNeto.value = montoNetoVal.toFixed(2);
+    }
+    [cantidad, costoUnitarioTotal, porcentajeDescuento].forEach(el => {
         el.addEventListener('input', calcularMontos);
     });
 }
+
 });
 
 $(document).ready(function() {
@@ -402,6 +356,11 @@ $(document).ready(function() {
                 alert('Error: Ocurrió un error en la comunicación con el servidor');
             }
         });
+    });
+
+    // Recargar la página al cerrar el modal de nueva lista de compras
+    $('#modalCRUDlistas_compras').on('hidden.bs.modal', function () {
+        location.reload();
     });
 });
 </script>

@@ -1,6 +1,9 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
 
+
+    
+
     $PageSection = "Listas de Compras";
 ?>
 
@@ -37,10 +40,10 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Lista de Compra','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
-      CreateInput(['type'=>'number','id'=>'num_articulos','etiqueta'=>'Número de Artículos','required' => '','min'=>'1']),
+      CreateInput(['type'=>'number','id'=>'num_articulos','etiqueta'=>'Número de Insumos','required' => '','min'=>'1']),
       CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
-      CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','class'=>'OnEditReadOnly'],$cuentas_bancarias),
-      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
+      CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$cuentas_bancarias),
+      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
     '<div id="articulos_container"></div>' // Container for dynamic articles
     ]);
 
@@ -68,6 +71,38 @@
     $detailsTableOutput
   ],
   ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+  
+  // Agregar botón para ver detalles en la tabla principal
+  $modalCRUD = 'detalles_listas_compras';
+  $nuevo_boton = '
+      <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>
+  ';
+  $data_script['botones_acciones'] = array();
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
+    $data_script['botones_acciones'] = array();
+}
+array_push($data_script['botones_acciones'], $nuevo_boton);
+  $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+  $optionkey = 'NewAdd3';
+  $data_script[$optionkey] =['data_list_column'=>[]];
 
   CreateModalForm(
   [

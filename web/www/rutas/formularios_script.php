@@ -847,9 +847,9 @@ $(document).ready(function() {
                 var id = $(this).attr('id');
                 var value;
 
-                // Quitar "-NewAdd1" del ID si existe
+                // Quitar "-SetData" del ID si existe
                 if (id && id.includes("-SetData")) {
-                    id = id.replace("-SetData", ""); // Elimina "-NewAdd1" del ID
+                    id = id.replace("-SetData", ""); // Elimina "-SetData" del ID
                 }
 
             
@@ -861,7 +861,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1034,7 +1034,7 @@ $(document).ready(function() {
                     }
                 }else{
                     if(response.data != 'NoChanges'){
-                        data = Object.values(response.data);    
+                        data = Object.values(response.data || {});    
                         UpdateRow(tablemodalCRUD,row,data)
                     }
                     
@@ -1333,7 +1333,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1434,7 +1434,7 @@ $(document).ready(function() {
                     }else{
                         console.log('Respuesta 1 del servidor:', response);
                         if(response.data != 'NoChanges'){
-                            data = Object.values(response.data);
+                            data = Object.values(response.data || {});
                             UpdateRow(modalCRUD.split('-')[0],row,data)
                         }
                         
@@ -1543,7 +1543,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1642,8 +1642,14 @@ $(document).ready(function() {
                             $(`#alert_${modalCRUD}`).show();
                         }
                     }else{
-                        data = Object.values(response.data);
-                        AddRow(modalCRUD,data)
+                        data = Object.values(response.data || {});
+                        try {
+                            AddRow(modalCRUD, data);
+                        } catch (e) {
+                            console.error('Error en AddRow:', e);
+                            // Cerrar el modal aunque AddRow falle
+                            $(`#modalCRUD${modalCRUD}`).modal('hide');
+                        }
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
                 },
@@ -1726,7 +1732,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1922,7 +1928,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1994,7 +2000,7 @@ $(document).ready(function() {
                         }
                     }else{
                         console.log('Respuesta 1 del servidor:', response);
-                        data = Object.values(response.data);
+                        data = Object.values(response.data || {});
                         UpdateRow(modalCRUD,row,data)
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
@@ -2155,7 +2161,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && (value.trim() === "" || ( $(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value.trim() === "" || ( $(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -2191,7 +2197,7 @@ $(document).ready(function() {
                 dataType: "json",
                 success: function(response) {
                     
-                    data = Object.values(response.data);
+                    data = Object.values(response.data || {});
                     AddRow(modalCRUD,data)
                     $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                 },
@@ -2868,7 +2874,11 @@ function actualizarResultadosPorClases(clases) {
 
     });
     
-    
+    // Recargar la página al cerrar cualquier modal de formulario que empiece con 'modalCRUD'
+    $("[id^='modalCRUD']").on('hidden.bs.modal', function () {
+        location.reload();
+    });
+
 
     });
 
@@ -2884,8 +2894,5 @@ function actualizarResultadosPorClases(clases) {
             console.log($(this).val());
         });
     });
-    
-    
-
     
 </script>

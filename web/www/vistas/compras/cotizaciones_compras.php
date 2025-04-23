@@ -70,7 +70,8 @@ if (!isset($_GET['section']) || $_GET['section'] != 'ordenes') {
             CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago','required' => ''],$tipos_pago),
             CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '', 'value'=>date('Y-m-d')]),
             CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
-        ]
+            '<div id="insumos_container"></div>' // Container for dynamic articles
+            ]
     );
 
     // Detalles de Cotizaciones

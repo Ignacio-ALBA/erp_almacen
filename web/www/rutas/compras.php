@@ -183,10 +183,12 @@ if($resultado){
             $data['data_show']['tiempos_entrega'] = GetTiemposEntregaListForSelect();
             $data['data_show']['tipos_pago'] = GetTiposPagoListForSelect();
             $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
-
+            $data['data_show']['articulos'] = GetArticulosListForSelect();
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             $optionkey = 'NewAdd3';
             $data_script[$optionkey] =['data_list_column'=>[]];
+            $data['list_js_scripts']['../vistas/compras/cotizaciones_compras_script'] =['data'=> $data_script];
+            $data['list_styles']['../vistas/compras/lista_compras_styles'] = [];
             break;
         case 'detalles_cotizaciones_compras':
             $perms = [
