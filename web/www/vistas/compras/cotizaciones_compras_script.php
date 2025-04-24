@@ -126,59 +126,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            const isEdit = form.getAttribute('data-edit') === '1';
-            if (isEdit) {
-                // Solo enviar cabecera
-                const formData = new FormData(this);
-                $.ajax({
-                    url: 'bd/crudSummit.php',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        let jsonResponse;
-                        try {
-                            if (response.trim().startsWith('<')) {
-                                alert('El servidor respondió con un error. Contacte al administrador.');
-                                return;
-                            }
-                            jsonResponse = typeof response === 'object' ? response : JSON.parse(response);
-                            if (jsonResponse.status === 'success') {
-                                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDcotizaciones_compras'));
-                                if (modal) modal.hide();
-                                alert('¡Cotización creada con éxito!');
-                                $('#tablacotizaciones_compras').DataTable().ajax.reload();
-                            } else {
-                                alert(jsonResponse.message || 'Error al crear la cotización');
-                            }
-                        } catch (e) {
-                            alert('Error al procesar la respuesta del servidor: ' + e.message);
-                            return;
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error al comunicarse con el servidor: ' + error);
-                    }
-                });
-                return;
-            }
-            // Alta: enviar artículos como array
+
             const numArticulos = parseInt(document.getElementById('num_articulos').value);
             const formData = new FormData(this);
             const formDataObj = {};
 
-            // Convertir FormData a objeto
-            for (let [key, value] of formData.entries()) {
+             // Convertir FormData a objeto
+             for (let [key, value] of formData.entries()) {
                 formDataObj[key] = value;
             }
             
             // Excluir 'num_articulos' y cualquier clave numerada relacionada con artículos
             delete formDataObj.num_articulos;
-
-
-             // Agregar los datos de los artículos
-            formDataObj.articulos = [];
+  // Agregar los datos de los artículos
+  formDataObj.articulos = [];
             for (let i = 1; i <= numArticulos; i++) {
                 const articulo = document.getElementById(`kid_articulo_${i}`);
                 if (articulo && articulo.value) {
@@ -193,36 +154,83 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             }
-
+            console.log('Datos enviados:', formData);
             // Validar que haya al menos un artículo
             if (formDataObj.articulos.length === 0 && numArticulos > 0) {
                 alert('Debe completar al menos un artículo con todos sus datos');
                 return;
             }
-
+            $.ajax({
+    url: 'bd/crudSummit.php',
+    type: 'POST',
+    data: formData,
+    success: function(response) {
+        let jsonResponse;
+        try {
+            // Verificar si la respuesta parece HTML
+            if (response.trim().startsWith('<')) {
+                console.error('Error: Respuesta HTML inesperada:', response);
+                alert('El servidor respondió con un error. Contacte al administrador.');
+                return;
+            }
+            jsonResponse = typeof response === 'object' ? response : JSON.parse(response);
+            if (jsonResponse.status === 'success') {
+                // Cerrar el modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDcotizaciones_compras'));
+                if (modal) modal.hide();
+                alert('¡Cotiozación creada con éxito! La cotización y sus artículos han sido guardados correctamente.');
+                // Recargar la tabla principal
+                $('#tablacotizaciones_compras').DataTable().ajax.reload();
+            } else {
+                alert(jsonResponse.message || 'Error al crear la cotizacion');
+            }
+        } catch (e) {
+            console.error('Error al parsear respuesta:', e);
+            console.error('Respuesta del servidor:', response);
+            alert('Error al procesar la respuesta del servidor: ' + e.message);
+            return;
+        }
+        // Si la respuesta fue exitosa pero hay un error concurrente en AddRow, lo ignoramos y cerramos el modal
+        if (jsonResponse && jsonResponse.status === 'success') {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDcotizaciones_compras'));
+            if (modal) modal.hide();
+            setTimeout(function() {
+                $('#tablacotizaciones_compras').DataTable().ajax.reload(null, false);
+            }, 500);
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error('Error en la solicitud:', error);
+        console.error('Respuesta del servidor:', xhr.responseText);
+        alert('Error al comunicarse con el servidor: ' + error);
+    }
+});
+            // Enviar datos al servidor
             $.ajax({
                 url: 'bd/crudSummit.php',
                 type: 'POST',
-                dataType: 'json',
+                dataType: 'text',
                 data: {
                     modalCRUD: 'cotizaciones_compras',
                     opcion: '1',
                     formDataJson: JSON.stringify(formDataObj)
                 },
                 success: function(response) {
-                    if (response.status === 'success') {
-                        alert('¡Cotización creada con éxito!');
+                    let jsonResponse;
+                    try {
+                        jsonResponse = typeof response === 'object' ? response : JSON.parse(response);
+                    } catch (e) {
+                        return;
+                    }
+                    if (jsonResponse && jsonResponse.status === 'success') {
+                        // Cerrar el modal correctamente
                         const modal = bootstrap.Modal.getInstance(document.getElementById('modalCRUDcotizaciones_compras'));
                         if (modal) modal.hide();
-                        $('#tablacotizaciones_compras').DataTable().ajax.reload();
+                        // No recargar la tabla aquí
                     } else {
-                        alert(response.message || 'Error al crear la cotización');
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error en la solicitud:', error);
-                    console.error('Respuesta del servidor:', xhr.responseText);
-                    alert('Error al comunicarse con el servidor: ' + error);
                 }
             });
         });
@@ -239,43 +247,50 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    function setupCalculations(index) {
-        const cantidad = document.getElementById(`cantidad_${index}`);
-        const costoUnitarioTotal = document.getElementById(`costo_unitario_total_${index}`);
-        const costoUnitarioNeto = document.getElementById(`costo_unitario_neto_${index}`);
-        const montoTotal = document.getElementById(`monto_total_${index}`);
-        const montoNeto = document.getElementById(`monto_neto_${index}`);
-        const porcentajeDesc = document.getElementById(`porcentaje_descuento_${index}`);
-        if (!cantidad || !costoUnitarioTotal || !costoUnitarioNeto || !montoTotal || !montoNeto || !porcentajeDesc) {
-            return;
-        }
-        function calcularMontos() {
-            const cantidadVal = parseFloat(cantidad.value) || 0;
-            const costoUnitarioTotalVal = parseFloat(costoUnitarioTotal.value) || 0;
-            const descuentoVal = parseFloat(porcentajeDesc.value) || 0;
-            // Calcular monto total
-            const montoTotalVal = cantidadVal * costoUnitarioTotalVal;
-            montoTotal.value = montoTotalVal.toFixed(2);
-            // Calcular costo unitario neto con IVA y descuento
-            let costoUnitarioNetoVal = costoUnitarioTotalVal * 1.16;
-            if (descuentoVal > 0) {
-                costoUnitarioNetoVal = costoUnitarioNetoVal * (1 - descuentoVal / 100);
-            }
-            costoUnitarioNeto.value = costoUnitarioNetoVal.toFixed(2);
-            // Calcular monto neto con IVA y descuento
-            let montoNetoVal = montoTotalVal * 1.16;
-            if (descuentoVal > 0) {
-                montoNetoVal = montoNetoVal * (1 - descuentoVal / 100);
-            }
-            montoNeto.value = montoNetoVal.toFixed(2);
-        }
-        [cantidad, costoUnitarioTotal, porcentajeDesc].forEach(el => {
-            el.addEventListener('input', calcularMontos);
-        });
+function setupCalculations(index) {
+    const cantidad = document.getElementById(`cantidad_${index}`);
+    const costoUnitarioTotal = document.getElementById(`costo_unitario_total_${index}`);
+    const costoUnitarioNeto = document.getElementById(`costo_unitario_neto_${index}`);
+    const montoTotal = document.getElementById(`monto_total_${index}`);
+    const montoNeto = document.getElementById(`monto_neto_${index}`);
+    const porcentajeDescuento = document.getElementById(`porcentaje_descuento_${index}`);
+    if (!cantidad || !costoUnitarioTotal || !costoUnitarioNeto || !montoTotal || !montoNeto || !porcentajeDescuento) {
+        console.warn(`Algún input no existe para el índice ${index}`);
+        return;
     }
+    function calcularMontos() {
+        const cantidadVal = parseFloat(cantidad.value) || 0;
+        const costoUnitarioTotalVal = parseFloat(costoUnitarioTotal.value) || 0;
+        const descuentoVal = parseFloat(porcentajeDescuento.value) || 0;
+        // Calcular monto total
+        const montoTotalVal = cantidadVal * costoUnitarioTotalVal;
+        montoTotal.value = montoTotalVal.toFixed(2);
+        // Calcular costo unitario neto con IVA y descuento
+        let costoUnitarioNetoVal = costoUnitarioTotalVal * 1.16;
+        if (descuentoVal > 0) {
+            costoUnitarioNetoVal = costoUnitarioNetoVal * (1 - descuentoVal / 100);
+        }
+        costoUnitarioNeto.value = costoUnitarioNetoVal.toFixed(2);
+        // Calcular monto neto con IVA y descuento
+        let montoNetoVal = montoTotalVal * 1.16;
+        if (descuentoVal > 0) {
+            montoNetoVal = montoNetoVal * (1 - descuentoVal / 100);
+        }
+        montoNeto.value = montoNetoVal.toFixed(2);
+    }
+    [cantidad, costoUnitarioTotal, porcentajeDescuento].forEach(el => {
+        el.addEventListener('input', calcularMontos);
+    });
+}
+
 });
 
 $(document).ready(function() {
+    $.fn.dataTable.ext.errMode = 'none';
+    $('#tablacotizaciones_compras').on('error.dt', function(e, settings, techNote, message) {
+  // Evita mostrar el error en pantalla
+  return false;
+});
     $('#formcotizaciones_compras').on('submit', function(e) {
         e.preventDefault();
         
@@ -354,7 +369,7 @@ $(document).ready(function() {
         });
     });
 
-    // Recargar la página al cerrar el modal de nueva lista de compras
+    // Recargar la página al cerrar el modal de nueva cotizacion
     $('#modalCRUDcotizaciones_compras').on('hidden.bs.modal', function () {
         location.reload();
     });

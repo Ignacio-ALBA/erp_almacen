@@ -116,6 +116,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $consecutivo = 0;
 
         switch ($modalCRUD) {
+            case 'tipos_comentarios':
+                $tabla = 'tipos_comentarios';
+                $idcolumn= "id_tipo_comentario";
+
+                $editformDataJson = $formDataJson;
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+                
+                $consultaselect = "SELECT id_tipo_comentario, 
+                            orden, 
+                            tipo_comentario, 
+                            CASE 
+                                WHEN pordefecto = 1 THEN 'SÍ' 
+                                ELSE 'NO' 
+                            END AS pordefecto,
+                            fecha_creacion
+                        FROM $tabla
+                        WHERE $idcolumn = :$idcolumn";
+
+                $ColumnsCheck = [
+                    ['column'=>"tipo_comentario","check_similar"=>true]
+                ];
+                break;
+                case 'estatus':
+                    $tabla = 'estatus';
+                    $idcolumn = "id_estatus";
+                    $editformDataJson = $formDataJson;
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
+                
+                    $consultaselect = "
+                        SELECT 
+                            id_estatus,
+                            estatus,
+                            CONCAT('<span class=\"badge\" style=\"background-color:', estatus_color, ';\">', estatus_color, '</span>') AS estatus_color,
+                            fecha_creacion
+                        FROM 
+                            estatus
+                        WHERE 
+                            kid_estatus = 1 AND $idcolumn = :$idcolumn
+                    ";
+                
+                    $ColumnsCheck = [
+                        ['column' => "estatus", "check_similar" => true]
+                    ];
+                    break;
             case 'permisos':
                 $tabla = 'permisos';
                 $idcolumn= "id_permiso";

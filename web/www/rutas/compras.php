@@ -155,7 +155,7 @@ if($resultado){
 
                 $bloque = 'compras';
                 $modalCRUD =  'update_estatus_cotizaciones_compras';
-                if(!in_array($row['kid_estatus'], [5,6,7])){
+              /*  if(!in_array($row['kid_estatus'], [5,6,7])){
                     $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
                     array_unshift($botones_acciones,$nuevo_boton);
                 }else if($row['kid_estatus'] == 6){
@@ -165,11 +165,11 @@ if($resultado){
                     $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
                     array_unshift($botones_acciones,$nuevo_boton);
                 }
-                
+                */
                 $hashed_id = codificar($row['id_cotizacion_compra']);
                 $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                array_push($botones_acciones, $nuevo_boton);
-                $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" form="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
+               // array_push($botones_acciones, $nuevo_boton);
+               // $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" form="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
                 array_push($botones_acciones, $nuevo_boton);
                 $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
                 $row['kid_estatus'] = $estatus[$row['kid_estatus']];

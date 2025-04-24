@@ -63,7 +63,7 @@ if (!isset($_GET['section']) || $_GET['section'] != 'ordenes') {
             'bloque'=>'compras'
         ],
         [
-            CreateInput(['type'=>'text','id'=>'cotizacion','etiqueta'=>'Cotización','required' => '']),
+            CreateInput(['type'=>'text','id'=>'cotizacion_compras','etiqueta'=>'Cotización','required' => '']),
             CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Proveedor','required' => ''],$proveedores),
             CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
             CreateSelect(['id'=>'kid_tiempo_entrega','etiqueta'=>'Tiempo de Entrega','required' => ''],$tiempos_entrega),

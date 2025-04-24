@@ -10,6 +10,176 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $elementID = $_POST['firstColumnValue'];
 
         switch ($modalCRUD) {
+            case 'proveedores':
+                $consultaselect = "SELECT p.*,
+                e.estado AS kid_estado
+                FROM proveedores p
+                LEFT JOIN estados e ON p.kid_estado = e.id_estados
+                WHERE p.kid_estatus != 3 AND p.id_proveedor  = :id";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_proveedor'] = null;
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
+            case 'comentarios_proveedores':
+                if(isset($_POST['opcion'])) {
+                    $consultaselect = "SELECT cp.id_comentario_proveedor, 
+                        p.nombre_comercial AS kid_proveedor, 
+                        cp.comentario_proveedor,
+                        tc.tipo_comentario AS kid_tipo_comentario,
+                        cp.fecha_creacion
+                    FROM 
+                        comentarios_proveedores cp
+                    LEFT JOIN 
+                        proveedores p ON cp.kid_proveedor = p.id_proveedor
+                    LEFT JOIN 
+                        tipos_comentarios tc ON cp.kid_tipo_comentario = tc.id_tipo_comentario
+                    WHERE cp.kid_estatus !=3 AND cp.kid_proveedor  = :id";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+                
+                    $consultaselect = "SELECT a.articulo
+                        FROM ordenes_compras oc
+                        LEFT JOIN detalles_ordenes_compras doc ON oc.id_orden_compras = doc.kid_orden_compras
+                        LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+                        WHERE a.kid_estatus != 3 AND doc.kid_estatus != 3 AND oc.kid_estatus = 6
+                        AND oc.kid_proyecto = (
+                            SELECT cc.kid_proyecto 
+                            FROM cotizaciones_compras cc 
+                            WHERE doc.kid_orden_compras = :id
+                        ) 
+                        ORDER BY a.articulo ASC;";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $data['options']['kid_articulo'] = array_map(fn($item) => [
+                        'valor'=> $item['articulo'],
+                        'pordefecto' => 0,
+                    ], $select);
+
+                }else{
+                    $consultaselect = "SELECT p.nombre_comercial AS kid_proveedor, 
+                        cp.comentario_proveedor,
+                        tc.tipo_comentario AS kid_tipo_comentario
+                    FROM 
+                        comentarios_proveedores cp
+                    LEFT JOIN 
+                        proveedores p ON cp.kid_proveedor = p.id_proveedor
+                    LEFT JOIN 
+                        tipos_comentarios tc ON cp.kid_tipo_comentario = tc.id_tipo_comentario
+                    WHERE cp.kid_estatus !=3 AND cp.id_comentario_proveedor  = :id";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $data['id_detalle_cotizacion_compras'] = null;
+                }
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+                case 'clientes':
+                    $consultaselect = "SELECT c.*,
+                        e.estado AS kid_estado
+                    FROM clientes c
+                    LEFT JOIN estados e ON c.kid_estado = e.id_estados 
+                    WHERE id_cliente = :idCliente";
+    
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':idCliente', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $data['id_cliente']=null;
+    
+                    // Verifica si se encontraron datos
+                    if ($data) {
+                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                    } else {
+                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                    }
+                    break;
+                    case 'comentarios_clientes':
+                        if(isset($_POST['opcion'])) {
+                            $consultaselect = "SELECT cc.id_comentario_cliente, 
+                                c.nombre AS kid_cliente, 
+                                cc.comentario_cliente,
+                                tc.tipo_comentario AS kid_tipo_comentario,
+                                cc.fecha_creacion
+                            FROM 
+                                comentarios_clientes cc
+                            LEFT JOIN 
+                                clientes c ON cc.kid_cliente = c.id_cliente
+                            LEFT JOIN 
+                                tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
+                            WHERE cc.kid_estatus !=3 AND cc.kid_cliente  = :id";
+                            $resultado = $conexion->prepare($consultaselect);
+                            $resultado->bindParam(':id', $elementID);
+                            $resultado->execute();
+                            $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+                        
+                            $consultaselect = "SELECT a.articulo
+                                FROM ordenes_compras oc
+                                LEFT JOIN detalles_ordenes_compras doc ON oc.id_orden_compras = doc.kid_orden_compras
+                                LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+                                WHERE a.kid_estatus != 3 AND doc.kid_estatus != 3 AND oc.kid_estatus = 6
+                                AND oc.kid_proyecto = (
+                                    SELECT cc.kid_proyecto 
+                                    FROM cotizaciones_compras cc 
+                                    WHERE doc.kid_orden_compras = :id
+                                ) 
+                                ORDER BY a.articulo ASC;";
+                            $resultado = $conexion->prepare($consultaselect);
+                            $resultado->bindParam(':id', $elementID);
+                            $resultado->execute();
+                            $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+        
+                            $data['options']['kid_articulo'] = array_map(fn($item) => [
+                                'valor'=> $item['articulo'],
+                                'pordefecto' => 0,
+                            ], $select);
+        
+                        }else{
+                            $consultaselect = "SELECT c.nombre AS kid_cliente, 
+                                cc.comentario_cliente,
+                                tc.tipo_comentario AS kid_tipo_comentario
+                            FROM 
+                                comentarios_clientes cc
+                            LEFT JOIN 
+                                clientes c ON cc.kid_cliente = c.id_cliente
+                            LEFT JOIN 
+                                tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
+                            WHERE cc.kid_estatus !=3 AND cc.id_comentario_cliente  = :id";
+                            $resultado = $conexion->prepare($consultaselect);
+                            $resultado->bindParam(':id', $elementID);
+                            $resultado->execute();
+                            $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                            $data['id_detalle_cotizacion_compras'] = null;
+                        }
+        
+                        // Verifica si se encontraron datos
+                        if ($data) {
+                            print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                        } else {
+                            print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                        }
+                        break;
             case 'colaboradores':
                 $consultaselect = "SELECT u.*,
                     tu.tipo_usuario AS kid_tipo_usuario,

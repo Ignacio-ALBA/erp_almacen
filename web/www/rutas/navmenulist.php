@@ -192,7 +192,7 @@ $navItems = [
             ]
         ]
       ]
-    ],*/
+    ],
     [
       'label' => 'Registro de eventos',
       'icon' => 'bi bi-calendar',
@@ -229,7 +229,7 @@ $navItems = [
             ]
         ]
       ]
-    ],
+    ],*/
     /*
     [
       'label' => 'Tiempo Real',
@@ -699,6 +699,43 @@ $navItems = [
       ]
     ],  
     [
+      'label' => 'Registro de eventos',
+      'icon' => 'bi bi-calendar',
+      'route' =>'/rutas/registro_eventos.php',
+      'subitems' => [
+        [
+          "label" => "Registro de Eventos",
+          "href" => "/registro_eventos",
+          "permiso" => [
+            "crear_registro_eventos",
+            "editar_registro_eventos",
+            "ver_registro_eventos",
+            "eliminar_registro_eventos"
+            ]
+        ],
+        [
+          "label" => "Contenido de Registro de Eventos",
+          "href" => "/detalles_registro_eventos",
+          "permiso" => [
+            "crear_detalles_registro_eventos",
+            "editar_detalles_registro_eventos",
+            "ver_detalles_registro_eventos",
+            "eliminar_detalles_registro_eventos"
+            ]
+        ],/*
+        [
+          "label" => "Comentarios de Registro de Eventos",
+          "href" => "/comentarios_registro_eventos",
+          "permiso" => [
+            "crear_comentarios_registro_eventos",
+            "editar_comentarios_registro_eventos",
+            "ver_comentarios_registro_eventos",
+            "eliminar_comentarios_registro_eventos"
+            ]
+        ]*/
+      ]
+    ],
+    [
       'label' => 'Catálogos',
       'icon' => 'bi bi-card-list',
       'route' =>'/rutas/catalogo.php',
@@ -857,7 +894,7 @@ $navItems = [
                 "ver_municipios",
                 "eliminar_municipios"
                 ]
-            ],
+            ],/*
             [
               "label" => "Tipos de Comentarios",
               "href" => "/tipos_comentarios",
@@ -877,7 +914,7 @@ $navItems = [
                 "ver_estatus",
                 "eliminar_estatus"
                 ]
-            ]
+            ]*/
           ] 
         ],
         [
@@ -962,6 +999,26 @@ $navItems = [
             "editar_permisos"
           ],
         ],
+        [
+          "label" => "Tipos de Comentarios",
+          "href" => "/tipos_comentarios",
+          "permiso" => [
+            "crear_tipos_comentarios",
+            "editar_tipos_comentarios",
+            "ver_tipos_comentarios",
+            "eliminar_tipos_comentarios"
+            ]
+        ],
+        [
+          "label" => "Tipos de Estados",
+          "href" => "/tipos_estados",
+          "permiso" => [
+            "crear_estatus",
+            "editar_estatus",
+            "ver_estatus",
+            "eliminar_estatus"
+            ]
+          ],
           // Agrega más subitems según sea necesario
       ]
       ]

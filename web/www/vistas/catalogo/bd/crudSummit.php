@@ -99,6 +99,161 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newformDataJson = null;
 
         switch ($modalCRUD) {
+            case 'proveedores':
+                $tabla = 'proveedores';
+                $idcolumn= "id_proveedor";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                $formDataJson['kid_estado'] = GetIDEstadoByName($formDataJson['kid_estado']);
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+                $editformDataJson = CleanJson($formDataJson);
+                
+
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+                $consultaselect = "SELECT id_proveedor,
+                    orden,
+                    codigo,
+                    proveedor,
+                    CONCAT(calificacion,' <i class=\"bi bi-star-fill\"></i>') AS calificacion,
+                    razon_social,
+                    rfc,
+                    email1,
+                    CASE 
+                        WHEN pordefecto = 1 THEN 'SÍ' 
+                        ELSE 'NO' 
+                    END AS pordefecto,
+                    fecha_creacion
+                FROM proveedores
+                WHERE kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
+
+                $ColumnsCheck = [
+                    ['column'=>"razon_social","check_similar"=>false],
+                    ['column'=>"rfc","check_similar"=>false]
+                ];
+                break;
+
+            case 'comentarios_proveedores':
+                $tabla = 'comentarios_proveedores';
+                $idcolumn= "id_comentario_proveedor";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                //$colaboradores = GetUsuariosListById();
+                $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+                $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;  
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+
+                $editformDataJson = CleanJson($formDataJson);
+                //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+
+                $consultaselect = "SELECT cp.id_comentario_proveedor, 
+                    p.nombre_comercial AS kid_proveedor, 
+                    cp.comentario_proveedor,
+                    tc.tipo_comentario AS kid_tipo_comentario,
+                    cp.fecha_creacion
+                FROM 
+                    comentarios_proveedores cp
+                LEFT JOIN 
+                    proveedores p ON cp.kid_proveedor = p.id_proveedor
+                LEFT JOIN 
+                    tipos_comentarios tc ON cp.kid_tipo_comentario = tc.id_tipo_comentario
+                WHERE cp.kid_estatus !=3 AND $idcolumn = :$idcolumn";
+
+                $ColumnsCheck = [];
+                break;
+                case 'clientes':
+                    $tabla = 'clientes';
+                    $idcolumn= "id_cliente";
+    
+                    /*-------------------- Obtener Tablas Foráneas --------------------*/
+                    $estados = GetEstadosListById();
+                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+    
+                    if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
+                        $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
+                    }
+    
+                    $editformDataJson = $formDataJson;
+                    //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
+                    $consultaselect = "SELECT id_marca, orden, marca, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
+                        FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
+    
+                    $consultaselect = "SELECT id_cliente , 
+                                            codigo, 
+                                            nombre,
+                                            razon_social,
+                                            rfc,
+                                            email,
+                                            fecha_creacion
+                                        FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
+    
+                    $fuc_mapping = function ($row) {
+                        global $data_script, $estatus;
+                        $botones_acciones = $data_script['botones_acciones'];
+                        $hashed_id = codificar($row['id_cliente']);
+                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
+                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
+                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
+                        array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
+                        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'clientes');
+                        return $row;
+                    };
+    
+    
+                    $ColumnsCheck = [
+                        ['column'=>"codigo","check_similar"=>false],
+                        ['column'=>"razon_social","check_similar"=>false],
+                        ['column'=>"rfc","check_similar"=>false]
+                    ];
+                    $text_colums_edit = [];
+    
+                    
+                    break;
+                    case 'comentarios_clientes':
+                        $tabla = 'comentarios_clientes';
+                        $idcolumn= "id_comentario_cliente";
+        
+                        /*-------------------- Obtener Tablas Foráneas --------------------*/
+                        //$colaboradores = GetUsuariosListById();
+                        $formDataJson['kid_cliente'] = isset($formDataJson['kid_cliente']) ? GetIDClienteByName($formDataJson['kid_cliente']) : null;
+                        $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;  
+                        /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+        
+        
+                        $editformDataJson = CleanJson($formDataJson);
+                        //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+                        $newformDataJson = $formDataJson;
+                        $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                        $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                        $newformDataJson['kid_estatus'] = 1;
+        
+                        $consultaselect = "SELECT cc.id_comentario_cliente, 
+                            c.nombre AS kid_cliente, 
+                            cc.comentario_cliente,
+                            tc.tipo_comentario AS kid_tipo_comentario,
+                            cc.fecha_creacion
+                        FROM 
+                            comentarios_clientes cc
+                        LEFT JOIN 
+                            clientes c ON cc.kid_cliente = c.id_cliente
+                        LEFT JOIN 
+                            tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
+                        WHERE cc.kid_estatus !=3 AND $idcolumn = :$idcolumn";
+        
+                        $ColumnsCheck = [];
+                        break;
             case 'marcas':
                 $tabla = 'marcas';
                 $idcolumn= "id_marca";

@@ -95,7 +95,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
-
+                case 'estatus':
+                    $consultaselect = "SELECT estatus,
+                        estatus_color
+                    FROM estatus
+                    WHERE kid_estatus = 1 AND id_estatus   = :id ";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $data['id_tipo_comentario'] = null;
+    
+                    // Verifica si se encontraron datos
+                    if ($data) {
+                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                    } else {
+                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                    }
+                    break;
+    
+                case 'tipos_comentarios':
+                    $consultaselect = "SELECT id_tipo_comentario, 
+                                            orden,
+                                            tipo_comentario,
+                                            pordefecto,
+                                            fecha_creacion
+                                        FROM 
+                                            tipos_comentarios
+                                        WHERE kid_estatus = 1 AND id_tipo_comentario   = :idTipoComentario ";
+                        $resultado = $conexion->prepare($consultaselect);
+                        $resultado->bindParam(':idTipoComentario', $elementID);
+                        $resultado->execute();
+                        $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                        $data['id_tipo_comentario'] = null;
+    
+                    // Verifica si se encontraron datos
+                    if ($data) {
+                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                    } else {
+                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                    }
+                    break;
             case 'detalles_planeaciones_compras':
                 if(isset($_POST['opcion'])) {
                     $consultaselect = "SELECT dpc.id_detalle_planeacion_compras, 

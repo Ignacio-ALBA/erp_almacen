@@ -62,7 +62,7 @@
       'bloque'=>'catalogo'
     ],
     [
-      CreateInput(['id'=>'kid_cliente','etiqueta'=>'Cliente','disabled' => '']),
+      CreateSelect(['id'=>'kid_cliente','etiqueta'=>'Cliente','disabled' => ''],$clientes),
       CreateInput(['type'=>'text','id'=>'comentario_cliente','etiqueta'=>'Comentario','required' => '']),
       CreateSelect(['id'=>'kid_tipo_comentario','etiqueta'=>'Tipo de comentario','disabled' => ''],$tipo_comentario)
 

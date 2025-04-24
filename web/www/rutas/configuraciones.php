@@ -85,7 +85,59 @@ if($resultado){
             $data['data_show']['data'] = $permisos;
 
             break;
-
+            case 'tipos_comentarios':
+                $perms = [
+                    "crear_tipos_comentarios",
+                        "editar_tipos_comentarios",
+                        "ver_tipos_comentarios",
+                        "eliminar_tipos_comentarios"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
+                $vista = 'tipos_comentarios';
+                break;
+            case 'tipos_estados':
+                $perms = [
+                    "crear_estatus",
+                    "editar_estatus",
+                    "ver_estatus",
+                    "eliminar_estatus"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
+                $vista = 'tipos_estados';
+                $consultaselect = "SELECT id_estatus,
+                    estatus,
+                    estatus_color,
+                    fecha_creacion
+                FROM estatus
+                WHERE kid_estatus = 1";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $consulta_data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($consulta_data as &$fila) { // Usar referencia para modificar el array original
+                    $fila['estatus_color'] = CreateBadge([
+                        'etiqueta' => $fila['estatus_color'] ? $fila['estatus_color'] : 'Sin Color',
+                        'style' => $fila['estatus_color'] ? ('background-color:' . $fila['estatus_color'].';') : 'color:black;' // Cambiar $data a $fila
+                    ]);
+                }
+                $data['data_show']['data'] = $consulta_data;
+                array_pop($data_script['botones_acciones']);
+                $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+    
+                break;
         default:
             $vista = '404'; // Vista de error 404 si no se encuentra la ruta
             break;

@@ -367,46 +367,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $tabla = 'cotizaciones_compras';
                     $idcolumn = "id_cotizacion_compra";
 
+                    // Obtener valores por defecto
+                    $defaultProjectId = GetDefaultProjectId();
+                    $defaultTiempoEntregaId = GetDefaultTiempoEntregaId();
+                    $defaultTipoPagoId = GetDefaultTipoPagoId();
+
+                    // Procesar y validar datos
+                    $formDataJson['kid_proyecto'] = $defaultProjectId;
+                    $formDataJson['kid_proveedor'] = !empty($formDataJson['kid_proveedor']) ? 
+                        GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+
+                    if (empty($formDataJson['kid_proveedor'])) {
+                        echo json_encode(['status' => 'error', 'message' => 'El campo Proveedor es requerido']);
+                        exit;
+                    }
+
+                    // Procesar tiempo de entrega y tipo de pago
+                    $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? 
+                        GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : $defaultTiempoEntregaId;
+                    $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? 
+                        GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : $defaultTipoPagoId;
+ 
+ 
+                        // Asegurarse de que el campo cotizacion_compras existe
+  if (isset($formDataJson['cotizacion']) && !empty($formDataJson['cotizacion'])) {
+    $newformDataJson['cotizacion_compras'] = $formDataJson['cotizacion'];
+    unset($newformDataJson['cotizacion']); // Eliminar el campo original
+}
+
+
+unset($formDataJson['num_articulos']);
+
                     $editformDataJson = CleanJson($formDataJson);
                     $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                    $newformDataJson['kid_autorizo'] = 0;
-                    
-                    // Nuevo código para convertir valores a IDs
-                    if (isset($formDataJson['kid_proveedor'])) {
-                        $newformDataJson['kid_proveedor'] = GetIDProveedorByName($formDataJson['kid_proveedor']);
-                        if (!$newformDataJson['kid_proveedor']) {
-                            echo json_encode(['status' => 'error', 'message' => 'Proveedor no encontrado']);
+
+                    if($opcion == 1) { // Insertar nueva cotización
+                        try {
+                            // Iniciar transacción
+                            $conexion->beginTransaction();
+
+                            // Preparar datos para la cotización
+                            $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                            $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                            $newformDataJson['kid_estatus'] = 1;
+                            $newformDataJson['kid_autorizo'] = 0;
+                            if (empty($newformDataJson['grupo'])) {
+                                $newformDataJson['grupo'] = 1;
+                            }
+
+                            // Extraer los artículos del formData
+                            $articulos = [];
+                            foreach ($formDataJson as $key => $value) {
+                                if (preg_match('/^(kid_articulo|cantidad|costo_unitario_total|costo_unitario_neto|monto_total|monto_neto|porcentaje_descuento)_(\d+)$/', $key, $matches)) {
+                                    $index = $matches[2];
+                                    $field = $matches[1];
+                                    $articulos[$index][$field] = $value;
+                                    unset($newformDataJson[$key]);
+                                }
+                            }
+
+                            // Convertir nombres de artículos a IDs
+                            foreach ($articulos as $index => $articulo) {
+                                if (!is_numeric($articulo['kid_articulo'])) {
+                                    $query = "SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1";
+                                    $stmt = $conexion->prepare($query);
+                                    $stmt->bindParam(':articulo', $articulo['kid_articulo']);
+                                    $stmt->execute();
+                                    $idArticulo = $stmt->fetchColumn();
+
+                                    if ($idArticulo) {
+                                        $articulos[$index]['kid_articulo'] = $idArticulo;
+                                    } else {
+                                        throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
+                                    }
+                                }
+                            }
+
+                            // Insertar la cotización
+                            $columns = implode(", ", array_keys($newformDataJson));
+                            $placeholders = ":" . implode(", :", array_keys($newformDataJson));
+                            $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
+                            $stmt = $conexion->prepare($query);
+                            $stmt->execute($newformDataJson);
+                            $lastInsertId = $conexion->lastInsertId();
+
+                            // Insertar los detalles de los artículos
+                            foreach ($articulos as $articulo) {
+                                $articulo['kid_cotizacion_compra'] = $lastInsertId;
+                                $articulo['fecha_creacion'] = date('Y-m-d H:i:s');
+                                $articulo['kid_creacion'] = $_SESSION["s_id"];
+                                $articulo['kid_estatus'] = 1;
+
+                                $columns = implode(", ", array_keys($articulo));
+                                $placeholders = ":" . implode(", :", array_keys($articulo));
+                                $query = "INSERT INTO detalles_cotizaciones_compras ($columns) VALUES ($placeholders)";
+                                $stmt = $conexion->prepare($query);
+                                $stmt->execute($articulo);
+                            }
+
+                            // Confirmar transacción
+                            $conexion->commit();
+                            echo json_encode(['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id_cotizacion_compra' => $lastInsertId]);
+                            $data = ['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id_cotizacion_compra' => $lastInsertId];
                             exit;
-                        } 
-                    }
-                    if (empty($newformDataJson['grupo'])) {
-                        $newformDataJson['grupo'] = 1;
-                    }
-                    if (empty($newformDataJson['kid_proyecto'])) {
-                        $newformDataJson['kid_proyecto'] = 1;
-                    }
-
-                    if (isset($formDataJson['kid_tiempo_entrega'])) {
-                        $newformDataJson['kid_tiempo_entrega'] = GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']);
-                        if (!$newformDataJson['kid_tiempo_entrega']) {
-                            $newformDataJson['kid_tiempo_entrega'] = GetDefaultTiempoEntregaId();
+                        } catch (Exception $e) {
+                            // Revertir transacción en caso de error
+                            $conexion->rollBack();
+                            $data = ['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()];
+                            echo json_encode(['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()]);
+                            exit;
                         }
-                    }
-
-                    if (isset($formDataJson['kid_tipo_pago'])) {
-                        $newformDataJson['kid_tipo_pago'] = GetIDTipoPagoByName($formDataJson['kid_tipo_pago']);
-                        if (!$newformDataJson['kid_tipo_pago']) {
-                            $newformDataJson['kid_tipo_pago'] = GetDefaultTipoPagoId();
-                        }
-                    }
-
-                    // Asegurarse de que el campo cotizacion_compras existe
-                    if (isset($formDataJson['cotizacion']) && !empty($formDataJson['cotizacion'])) {
-                        $newformDataJson['cotizacion_compras'] = $formDataJson['cotizacion'];
-                        unset($newformDataJson['cotizacion']); // Eliminar el campo original
                     }
 
 
@@ -539,20 +609,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         unset($newformDataJson['cotizacion']);
                         try {
                             // Iniciar transacción
-                            $conexion->beginTransaction();
+                         //   $conexion->beginTransaction();
 
                             // Insertar la cotización
-                            $columns = implode(", ", array_keys($newformDataJson));
-                            $placeholders = ":" . implode(", :", array_keys($newformDataJson));
-                            $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
-                            $stmt = $conexion->prepare($query);
-                            $stmt->execute($newformDataJson);
-                            $lastInsertId = $conexion->lastInsertId();
+                           // $columns = implode(", ", array_keys($newformDataJson));
+                          //  $placeholders = ":" . implode(", :", array_keys($newformDataJson));
+                          //  $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
+                          //  $stmt = $conexion->prepare($query);
+                           // $stmt->execute($newformDataJson);
+                           // $lastInsertId = $conexion->lastInsertId();
 
                             //insertar los detalles de los articulos
-                            foreach ($articulos as $articulo) {
+                           // foreach ($articulos as $articulo) {
                                
-                                    $articulo[ 'kid_cotizacion_compra'] = $lastInsertId;
+                                   // $articulo[ 'kid_cotizacion_compra'] = $lastInsertId;
                                     //'kid_articulo' => $articulo['kid_articulo'],
                                    // 'cantidad' => $articulo['cantidad'],
                                     //'costo_unitario_total' => $articulo['costo_unitario_total'],
