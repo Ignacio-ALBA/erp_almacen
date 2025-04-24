@@ -22,7 +22,7 @@
   $id = 'proveedores';
   $ButtonAddLabel = "Nuevo Proveedor";
   $titulos = ['ID', 'Orden','Código','Proveedores','Calificación','Razón Social','RFC','Correo','Por Defecto','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, 'ButtonsInRow','StaticButtons');
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
     [
       'id'=> $id, 
@@ -44,12 +44,12 @@
       CreateInput(['type'=>'text','maxlength'=>'50','id'=>'nombre','etiqueta'=>'Nombre','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'50','id'=>'apellido_paterno','etiqueta'=>'Apellido Paterno','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'50','id'=>'apellido_materno','etiqueta'=>'Apellido Materno','required' => '']),
-      CreateInput(['type'=>'number','min'=>'1'.str_repeat('0',9), 'max'=>str_repeat('9', 10),'id'=>'telefono1','etiqueta'=>'Teléfono 1','class'=>'ValidateTelefono']),
-      CreateInput(['type'=>'number','min'=>'1'.str_repeat('0',9), 'max'=>str_repeat('9', 10),'id'=>'telefono2','etiqueta'=>'Teléfono 2','class'=>'ValidateTelefono']),
-      CreateInput(['type'=>'number','min'=>'1'.str_repeat('0',9), 'max'=>str_repeat('9', 10),'id'=>'celular1','etiqueta'=>'Celular 1','class'=>'ValidateTelefono']),
-      CreateInput(['type'=>'number','min'=>'1'.str_repeat('0',9), 'max'=>str_repeat('9', 10),'id'=>'celular2','etiqueta'=>'Celular 2','class'=>'ValidateTelefono']),
-      CreateInput(['type'=>'email','id'=>'email1','etiqueta'=>'Correo 1','class'=>'ValidateCorreo']),
-      CreateInput(['type'=>'email','id'=>'email2','etiqueta'=>'Correo 2','class'=>'ValidateCorreo']),
+      CreateInput(['type'=>'number','maxlength'=>'10','id'=>'telefono1','etiqueta'=>'Teléfono 1','class'=>'ValidateTelefono']),
+      CreateInput(['type'=>'number','maxlength'=>'10','id'=>'telefono2','etiqueta'=>'Teléfono 2','class'=>'ValidateTelefono']),
+      CreateInput(['type'=>'number','maxlength'=>'10','id'=>'celular1','etiqueta'=>'Celular 1','class'=>'ValidateTelefono']),
+      CreateInput(['type'=>'number','maxlength'=>'10','id'=>'celular2','etiqueta'=>'Celular 2','class'=>'ValidateTelefono']),
+      CreateInput(['type'=>'email','maxlength'=>'50','id'=>'email1','etiqueta'=>'Correo 1','class'=>'ValidateCorreo']),
+      CreateInput(['type'=>'email','maxlength'=>'50','id'=>'email2','etiqueta'=>'Correo 2','class'=>'ValidateCorreo']),
       CreateSelect(['id'=>'nombre_pais','etiqueta'=>'País'],$paises),
       CreateSelect(['id'=>'kid_estado','etiqueta'=>'Estado', 'class'=>'DataGET Data-GETMunicipios','bloque'=>'catalogo'],$estados),
       CreateSelect(['id'=>'nombre_municipio','etiqueta'=>'Municipio', 'class'=>'kid_estado'],[]),

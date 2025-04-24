@@ -59,7 +59,6 @@ if($resultado){
             ORDER BY calificacion DESC";
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
-
             $modalCRUD = 'comentarios_proveedores';
             $nuevo_boton = '
                 <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
@@ -69,29 +68,16 @@ if($resultado){
             
             $data_script['NewAdd1'] =['data_list_column'=>[
                 'kid_proveedor'=>5,
+                
             ]];
 
-            
-            $proveedores = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-            $proveedores = array_map(function ($row) {
-                global $data_script, $estatus;
-                $botones_acciones = $data_script['botones_acciones'];
-                $hashed_id = codificar($row['id_proveedor']);
-                // Reemplazar los botones genéricos con botones específicos que incluyen el modalCRUD
-                $row['botones'] = GenerateCustomsButtons($botones_acciones, 'proveedores');
-                return $row;
-            }, $proveedores);
-
-            $data['data_show']['data'] = $proveedores;
-            
-            $data['data_show']['estados'] = GetEstadosListForSelect();
-            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             $data['data_show']['regimenes'] = GetRegimenesListForSelect();
             $data['data_show']['paises'] = GetPaisesListForSelect();
             $data['data_show']['estados'] = GetEstadosListForSelect();
-           
+            $data['data_show']['proveedores'] = GetProvedoresListForSelect();
+            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
+
             break;
 
         case 'comentarios_proveedores':

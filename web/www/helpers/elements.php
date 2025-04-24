@@ -31,9 +31,9 @@ function CreateInput($atributos = []) {
     $id = isset($atributos['id']) ? $atributos['id'] : null;
     $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : '';
     $tipoInput = isset($atributos['type']) ? $atributos['type'] : 'text'; // Tipo por defecto
-    $clases = isset($atributos['class']) ? $atributos['class'] :'';
-    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] :'';
-    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] :'';
+    $clases = isset($atributos['class']) ? $atributos['class'] : '';
+    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] : '';
+    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] : '';
     $styleinput= '';
     if($tipoInput == 'color'){
         $styleinput = 'style="max-width:90px; min-height:80px;"';
@@ -61,9 +61,9 @@ function CreateTextArea($atributos = []) {
     $id = isset($atributos['id']) ? $atributos['id'] : null;
     $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : null;
     $tipoInput = isset($atributos['tipo']) ? $atributos['tipo'] : 'text'; // Tipo por defecto
-    $clases = isset($atributos['class']) ? $atributos['class'] :'';
-    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] :'';
-    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] :'';
+    $clases = isset($atributos['class']) ? $atributos['class'] : '';
+    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] : '';
+    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] : '';
 
     return '
     <div class="form-group '.$div_clases.'" style="' . $div_style . '">
@@ -88,9 +88,9 @@ function CreateCardIMG($atributos = []) {
     $id = isset($atributos['id']) ? $atributos['id'] : null;
     $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : null;
     $tipoInput = isset($atributos['tipo']) ? $atributos['tipo'] : 'text'; // Tipo por defecto
-    $clases = isset($atributos['class']) ? $atributos['class'] :'';
-    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] :'';
-    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] :'';
+    $clases = isset($atributos['class']) ? $atributos['class'] : '';
+    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] : '';
+    $div_clases = isset($atributos['div_clases']) ? $atributos['div_clases'] : '';
 
     return '
     <div class="card" id="div'.$id.'" class="'.$div_clases.'" style="margin-bottom:0px; display:none; '.$div_style.'">
@@ -181,7 +181,7 @@ function CreateCarousel($atributos = [],$fotos = []){
     $id_aleatorio = rand(1, 100);
 
     foreach ($fotos as $key => $foto) {
-        debug($key);
+        // Se eliminó la línea debug($key) que causaba el error
         $content_fotos .= ' 
         <div class="carousel-item">
             <img src="'.getServerUrl().$foto.'" class="d-block w-100" alt="...">
@@ -312,8 +312,8 @@ function CreateSelect($atributos = [], $opciones = [], $valorSeleccionado = null
     $id = isset($atributos['id']) ? $atributos['id'] : null;
     $etiqueta = isset($atributos['etiqueta']) ? $atributos['etiqueta'] : null;
     $placeholder = isset($atributos['placeholder']) ? $atributos['placeholder'] : null;
-    $clases = isset($atributos['class']) ? $atributos['class'] :'';
-    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] :'';
+    $clases = isset($atributos['class']) ? $atributos['class'] : '';
+    $div_style = isset($atributos['div_style']) ? $atributos['div_style'] : '';
     $select_input = '
     <div class="form-group" style="' . $div_style . '">
     <label for="' . htmlspecialchars($id) . '" class="col-form-label">' . htmlspecialchars($etiqueta) . ':</label>
