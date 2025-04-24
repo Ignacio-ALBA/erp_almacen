@@ -440,7 +440,7 @@ $navItems = [
             "ver_tipos_viaticos",
             "eliminar_tipos_viaticos"
             ]
-        ], */
+        ], 
         [
           "label" => "Tiempos de Entrega",
           "href" => "/tiempos_entregas",
@@ -460,7 +460,7 @@ $navItems = [
             "ver_tipos_pagos",
             "eliminar_tipos_pagos"
             ]
-        ]
+        ]*/
       ]
     ],/*
     [

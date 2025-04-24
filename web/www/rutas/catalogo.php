@@ -59,6 +59,7 @@ if($resultado){
             ORDER BY calificacion DESC";
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
+
             $modalCRUD = 'comentarios_proveedores';
             $nuevo_boton = '
                 <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
@@ -68,16 +69,29 @@ if($resultado){
             
             $data_script['NewAdd1'] =['data_list_column'=>[
                 'kid_proveedor'=>5,
-                
             ]];
 
+            
+            $proveedores = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+            $proveedores = array_map(function ($row) {
+                global $data_script, $estatus;
+                $botones_acciones = $data_script['botones_acciones'];
+                $hashed_id = codificar($row['id_proveedor']);
+                // Reemplazar los botones genéricos con botones específicos que incluyen el modalCRUD
+                $row['botones'] = GenerateCustomsButtons($botones_acciones, 'proveedores');
+                return $row;
+            }, $proveedores);
+
+            $data['data_show']['data'] = $proveedores;
+            
+            $data['data_show']['estados'] = GetEstadosListForSelect();
+            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             $data['data_show']['regimenes'] = GetRegimenesListForSelect();
             $data['data_show']['paises'] = GetPaisesListForSelect();
             $data['data_show']['estados'] = GetEstadosListForSelect();
-            $data['data_show']['proveedores'] = GetProvedoresListForSelect();
-            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
-
+           
             break;
 
         case 'comentarios_proveedores':
@@ -147,16 +161,28 @@ if($resultado){
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
 
+            $modalCRUD = 'comentarios_clientes';
+            $nuevo_boton = '
+                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
+            ';
+            array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
+            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+            
+            $data_script['NewAdd1'] =['data_list_column'=>[
+                'kid_cliente'=>5,
+                
+            ]];
+
             $clientes = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
             $clientes = array_map(function ($row) {
                 global $data_script, $estatus;
                 $botones_acciones = $data_script['botones_acciones'];
                 $hashed_id = codificar($row['id_cliente']);
-                array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
-                array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
-                array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
-                array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
+               // array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
+                //array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
+              //  array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
+              //  array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
                 $row['botones'] = GenerateCustomsButtons($botones_acciones, 'clientes');
                 return $row;
             }, $clientes);
@@ -166,6 +192,8 @@ if($resultado){
             $data['data_show']['regimenes'] = GetRegimenesListForSelect();
             $data['data_show']['paises'] = GetPaisesListForSelect();
             $data['data_show']['estados'] = GetEstadosListForSelect();
+            $data['data_show']['clientes'] = GetClientesListForSelect();
+            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
             $data['data_show']['bolsas_proyectos'] = GetBolsaProyectosListForSelect();
             break;
 

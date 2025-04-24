@@ -211,6 +211,29 @@
       ]);
 
 
+
+      $id = 'comentarios_clientes';
+      $ButtonAddLabel = "Nuevo Comentario";
+      CreateModalForm(
+          [
+            'id'=> $id, 
+            'Title'=>$ButtonAddLabel,
+            'Title2'=>'Editar Comentario',
+            'Title3'=>'Ver Comentario',
+            'ModalType'=>'modal-dialog-scrollable', 
+            'method'=>'POST',
+            'action'=>'bd/crudSummit.php',
+            'bloque'=>'catalogo'
+          ],
+          [
+            CreateSelect(['id'=>'kid_cliente','etiqueta'=>'Cliente','readonly' => '','class'=>''],$clientes),
+            CreateTextArea(['type'=>'text', 'maxlength'=>'300','id'=>'comentario_cliente','etiqueta'=>'Comentario','required' => '']),
+            CreateSelect(['id'=>'kid_tipo_comentario','etiqueta'=>'Tipo de Comentario'],$tipo_comentario)
+      
+            //CreatSwitchCheck(['id'=>'pordefecto','etiqueta'=>'Por defecto'])
+            
+          ]);
+
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
 
   include 'wrapper.php'; // Incluye el wrapper

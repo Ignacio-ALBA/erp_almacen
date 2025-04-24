@@ -22,7 +22,7 @@
   $id = 'proveedores';
   $ButtonAddLabel = "Nuevo Proveedor";
   $titulos = ['ID', 'Orden','Código','Proveedores','Calificación','Razón Social','RFC','Correo','Por Defecto','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, 'ButtonsInRow','StaticButtons');
   CreateModalForm(
     [
       'id'=> $id, 
@@ -80,7 +80,7 @@
           'bloque'=>'catalogo'
         ],
         [
-          CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Recepción','readonly' => '','class'=>''],$proveedores),
+          CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Proveedor','readonly' => '','class'=>''],$proveedores),
           CreateTextArea(['type'=>'text', 'maxlength'=>'300','id'=>'comentario_proveedor','etiqueta'=>'Comentario','required' => '']),
           CreateSelect(['id'=>'kid_tipo_comentario','etiqueta'=>'Tipo de Comentario'],$tipo_comentario)
     
