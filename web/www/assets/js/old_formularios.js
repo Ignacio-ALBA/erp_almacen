@@ -616,7 +616,16 @@ $(document).ready(function() {
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
                 if(response.data){
-                    DeleteRow(modalCRUD,row)
+                    DeleteRow(modalCRUD,row);
+                    
+                    // Si el elemento eliminado es un proveedor, recarga la página
+                    if(modalCRUD === 'proveedores') {
+                        console.log('Recargando página después de eliminar un proveedor...');
+                        // Pequeño delay para permitir que la tabla se actualice visualmente antes de recargar
+                        setTimeout(function() {
+                            window.location.href = window.location.href;
+                        }, 100);
+                    }
                 }
             },
             error: function(xhr, status, error) {

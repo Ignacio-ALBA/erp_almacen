@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+// Set appropriate headers at the beginning and clear any output buffer
 header('Content-Type: application/json; charset=utf-8');
 ob_start();
 $objeto = new Conexion();
@@ -239,11 +240,279 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Eliminar campos no necesarios
                     unset($formDataJson['num_articulos']);
 
+                    // Opción 3: Eliminar lista de compras
+                    if ($opcion == 3) {
+                        try {
+                            if (isset($_POST['firstColumnValue']) && !empty($_POST['firstColumnValue'])) {
+                                $id = $_POST['firstColumnValue'];
+                                
+                                // Iniciar transacción
+                                $conexion->beginTransaction();
+                                
+                                // Marcar los detalles de la lista como eliminados
+                                $detalles_query = "UPDATE detalles_listas_compras SET kid_estatus = 3 WHERE kid_lista_compras = :id";
+                                $resultado_detalles = $conexion->prepare($detalles_query);
+                                $resultado_detalles->bindParam(':id', $id);
+                                $resultado_detalles->execute();
+                                
+                                // Marcar la lista como eliminada
+                                $consulta = "UPDATE listas_compras SET kid_estatus = 3 WHERE id_lista_compra = :id";
+                                $resultado = $conexion->prepare($consulta);
+                                $resultado->bindParam(':id', $id);
+                                
+                                if ($resultado->execute()) {
+                                    // Confirmar transacción
+                                    $conexion->commit();
+                                    
+                                    $data = ['status' => 'success', 'message' => 'Lista de compras eliminada correctamente'];
+                                    echo json_encode($data);
+                                    exit;
+                                } else {
+                                    throw new Exception("No se pudo eliminar la lista de compras");
+                                }
+                            } else {
+                                throw new Exception("ID de lista de compras no válido");
+                            }
+                        } catch (Exception $e) {
+                            // Revertir transacción en caso de error
+                            $conexion->rollBack();
+                            $data = ['status' => 'error', 'message' => 'Error al eliminar la lista de compras: ' . $e->getMessage()];
+                            echo json_encode($data);
+                            exit;
+                        }
+                    }
+                    
+                    // Opción 4: Cargar datos para edición
+                    if ($opcion == 4) {
+                        try {
+                            if (isset($_POST['firstColumnValue']) && !empty($_POST['firstColumnValue'])) {
+                                $id = $_POST['firstColumnValue'];
+                                
+                                // Consulta para obtener datos de la lista de compras
+                                $consulta = "SELECT 
+                                    lc.id_lista_compra,
+                                    lc.lista_compra,
+                                    lc.orden,
+                                    lc.kid_estatus,
+                                    lc.kid_cuenta_bancaria,
+                                    lc.kid_proyecto
+                                FROM listas_compras lc
+                                WHERE lc.kid_estatus != 3 AND lc.id_lista_compra = :id";
+                                
+                                $resultado = $conexion->prepare($consulta);
+                                $resultado->bindParam(':id', $id);
+                                $resultado->execute();
+                                $lista_data = $resultado->fetch(PDO::FETCH_ASSOC);
+                                
+                                if (!$lista_data) {
+                                    throw new Exception("Lista de compras no encontrada");
+                                }
+                                
+                                // Consulta para obtener detalles de la lista de compras
+                                $consulta_detalles = "SELECT 
+                                    dlc.id_detalle_lista_compras,
+                                    dlc.kid_articulo,
+                                    a.articulo,
+                                    dlc.cantidad,
+                                    dlc.costo_unitario_total,
+                                    dlc.costo_unitario_neto,
+                                    dlc.monto_total,
+                                    dlc.monto_neto,
+                                    dlc.porcentaje_descuento
+                                FROM detalles_listas_compras dlc
+                                LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
+                                WHERE dlc.kid_estatus != 3 AND dlc.kid_lista_compras = :id
+                                ORDER BY dlc.id_detalle_lista_compras ASC";
+                                
+                                $resultado_detalles = $conexion->prepare($consulta_detalles);
+                                $resultado_detalles->bindParam(':id', $id);
+                                $resultado_detalles->execute();
+                                $detalles_data = $resultado_detalles->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                // Devolver los datos para edición
+                                $data = [
+                                    'status' => 'success',
+                                    'data' => [
+                                        'lista' => $lista_data,
+                                        'detalles' => $detalles_data
+                                    ]
+                                ];
+                                
+                                echo json_encode($data);
+                                exit;
+                            } else {
+                                throw new Exception("ID de lista de compras no válido");
+                            }
+                        } catch (Exception $e) {
+                            $data = ['status' => 'error', 'message' => 'Error al cargar la lista de compras: ' . $e->getMessage()];
+                            echo json_encode($data);
+                            exit;
+                        }
+                    }
+
                     $editformDataJson = CleanJson($formDataJson);
                     $newformDataJson = $formDataJson;
                     $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                     $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                     $newformDataJson['kid_estatus'] = 1;
+
+                    // Editar lista de compras y sus detalles
+                    if ($opcion == 2) {
+                        try {
+                            // Iniciar transacción para actualización de lista y detalles
+                            $conexion->beginTransaction();
+                            
+                            // Obtener ID de la lista a editar
+                            if (!isset($_POST['firstColumnValue']) || empty($_POST['firstColumnValue'])) {
+                                throw new Exception("ID de lista de compras no proporcionado");
+                            }
+                            
+                            $id = $_POST['firstColumnValue'];
+                            
+                            // Extraer los artículos del formData si existen
+                            $articulos = [];
+                            if (isset($formDataJson['articulos']) && is_string($formDataJson['articulos'])) {
+                                $articulos = json_decode($formDataJson['articulos'], true);
+                                unset($newformDataJson['articulos']);
+                            } else if (isset($formDataJson['articulos']) && is_array($formDataJson['articulos'])) {
+                                $articulos = $formDataJson['articulos'];
+                                unset($newformDataJson['articulos']);
+                            }
+                            
+                            // Actualizar la lista de compras
+                            $setPart = [];
+                            foreach ($editformDataJson as $key => $value) {
+                                if ($key !== 'id_lista_compra') { // No incluir el ID en el SET
+                                    $setPart[] = "$key = :$key";
+                                }
+                            }
+                            
+                            $consulta = "UPDATE $tabla SET " . implode(', ', $setPart) . " WHERE $idcolumn = :id";
+                            $resultado = $conexion->prepare($consulta);
+                            
+                            foreach ($editformDataJson as $key => $value) {
+                                if ($key !== 'id_lista_compra') {
+                                    $resultado->bindValue(":$key", $value);
+                                }
+                            }
+                            
+                            $resultado->bindValue(":id", $id);
+                            $resultado->execute();
+                            
+                            // Actualizar los detalles de los artículos
+                            foreach ($articulos as $articulo) {
+                                // Asegurarse de que kid_articulo sea un ID numérico
+                                if (!is_numeric($articulo['kid_articulo'])) {
+                                    $query = "SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1";
+                                    $stmt = $conexion->prepare($query);
+                                    $stmt->bindParam(':articulo', $articulo['kid_articulo']);
+                                    $stmt->execute();
+                                    $idArticulo = $stmt->fetchColumn();
+
+                                    if ($idArticulo) {
+                                        $articulo['kid_articulo'] = $idArticulo;
+                                    } else {
+                                        throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
+                                    }
+                                }
+                                
+                                // Si tiene ID de detalle, actualizar; de lo contrario, insertar nuevo
+                                if (isset($articulo['id_detalle_lista_compras']) && $articulo['id_detalle_lista_compras']) {
+                                    $updateQuery = "UPDATE detalles_listas_compras SET 
+                                        kid_articulo = :kid_articulo,
+                                        cantidad = :cantidad,
+                                        costo_unitario_total = :costo_unitario_total,
+                                        costo_unitario_neto = :costo_unitario_neto,
+                                        monto_total = :monto_total,
+                                        monto_neto = :monto_neto,
+                                        porcentaje_descuento = :porcentaje_descuento
+                                    WHERE id_detalle_lista_compras = :id_detalle_lista_compras";
+                                    
+                                    $stmt = $conexion->prepare($updateQuery);
+                                    $stmt->bindParam(':kid_articulo', $articulo['kid_articulo']);
+                                    $stmt->bindParam(':cantidad', $articulo['cantidad']);
+                                    $stmt->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
+                                    $stmt->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
+                                    $stmt->bindParam(':monto_total', $articulo['monto_total']);
+                                    $stmt->bindParam(':monto_neto', $articulo['monto_neto']);
+                                    $stmt->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
+                                    $stmt->bindParam(':id_detalle_lista_compras', $articulo['id_detalle_lista_compras']);
+                                    $stmt->execute();
+                                } else {
+                                    $insertQuery = "INSERT INTO detalles_listas_compras (
+                                        kid_lista_compras, 
+                                        kid_articulo, 
+                                        cantidad, 
+                                        costo_unitario_total, 
+                                        costo_unitario_neto, 
+                                        monto_total, 
+                                        monto_neto, 
+                                        porcentaje_descuento,
+                                        fecha_creacion,
+                                        kid_creacion,
+                                        kid_estatus
+                                    ) VALUES (
+                                        :kid_lista_compras,
+                                        :kid_articulo,
+                                        :cantidad,
+                                        :costo_unitario_total,
+                                        :costo_unitario_neto,
+                                        :monto_total,
+                                        :monto_neto,
+                                        :porcentaje_descuento,
+                                        :fecha_creacion,
+                                        :kid_creacion,
+                                        :kid_estatus
+                                    )";
+                                    
+                                    $stmt = $conexion->prepare($insertQuery);
+                                    $stmt->bindParam(':kid_lista_compras', $id);
+                                    $stmt->bindParam(':kid_articulo', $articulo['kid_articulo']);
+                                    $stmt->bindParam(':cantidad', $articulo['cantidad']);
+                                    $stmt->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
+                                    $stmt->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
+                                    $stmt->bindParam(':monto_total', $articulo['monto_total']);
+                                    $stmt->bindParam(':monto_neto', $articulo['monto_neto']);
+                                    $stmt->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
+                                    $fecha_creacion = date('Y-m-d H:i:s');
+                                    $stmt->bindParam(':fecha_creacion', $fecha_creacion);
+                                    $stmt->bindParam(':kid_creacion', $_SESSION["s_id"]);
+                                    $kid_estatus = 1;
+                                    $stmt->bindParam(':kid_estatus', $kid_estatus);
+                                    $stmt->execute();
+                                }
+                            }
+                            
+                            // Confirmar transacción
+                            $conexion->commit();
+                            
+                            // Obtener los datos actualizados para responder
+                            $resultado = $conexion->prepare("SELECT * FROM $tabla WHERE $idcolumn = :id AND kid_estatus != 3");
+                            $resultado->bindParam(":id", $id);
+                            $resultado->execute();
+                            $data_resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                            
+                            $data = [
+                                'status' => 'success', 
+                                'message' => 'Lista de compras actualizada correctamente',
+                                'data' => $data_resultado
+                            ];
+                            
+                            echo json_encode($data);
+                            exit;
+                        } catch (Exception $e) {
+                            // Revertir transacción en caso de error
+                            $conexion->rollBack();
+                            
+                            $data = [
+                                'status' => 'error', 
+                                'message' => 'Error al actualizar la lista de compras: ' . $e->getMessage()
+                            ];
+                            
+                            echo json_encode($data);
+                            exit;
+                        }
+                    }
 
                     // Antes de insertar en la tabla `listas_compras`, verificar y asignar un valor predeterminado para `kid_proyecto`
                     if (empty($newformDataJson['kid_proyecto'])) {
@@ -372,48 +641,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $defaultTiempoEntregaId = GetDefaultTiempoEntregaId();
                     $defaultTipoPagoId = GetDefaultTipoPagoId();
 
+                    // Eliminar campos no necesarios
+                    unset($formDataJson['num_articulos']);
+
                     // Procesar y validar datos
-                    $formDataJson['kid_proyecto'] = $defaultProjectId;
+                    $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? 
+                        GetIDProyectoByName($formDataJson['kid_proyecto']) : $defaultProjectId;
+                        
                     $formDataJson['kid_proveedor'] = !empty($formDataJson['kid_proveedor']) ? 
                         GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-
-                    if (empty($formDataJson['kid_proveedor'])) {
-                        echo json_encode(['status' => 'error', 'message' => 'El campo Proveedor es requerido']);
-                        exit;
-                    }
 
                     // Procesar tiempo de entrega y tipo de pago
                     $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? 
                         GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : $defaultTiempoEntregaId;
                     $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? 
                         GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : $defaultTipoPagoId;
- 
- 
-                        // Asegurarse de que el campo cotizacion_compras existe
-  if (isset($formDataJson['cotizacion']) && !empty($formDataJson['cotizacion'])) {
-    $newformDataJson['cotizacion_compras'] = $formDataJson['cotizacion'];
-    unset($newformDataJson['cotizacion']); // Eliminar el campo original
-}
 
-
-unset($formDataJson['num_articulos']);
+                    // Asegurarse de que el campo cotizacion_compras existe
+                    if (isset($formDataJson['cotizacion']) && !empty($formDataJson['cotizacion'])) {
+                        $formDataJson['cotizacion_compras'] = $formDataJson['cotizacion'];
+                        unset($formDataJson['cotizacion']); // Eliminar el campo original
+                    }
 
                     $editformDataJson = CleanJson($formDataJson);
                     $newformDataJson = $formDataJson;
 
-                    if($opcion == 1) { // Insertar nueva cotización
+                    // Inicializar valores para la nueva cotización
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
+                    $newformDataJson['kid_autorizo'] = 0;
+                    if (empty($newformDataJson['grupo'])) {
+                        $newformDataJson['grupo'] = 1;
+                    }
+
+                    // Verifica si el proveedor es requerido
+                    if (empty($newformDataJson['kid_proveedor'])) {
+                        echo json_encode(['status' => 'error', 'message' => 'El campo Proveedor es requerido']);
+                        exit;
+                    }
+
+                    // Si la opción es 1 (insertar nueva cotización)
+                    if ($opcion == 1) {
                         try {
                             // Iniciar transacción
                             $conexion->beginTransaction();
-
-                            // Preparar datos para la cotización
-                            $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                            $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                            $newformDataJson['kid_estatus'] = 1;
-                            $newformDataJson['kid_autorizo'] = 0;
-                            if (empty($newformDataJson['grupo'])) {
-                                $newformDataJson['grupo'] = 1;
-                            }
 
                             // Extraer los artículos del formData
                             $articulos = [];
@@ -424,6 +696,18 @@ unset($formDataJson['num_articulos']);
                                     $articulos[$index][$field] = $value;
                                     unset($newformDataJson[$key]);
                                 }
+                            }
+
+                            // Si también hay un array de artículos, fusionarlos
+                            if (isset($formDataJson['articulos']) && is_array($formDataJson['articulos'])) {
+                                $articulos = array_merge($articulos, $formDataJson['articulos']);
+                                unset($newformDataJson['articulos']);
+                            } else if (isset($formDataJson['articulos']) && is_string($formDataJson['articulos'])) {
+                                $articulosArray = json_decode($formDataJson['articulos'], true);
+                                if (is_array($articulosArray)) {
+                                    $articulos = array_merge($articulos, $articulosArray);
+                                }
+                                unset($newformDataJson['articulos']);
                             }
 
                             // Convertir nombres de artículos a IDs
@@ -467,189 +751,37 @@ unset($formDataJson['num_articulos']);
 
                             // Confirmar transacción
                             $conexion->commit();
-                            echo json_encode(['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id_cotizacion_compra' => $lastInsertId]);
                             $data = ['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id_cotizacion_compra' => $lastInsertId];
+                            echo json_encode($data);
                             exit;
                         } catch (Exception $e) {
                             // Revertir transacción en caso de error
                             $conexion->rollBack();
                             $data = ['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()];
-                            echo json_encode(['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()]);
+                            echo json_encode($data);
                             exit;
                         }
                     }
+                    
+                    $consultaselect = "SELECT cc.id_cotizacion_compra,
+                        cc.cotizacion_compras,
+                        cc.grupo,
+                        p.proyecto AS kid_proyecto,
+                        prov.razon_social AS kid_proveedor,
+                        cc.kid_estatus,
+                        u.email AS kid_creacion,
+                        COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                        cc.fecha_creacion
+                    FROM cotizaciones_compras cc
+                    LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
+                    LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
+                    LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
+                    LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u2.id_colaborador
+                    WHERE cc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
 
-
-                    unset($formDataJson['num_articulos']);
-
-                    // Extraer los artículos del formData si existen (igual que en listas_compras)
-                    $articulos = [];
-                    foreach ($formDataJson as $key => $value) {
-                        if (preg_match('/^(kid_articulo|cantidad|costo_unitario_total|costo_unitario_neto|monto_total|monto_neto|porcentaje_descuento)_(\\d+)$/', $key, $matches)) {
-                            $index = $matches[2];
-                            $field = $matches[1];
-                            $articulos[$index][$field] = $value;
-                            unset($newformDataJson[$key]); // Remover del formData principal
-                        }
-                    }
-
-                  
-                    try {
-                        // Iniciar transacción
-                        $conexion->beginTransaction();
-
-                        // Insertar la cotización
-                        $columns = implode(", ", array_keys($newformDataJson));
-                        $placeholders = ":" . implode(", :", array_keys($newformDataJson));
-                        $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
-                        $stmt = $conexion->prepare($query);
-                        $stmt->execute($newformDataJson);
-                        $lastInsertId = $conexion->lastInsertId();
-
-                        // Insertar los artículos
-                        if (isset($formDataJson['articulos']) && is_array($formDataJson['articulos'])) {
-                            foreach ($formDataJson['articulos'] as $articulo) {
-                                $articulo['kid_cotizacion_compra'] = $lastInsertId;
-                                $articulo['fecha_creacion'] = date('Y-m-d H:i:s');
-                                $articulo['kid_creacion'] = $_SESSION["s_id"];
-                                $articulo['kid_estatus'] = 1;
-
-                                // Convertir el nombre del artículo a ID si es necesario
-                                if (!is_numeric($articulo['kid_articulo'])) {
-                                    $stmt = $conexion->prepare("SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1");
-                                    $stmt->bindParam(':articulo', $articulo['kid_articulo']);
-                                    $stmt->execute();
-                                    $idArticulo = $stmt->fetchColumn();
-                                    if ($idArticulo) {
-                                        $articulo['kid_articulo'] = $idArticulo;
-                                    } else {
-                                        throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
-                                    }
-                                }
-
-                                $columns = implode(", ", array_keys($articulo));
-                                $placeholders = ":" . implode(", :", array_keys($articulo));
-                                $query = "INSERT INTO detalles_cotizaciones_compras ($columns) VALUES ($placeholders)";
-                                $stmt = $conexion->prepare($query);
-                                $stmt->execute($articulo);
-                            }
-                        }
-
-                        $conexion->commit();
-                        echo json_encode(['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id' => $lastInsertId]);
-                        exit;
-                    } catch (Exception $e) {
-                        $conexion->rollBack();
-                        echo json_encode(['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()]);
-                        exit;
-                    }
-
-                    /*$editformDataJson = CleanJson($formDataJson);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 8;
-                    $newformDataJson['kid_autorizo'] = 0;
-
-   /*-------------------- Obtener Tablas Foráneas --------------------*/
-   /*$formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? GetIDProyectoByName($formDataJson['kid_proyecto']) : null;
-   $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ?GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-   //$formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ?GetIDArticuloByName($formDataJson['kid_articulo']) : null;
-   $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;
-   $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : null;
-   $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : null;
-   /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-
-                   // Asegurarse de que el campo cotizacion_compras existe
-                   /*if (isset($formDataJson['cotizacion']) && !empty($formDataJson['cotizacion'])) {
-                    $newformDataJson['cotizacion_compras'] = $formDataJson['cotizacion'];
-                    unset($newformDataJson['cotizacion']); // Eliminar el campo original
-                }
-                    if (empty($newformDataJson['kid_proyecto'])) {
-                        $newformDataJson['kid_proyecto'] = GetDefaultProjectId();
-                    }
-                    if (empty($newformDataJson['kid_tiempo_entrega'])) {
-                        $newformDataJson['kid_tiempo_entrega'] = GetDefaultTiempoEntregaId();
-                    }
-                    if (empty($newformDataJson['kid_tipo_pago'])) {
-                        $newformDataJson['kid_tipo_pago'] = GetDefaultTipoPagoId();
-                    }
-                    if (empty($newformDataJson['grupo'])) {
-                        $newformDataJson['grupo'] = 1;
-                    }
-                    unset($formDataJson['num_articulos']);
-
-                    // Extraer los artículos del formData si existen (igual que en listas_compras)
-                    $articulos = [];
-                    foreach ($formDataJson as $key => $value) {
-                        if (preg_match('/^(kid_articulo|cantidad|costo_unitario_total|costo_unitario_neto|monto_total|monto_neto|porcentaje_descuento)_(\\d+)$/', $key, $matches)) {
-                            $index = $matches[2];
-                            $field = $matches[1];
-                            $articulos[$index][$field] = $value;
-                            unset($newformDataJson[$key]); // Remover del formData principal
-                        }
-                    }
-
-                    // Convertir el nombre del artículo a su ID antes de la inserción
-                    foreach ($articulos as $index => $articulo) {
-                        if (!is_numeric($articulo['kid_articulo'])) {
-                            $query = "SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1";
-                            $stmt = $conexion->prepare($query);
-                            $stmt->bindParam(':articulo', $articulo['kid_articulo']);
-                            $stmt->execute();
-                            $idArticulo = $stmt->fetchColumn();
-
-                            if ($idArticulo) {
-                                $articulos[$index]['kid_articulo'] = $idArticulo;
-                            } else {
-                                throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
-                            }
-                        }
-                    }
-                        unset($newformDataJson['cotizacion']);
-                        try {
-                            // Iniciar transacción
-                         //   $conexion->beginTransaction();
-
-                            // Insertar la cotización
-                           // $columns = implode(", ", array_keys($newformDataJson));
-                          //  $placeholders = ":" . implode(", :", array_keys($newformDataJson));
-                          //  $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
-                          //  $stmt = $conexion->prepare($query);
-                           // $stmt->execute($newformDataJson);
-                           // $lastInsertId = $conexion->lastInsertId();
-
-                            //insertar los detalles de los articulos
-                           // foreach ($articulos as $articulo) {
-                               
-                                   // $articulo[ 'kid_cotizacion_compra'] = $lastInsertId;
-                                    //'kid_articulo' => $articulo['kid_articulo'],
-                                   // 'cantidad' => $articulo['cantidad'],
-                                    //'costo_unitario_total' => $articulo['costo_unitario_total'],
-                                   // 'costo_unitario_neto' => $articulo['costo_unitario_neto'],
-                                   // 'monto_total' => $articulo['monto_total'],
-                                    //'monto_neto' => $articulo['monto_neto'],
-                                    //'porcentaje_descuento' => $articulo['porcentaje_descuento'],
-                                    $articulo['fecha_creacion'] = date('Y-m-d H:i:s');
-                                    $articulo['kid_creacion' ] = $_SESSION["s_id"];
-                                    $articulo['kid_estatus'] = 1;
-                                
-                                $columns = implode(", ", array_keys($articulo));
-                                $placeholders = ":" . implode(", :", array_keys($articulo));
-                                $query = "INSERT INTO detalles_cotizaciones_compras ($columns) VALUES ($placeholders)";
-                                $stmt = $conexion->prepare($query);
-                                $stmt->execute($articulo);
-                            }
-                            $conexion->commit();
-                            echo json_encode(['status' => 'success', 'message' => 'Cotización creada exitosamente', 'id_cotizacion_compra' => $lastInsertId]);
-                            exit;
-                        } catch (Exception $e) {
-                            $conexion->rollBack();
-                            echo json_encode(['status' => 'error', 'message' => 'Error al guardar la cotización: ' . $e->getMessage()]);
-                            exit;
-                        }
-                    */
-                    // ...existing code for edit/delete and mapping...
+                    $ColumnsCheck = [
+                        ['column'=>"cotizacion_compras","check_similar"=>true]
+                    ];
                     break;
 
                 case 'update_estatus_cotizaciones_compras':
@@ -809,7 +941,7 @@ unset($formDataJson['num_articulos']);
                         LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
                         LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
                         LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
-                        LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
+                        LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u2.id_colaborador
                         WHERE cc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
 
                         $fuc_mapping = function ($row) {
@@ -858,215 +990,6 @@ unset($formDataJson['num_articulos']);
                     /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                     $editformDataJson = CleanJson($formDataJson);
-                    //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                    $consultaselect = "SELECT dcc.id_detalle_cotizacion_compras,
-                        cc.cotizacion_compras AS kid_cotizacion_compra,
-                        a.articulo AS kid_articulo,
-                        dcc.cantidad,
-                        dcc.costo_unitario_total,
-                        dcc.costo_unitario_neto,
-                        dcc.monto_total,
-                        dcc.monto_neto,
-                        dcc.fecha_creacion
-                    FROM detalles_cotizaciones_compras dcc
-                    LEFT JOIN cotizaciones_compras cc ON dcc.kid_cotizacion_compra = cc.id_cotizacion_compra 
-                    LEFT JOIN articulos a ON dcc.kid_articulo = a.id_articulo
-                    WHERE dcc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
-
-                    $ColumnsCheck = [];
-                    break;
-
-                    case 'ordenes_compras':
-                        $tabla = 'ordenes_compras';
-                        $idcolumn= "id_orden_compras";
-                        $custombt = true;
-        
-                        /*-------------------- Obtener Tablas Foráneas --------------------*/
-                        $formDataJson['kid_proyecto'] = (isset($formDataJson['kid_proyecto']) && !is_numeric($formDataJson['kid_proyecto']) ? GetIDProyectoByName($formDataJson['kid_proyecto']) : null);
-                        $formDataJson['kid_proveedor'] = (isset($formDataJson['kid_proveedor']) && !is_numeric($formDataJson['kid_proveedor'])) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-                        $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;
-                        /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-        
-                        $editformDataJson = CleanJson($formDataJson);
-                        //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
-                        $newformDataJson = $formDataJson;
-                        $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                        $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                        $newformDataJson['kid_estatus'] = 1;
-        
-                        $consultaselect = "SELECT oc.id_orden_compras ,
-                            oc.orden_compras,
-                            oc.codigo_externo,
-                            oc.grupo_cotizacion,
-                            p.proyecto AS kid_proyecto,
-                            prov.proveedor AS kid_proveedor,
-                            oc.monto_total,
-                            oc.monto_neto,
-                            oc.kid_estatus,
-                            oc.fecha_creacion
-                        FROM ordenes_compras oc
-                        LEFT JOIN proyectos p ON oc.kid_proyecto = p.id_proyecto
-                        LEFT JOIN proveedores prov ON oc.kid_proveedor = prov.id_proveedor
-                        WHERE oc.kid_estatus !=3 and ".$idcolumn." = :".$idcolumn;
-        
-                        
-                        $fuc_mapping = function ($row) {
-                            global $data_script, $estatus, $estatus_name;
-                            $botones_acciones = $data_script['botones_acciones'];
-            
-                            $bloque = 'compras';
-                            $modalCRUD =  'update_estatus_ordenes_compras';
-                            if(!in_array($row['kid_estatus'], [5,6,9])){
-                                $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
-                                array_unshift($botones_acciones,$nuevo_boton);
-                            }else if($row['kid_estatus'] == 6){
-                                $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                                array_unshift($botones_acciones,$nuevo_boton);
-                            }if($row['kid_estatus'] == 5){
-                                $nuevo_boton = '<button class="ModalSetData btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[9].'" modalCRUD="recepciones_compras"><i class="bi bi-check2-circle"></i> Comprar</button>';
-                                array_unshift($botones_acciones,$nuevo_boton);
-                            }
-                            
-                            $hashed_id = codificar($row['id_orden_compras']);
-                            $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                            array_push($botones_acciones, $nuevo_boton);
-                            $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                            array_push($botones_acciones, $nuevo_boton);
-                            $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
-                            $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                            return $row;
-                        };
-        
-                        $ColumnsCheck = [
-                            ['column'=>"orden_compras","check_similar"=>false]
-                        ];
-        
-                        $nuevo_boton = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
-                        //array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
-                        array_push($data_script['botones_acciones'], $nuevo_boton);
-        
-                        $modalCRUD = 'ordenes_compras';
-                        $newbuttons = [
-                            7 =>'<button class="UpdateEstatus btn btn-success success" bloque="compras" name="revisar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Dar Revisión</button>',
-                            6 =>'<button class="UpdateEstatus btn btn-success success" bloque="compras" name="autorizar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Autorizar</button>',
-                            5 => '<button class="ModalSetData btn btn-success success" bloque="compras" name="comprar" modalCRUD="recepciones_compras"><i class="bi bi-bag"></i> Confirmar Compra</button>'
-                        ];
-        
-                        if (isset($formDataJson['UpdateEstatus'])) {
-                            $statusMap = [
-                                'revisar' => 6,
-                                'autorizar' => 5
-                            ];
-                            
-                            if (array_key_exists($formDataJson['UpdateEstatus'], $statusMap)) {
-                                $editformDataJson['kid_estatus'] = $statusMap[$formDataJson['UpdateEstatus']];
-                                $ColumnsCheck = [];
-                                unset($editformDataJson['UpdateEstatus']);
-                            }
-                        }
-                        break;
-
-                case 'update_estatus_ordenes_compras':
-
-                    $opcion = 2;
-                    $id = $_POST['firstColumnValue'];
-
-                    $formDataJson['kid_estatus'] = isset($formDataJson['UpdateEstatus']) ? GetIDEstatusByName($formDataJson['UpdateEstatus']) : null;
-        
-                    unset($formDataJson['UpdateEstatus']);
-        
-                    $editformDataJson = CleanJson($formDataJson);
-        
-                    $tabla = 'ordenes_compras';
-                    $idcolumn= "id_orden_compras";
-        
-                    $consultaselect = "SELECT oc.id_orden_compras ,
-                        oc.orden_compras,
-                        oc.codigo_externo,
-                        oc.grupo_cotizacion,
-                        p.proyecto AS kid_proyecto,
-                        prov.proveedor AS kid_proveedor,
-                        oc.monto_total,
-                        oc.monto_neto,
-                        oc.kid_estatus,
-                        oc.fecha_creacion
-                    FROM ordenes_compras oc
-                    LEFT JOIN proyectos p ON oc.kid_proyecto = p.id_proyecto
-                    LEFT JOIN proveedores prov ON oc.kid_proveedor = prov.id_proveedor
-                    WHERE oc.kid_estatus !=3 and ".$idcolumn." = :".$idcolumn;
-
-                    
-                    $fuc_mapping = function ($row) {
-                        global $data_script, $estatus, $estatus_name;
-                        $botones_acciones = $data_script['botones_acciones'];
-        
-                        $bloque = 'compras';
-                        $modalCRUD =  'update_estatus_ordenes_compras';
-                        if(!in_array($row['kid_estatus'], [5,6,9])){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }else if($row['kid_estatus'] == 6){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }if($row['kid_estatus'] == 5){
-                            $nuevo_boton = '<button class="ModalSetData btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[9].'" modalCRUD="recepciones_compras"><i class="bi bi-check2-circle"></i> Comprar</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }
-                        
-                        $hashed_id = codificar($row['id_orden_compras']);
-                        $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                        array_push($botones_acciones, $nuevo_boton);
-                        $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                        array_push($botones_acciones, $nuevo_boton);
-                        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
-                        $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                        return $row;
-                    };
-        
-        
-        
-                    //debug($editformDataJson);
-                    $ColumnsCheck = [];
-        
-                    $text_colums_edit = [];
-                    break;
-
-                case 'detalles_ordenes_compras':
-                    $tabla = 'detalles_ordenes_compras';
-                    $idcolumn= "id_detalle_orden_compra";
-
-                    /*-------------------- Obtener Tablas Foráneas --------------------*/
-                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null; 
-                    $formDataJson['kid_orden_compra'] = isset($formDataJson['kid_orden_compra']) ? GetIDOrdenComprasByName($formDataJson['kid_orden_compra']) : null;
-                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-
-                    $editformDataJson = CleanJson($formDataJson);
-                    //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                    $consultaselect = "SELECT doc.id_detalle_orden_compra,
-                        oc.orden_compras AS kid_orden_compra,
-                        doc.grupo_cotizacion,
-                        a.articulo AS kid_articulo,
-                        doc.cantidad,
-                        doc.costo_unitario_total,
-                        doc.costo_unitario_neto,
-                        doc.monto_total,
-                        doc.monto_neto,
-                        doc.fecha_creacion
-                    FROM detalles_ordenes_compras doc
-                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
-                    LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                    WHERE doc.kid_estatus  !=3 and ".$idcolumn." = :".$idcolumn;
-
-                    $ColumnsCheck = [];
-                    break;
 
                 
                 case 'recepciones_compras':

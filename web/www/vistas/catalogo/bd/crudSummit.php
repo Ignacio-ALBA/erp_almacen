@@ -492,6 +492,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($formDataJson['kid_dimension']) && isset($dimensiones[$formDataJson['kid_dimension']])) {
                     $formDataJson['kid_dimension'] = $dimensiones[$formDataJson['kid_dimension']];
                 }
+                
+                // Asegurarse de que el campo costo esté presente y tenga un valor por defecto si no se proporciona
+                if (!isset($formDataJson['costo']) || $formDataJson['costo'] === null || $formDataJson['costo'] === '') {
+                    $formDataJson['costo'] = 0; // Establecer un valor predeterminado para el campo costo
+                }
 
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
@@ -503,7 +508,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $consultaselect = "SELECT a.id_articulo  , 
                             a.codigo_interno, 
-                            a.codigo_externo, 
+                            a.codigo_externo,
+                            a.costo, 
                             a.articulo, 
                             m.marca as kid_marca,
                             c.categoria as kid_categoria,
@@ -611,7 +617,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $formDataJson['kid_propietario'] = !empty($formDataJson['kid_propietario']) && isset($colaboradores[$formDataJson['kid_propietario']]) ? $colaboradores[$formDataJson['kid_propietario']] : -1;
-                $formDataJson['kid_representante_legal'] = !empty($formDataJson['kid_representante_legal']) && isset($colaboradores[$formDataJson['kid_representante_legal']]) ? $colaboradores[$formDataJson['kid_representante_legal']] : -1;
+                $formDataJson['kid_representante_legal'] = !empty($formDataJson['kid_representante_legal']) && isset($colaboradores[$formDataJson['kid_representante_legal']]) ? $colaborres[$formDataJson['kid_representante_legal']] : -1;
                 $formDataJson['kid_representante_tecnico'] = !empty($formDataJson['kid_representante_tecnico']) && isset($colaboradores[$formDataJson['kid_representante_tecnico']]) ? $colaboradores[$formDataJson['kid_representante_tecnico']] : -1;
                 $formDataJson['kid_representante_administrativo'] = !empty($formDataJson['kid_representante_administrativo']) && isset($colaboradores[$formDataJson['kid_representante_administrativo']]) ? $colaboradores[$formDataJson['kid_representante_administrativo']] : -1;
 
@@ -1016,30 +1022,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (isset($_POST['firstColumnValue']) && is_numeric($_POST['firstColumnValue'])) {
                         $id = $_POST['firstColumnValue'];
 
-                        $consulta = "UPDATE ".$tabla." SET kid_estatus = :kid_estatus WHERE " . $idcolumn . " = :id";
-                        $resultado = $conexion->prepare($consulta);
-                        $kid_estatus = '3'; // Asignar el nuevo estatus
-                        $resultado->bindParam(':kid_estatus', $kid_estatus);
-                        $resultado->bindParam(':id', $id);
+                        // Verificar si el registro existe antes de intentar actualizarlo
+                        $consulta_check = "SELECT * FROM ".$tabla." WHERE " . $idcolumn . " = :id";
+                        $resultado_check = $conexion->prepare($consulta_check);
+                        $resultado_check->bindParam(':id', $id);
+                        $resultado_check->execute();
                         
-                        if ($resultado->execute()) {
-                            $consulta = "SELECT * FROM " . $tabla . " WHERE " . $idcolumn . " = :id and kid_estatus !=3";
+                        if($resultado_check->rowCount() > 0) {
+                            // El registro existe, proceder con la actualización
+                            $consulta = "UPDATE ".$tabla." SET kid_estatus = :kid_estatus WHERE " . $idcolumn . " = :id";
                             $resultado = $conexion->prepare($consulta);
-                            $resultado->bindParam(':id', $id); // Usa el ID que ya tienes
-                            $resultado->execute();
-                            $data_resultado = $resultado->fetch(PDO::FETCH_ASSOC);
-                
-                            $data = $data_resultado;
-                            if($data_resultado){
+                            $kid_estatus = 3; // Asignar el estatus de eliminado
+                            $resultado->bindParam(':kid_estatus', $kid_estatus);
+                            $resultado->bindParam(':id', $id);
+                            
+                            if ($resultado->execute()) {
+                                // Verificar que se haya actualizado correctamente
+                                $consulta_verify = "SELECT * FROM " . $tabla . " WHERE " . $idcolumn . " = :id AND kid_estatus = 3";
+                                $resultado_verify = $conexion->prepare($consulta_verify);
+                                $resultado_verify->bindParam(':id', $id);
+                                $resultado_verify->execute();
+                                
+                                if($resultado_verify->rowCount() > 0) {
+                                    // La actualización del estatus fue exitosa
+                                    $data = true;
+                                } else {
+                                    // No se actualizó el estatus correctamente
+                                    $data = false;
+                                    print json_encode(['status' => 'error', 'message' => 'Error al eliminar el registro. No se pudo actualizar el estatus.'], JSON_UNESCAPED_UNICODE);
+                                    exit;
+                                }
+                            } else {
                                 $data = false;
-                            }else{
-                                $data = true;
+                                print json_encode(['status' => 'error', 'message' => 'Error en la consulta de eliminación.'], JSON_UNESCAPED_UNICODE);
+                                exit;
                             }
+                        } else {
+                            $data = false;
+                            print json_encode(['status' => 'error', 'message' => 'El registro que intenta eliminar no existe.'], JSON_UNESCAPED_UNICODE);
+                            exit;
                         }
                     } else {
-                        print json_encode(['status' => 'error', 'message' => 'Elemento no valido.'], JSON_UNESCAPED_UNICODE);
+                        print json_encode(['status' => 'error', 'message' => 'ID no válido o no especificado.'], JSON_UNESCAPED_UNICODE);
+                        exit;
                     }
                     break;
+
     
                 default:
                     print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
