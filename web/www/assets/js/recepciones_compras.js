@@ -70,32 +70,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-     // Lógica para generar el archivo PDF con el Código QR para impresión en la Zebra ZD220
-     btnGenerarPDF.addEventListener('click', () => {
-        if (!qrCanvas) {
-            alert('Primero debes generar el código QR.');
-            return;
-        }
+// Lógica para generar el archivo PDF con el Código QR
+btnGenerarPDF.addEventListener('click', () => {
+    if (!qrCanvas) {
+        alert('Primero debes generar el código QR.');
+        return;
+    }
 
-        const { jsPDF } = window.jspdf;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
-        // Configurando dimensiones del papel: 104mm x 50.8mm (en puntos: 1 mm ≈ 2.83465 puntos)
-        const pdfWidth = 104 * 2.83465; // 104 mm a puntos
-        const pdfHeight = 50.8 * 2.83465; // 50.8 mm a puntos
-        const pdf = new jsPDF({
-            unit: 'pt', // Puntos como unidad
-            format: [pdfWidth, pdfHeight] // Formato personalizado
-        });
+    const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
 
-        const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
-    // Ajustar la imagen del QR para que sea más pequeña y centrada en el ticket
-    const qrWidth = 80; // Ajustar el ancho del QR en puntos
-    const qrHeight = 80; // Ajustar el alto del QR en puntos
-    const xOffset = (pdfWidth - qrWidth) / 2; // Centrar horizontalmente
-    const yOffset = (pdfHeight - qrHeight) / 2; // Centrar verticalmente
+    // Dimensiones originales del QR en el PDF
+    const originalWidth = 50; // Ancho original
+    const originalHeight = 50; // Alto original
 
-    pdf.addImage(imgData, 'PNG', xOffset, yOffset, qrWidth, qrHeight);
-        // Descargar el archivo PDF optimizado para el ticket
-        pdf.save('codigo_qr_ticket.pdf');
-    });
+    // Duplicar las dimensiones para hacer el QR un 100% más grande
+    const newWidth = originalWidth * 3; // Duplicar ancho
+    const newHeight = originalHeight * 3; // Duplicar alto
+
+    // Insertar el QR en el PDF con las nuevas dimensiones
+    pdf.addImage(imgData, 'PNG', 10, 20, newWidth, newHeight);
+
+    // Descargar el archivo PDF
+    pdf.save('codigo_qr_peso.pdf');
 });
+}); 
