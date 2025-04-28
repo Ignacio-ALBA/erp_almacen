@@ -6,10 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let qrCanvas = null; // Variable para almacenar el canvas del QR generado
 
 
-    // Lógica para conectar con la báscula
-    btnConectarBalanza.addEventListener('click', async () => {
+       // Lógica para conectar con la báscula
+       btnConectarBalanza.addEventListener('click', async () => {
         try {
+            // Solicitar permisos para acceder al puerto serial
             const port = await navigator.serial.requestPort();
+
+            // Configurar el puerto serial
             await port.open({
                 baudRate: 9600,
                 dataBits: 8,
@@ -17,40 +20,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 parity: "none",
                 flowControl: "none"
             });
-    
+
             console.log('Conectado al puerto serial.');
+
+            // Cambiar el estado del botón para indicar conexión activa
             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
             btnConectarBalanza.classList.remove('btn-info');
             btnConectarBalanza.classList.add('btn-success');
-    
+
             const decoder = new TextDecoderStream();
+            const inputDone = port.readable.pipeTo(decoder.writable);
             const inputStream = decoder.readable;
+
             const reader = inputStream.getReader();
-    
+
+            // Leer continuamente desde el puerto
             while (true) {
-                try {
-                    const { value, done } = await reader.read();
-                    if (done) {
-                        console.log('Conexión cerrada.');
-                        break;
-                    }
-                    if (value) {
-                        console.log('Peso recibido:', value.trim()); // Depurar los datos
-                        pesoBascula.value = value.trim(); // Actualizar el input con los datos recibidos
-                    }
-                } catch (err) {
-                    console.error('Error al leer desde el puerto:', err.message);
+                const { value, done } = await reader.read();
+                if (done) {
+                    console.log('Conexión cerrada.');
                     break;
                 }
+                if (value) {
+                    // Actualizar el valor del input con los datos recibidos
+                    pesoBascula.value = value.trim();
+                }
             }
-    
+
+            // Liberar el lector una vez que termine
             await reader.releaseLock();
         } catch (err) {
             console.error('Error:', err.message);
-            alert('Error al conectar con la báscula: ' + err.message);
+            alert('Error al conectar con la balanza: ' + err.message);
         }
     });
-    
     // Lógica para generar el Código QR
     btnGenerarQR.addEventListener('click', () => {
         const pesoActual = pesoBascula.value || '0.00';
