@@ -570,6 +570,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ['column'=>"estado","check_similar"=>true]
                 ];
                 break;
+                case 'detalles_produccion':
+                    $tabla = 'detalle_produccion';
+                    $idcolumn = "id_detalle_produccion";
+                
+                    /*-------------------- Obtener Tablas Foráneas --------------------*/
+                    $formDataJson['kid_produccion'] = isset($formDataJson['kid_produccion']) ? GetIDProduccionByName($formDataJson['kid_produccion']) : null;
+                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+                    $formDataJson['kid_ubicacion'] = isset($formDataJson['kid_ubicacion']) ? GetIDUbicacionByName($formDataJson['kid_ubicacion']) : null;
+                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                
+                    $editformDataJson = CleanJson($formDataJson);
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
+                
+                    $consultaselect = "SELECT dp.id_detalle_produccion,
+                        p.fecha_produccion AS kid_produccion,
+                        a.articulo AS kid_articulo,
+                        dp.cantidad_usada,
+                        u.codigo_localizacion AS kid_ubicacion,
+                        c.email AS kid_creacion,
+                        dp.codigo_qr,
+                        dp.fecha_creacion
+                    FROM detalle_produccion dp
+                    LEFT JOIN produccion p ON dp.kid_produccion = p.id_produccion
+                    LEFT JOIN articulos a ON dp.kid_articulo = a.id_articulo
+                    LEFT JOIN ubicacion_almacen u ON dp.kid_ubicacion = u.id_ubicacion
+                    LEFT JOIN colaboradores c ON dp.kid_creacion = c.id_colaborador
+                    WHERE dp.kid_estatus != 3 AND $idcolumn = :$idcolumn";
+                
+                    $ColumnsCheck = [
+                        ['column' => "cantidad_usada", "check_similar" => false],
+                        ['column' => "codigo_qr", "check_similar" => true],
+                    ];
+                    break;
+                case 'capturar_produccion':
+                    $tabla = 'produccion';
+                    $idcolumn = "id_produccion";
+                
+                    /*-------------------- Obtener Tablas Foráneas --------------------*/
+                   // $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+                    $formDataJson['kid_almacen'] = isset($formDataJson['kid_almacen']) ? GetIDAlmacenByName($formDataJson['kid_almacen']) : null;
+                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+
+                    if (!$formDataJson['kid_articulo']) {
+                        echo json_encode(['status' => 'error', 'message' => 'El artículo especificado no es válido.']);
+                        exit;
+                    }
+                    $editformDataJson = CleanJson($formDataJson);
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
+                
+                    $consultaselect = "SELECT p.id_produccion,
+                        p.fecha_produccion,
+                        a.articulo AS kid_articulo,
+                        p.cantidad_producida,
+                        al.almacen AS kid_almacen,
+                        c.email AS kid_creacion,
+                        p.fecha_creacion
+                    FROM produccion p
+                    LEFT JOIN articulos a ON p.kid_articulo = a.id_articulo
+                    LEFT JOIN almacenes al ON p.kid_almacen = al.id_almacen
+                    LEFT JOIN colaboradores c ON p.kid_creacion = c.id_colaborador
+                    WHERE p.kid_estatus != 3 AND $idcolumn = :$idcolumn";
+                
+                    $ColumnsCheck = [
+                        ['column' => "fecha_produccion", "check_similar" => false],
+                        ['column' => "cantidad_producida", "check_similar" => false],
+                    ];
+                    break;
                 case 'ubicacion_almacen':
                     $tabla = 'ubicacion_almacen';
                     $idcolumn = "id_ubicacion";

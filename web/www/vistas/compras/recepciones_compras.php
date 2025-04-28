@@ -166,6 +166,23 @@
                   'text' => '<i class="bi bi-save2-fill"></i> Registrar peso',
                   'html' => true
               ]);
+                 // Botón para generar QR
+                 echo CreateButtonP([
+                  'id' => 'btn_generar_qr',
+                  'type' => 'button',
+                  'class' => 'btn btn-secondary ms-2',
+                  'text' => '<i class="bi bi-qr-code"></i> Generar Código QR',
+                  'html' => true
+              ]);
+
+              // Botón para generar PDF
+              echo CreateButtonP([
+                  'id' => 'btn_generar_pdf',
+                  'type' => 'button',
+                  'class' => 'btn btn-success ms-2',
+                  'text' => '<i class="bi bi-file-earmark-pdf"></i> Generar PDF',
+                  'html' => true
+              ]);
           echo '</div>
       </div>
   </div>

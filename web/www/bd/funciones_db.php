@@ -56,6 +56,7 @@ function GetIDProyectoByName($valor){
     return $resultado->fetchColumn() ?: null;
 }
 
+
 function GetIDProveedorByName($valor){
     global $conexion;
     $consult = "SELECT id_proveedor FROM proveedores WHERE kid_estatus != 3 AND razon_social =:valor";
@@ -64,10 +65,9 @@ function GetIDProveedorByName($valor){
     $resultado->execute();
     return $resultado->fetchColumn() ?: null;
 }
-
-function GetIDTiempoEntregaByName($valor){
+function GetIDAlmacenByName($valor){
     global $conexion;
-    $consult = "SELECT id_tiempo_entrega  FROM tiempos_entregas WHERE kid_estatus != 3 AND tiempo_entrega =:valor";
+    $consult = "SELECT id_almacen FROM almacenes WHERE kid_estatus != 3 AND almacen =:valor";
     $resultado = $conexion->prepare($consult);
     $resultado->bindParam(':valor', $valor);
     $resultado->execute();
@@ -90,16 +90,31 @@ function GetIDArticuloByName($valor){
     $resultado->execute();
     return $resultado->fetchColumn() ?: null;
 }
-
-function GetIDEstadoByName($valor){
+function GetIDArticuloByName1($nombre_articulo) {
     global $conexion;
-    $consult = "SELECT id_estados FROM estados WHERE kid_estatus != 3 AND estado =:valor";
+    $consulta = "SELECT id_articulo FROM articulos WHERE articulo = :nombre_articulo AND kid_estatus != 3 LIMIT 1";
+    $stmt = $conexion->prepare($consulta);
+    $stmt->bindParam(':nombre_articulo', $nombre_articulo);
+    $stmt->execute();
+    return $stmt->fetchColumn(); // Retorna el ID del artículo
+}
+
+function GetIDProduccionByName($valor){
+    global $conexion;
+    $consult = "SELECT id_produccion FROM produccion WHERE kid_estatus != 3 AND produccion =:valor";
     $resultado = $conexion->prepare($consult);
     $resultado->bindParam(':valor', $valor);
     $resultado->execute();
     return $resultado->fetchColumn() ?: null;
 }
-
+function GetIDUbicacionByName($valor){
+    global $conexion;
+    $consult = "SELECT id_ubicacion FROM ubicacion_almacen WHERE kid_estatus != 3 AND codigo_localizacion =:valor";
+    $resultado = $conexion->prepare($consult);
+    $resultado->bindParam(':valor', $valor);
+    $resultado->execute();
+    return $resultado->fetchColumn() ?: null;
+}
 function GetIDCuentaBancariaByName($valor){
     global $conexion;
     $consult = "SELECT id_cuenta_bancaria FROM cuentas_bancarias WHERE kid_estatus != 3 AND cuenta_bancaria =:valor";
@@ -725,7 +740,53 @@ function GetArticulosListForSelect($condiciones  = []){
     ], $data);
     return $data;
 }
+function GetProduccionesListForSelect($condiciones  = []){
+    global $conexion;
+    // Construir las condiciones y parámetros
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
 
+    // Consulta para obtener las producciones activas
+    $consulta = "SELECT id_produccion, fecha_produccion 
+                 FROM produccion 
+                 WHERE kid_estatus != 3 $condiciones_str";
+
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute($parametros);
+
+    // Mapear los datos al formato esperado
+    $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    $data = array_map(fn($item) => [
+        'valor' => $item['id_produccion'],
+        'text' => date('Y-m-d H:i:s', strtotime($item['fecha_produccion'])), // Formatear la fecha
+        'pordefecto' => 0
+    ], $data);
+
+    return $data;
+}
+
+function GetUbicacionListForSelect($condiciones  = []){
+    global $conexion;
+    // Construir las condiciones y parámetros
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
+
+    // Consulta para obtener las producciones activas
+    $consulta = "SELECT id_ubicacion, codigo_localizacion 
+                 FROM ubicacion_almacen
+                 WHERE kid_estatus != 3 $condiciones_str";
+
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute($parametros);
+
+    // Mapear los datos al formato esperado
+    $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    $data = array_map(fn($item) => [
+        'valor' => $item['id_ubicacion'],
+        'text' => $item['codigo_localizacion'],
+        'pordefecto' => 0
+    ], $data);
+
+    return $data;
+}
 
 function GetEstadosListForSelect($condiciones  = []){
     global $conexion;

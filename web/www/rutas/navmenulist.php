@@ -941,7 +941,7 @@ $navItems = [
                 "ver_locaciones",
                 "eliminar_locaciones"
                 ]
-            ],
+            ],/*
             [
               "label" => "Contenido de Almacenes",
               "href" => "/detalles_almacenes",
@@ -951,7 +951,7 @@ $navItems = [
                 "ver_detalles_almacenes",
                 "eliminar_detalles_almacenes"
                 ]
-            ],
+            ],*/
             [
               "label" => "Comentarios de Almacenes",
               "href" => "/comentarios_almacenes",

@@ -441,10 +441,49 @@ if($resultado){
             $vista = 'almacenes';
             break;
             case 'mermas':
-                $vista = 'mermas';
+                case 'mermas':
+                    $vista = 'mermas';
+                    $consultaselect = "SELECT m.id_merma,
+                        p.id_produccion AS kid_produccion,
+                        a.articulo AS kid_articulo,
+                        m.tipo_merma,
+                        m.titulo,
+                        m.descripcion,
+                        m.cantidad,
+                        c.email AS kid_creacion,
+                        m.fecha_creacion
+                    FROM mermas m
+                    LEFT JOIN produccion p ON m.kid_produccion = p.id_produccion
+                    LEFT JOIN articulos a ON m.kid_articulo = a.id_articulo
+                    LEFT JOIN colaboradores c ON m.kid_creacion = c.id_colaborador
+                    WHERE m.kid_estatus != 3";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->execute();
+                
+                    $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    $data['data_show']['producciones'] = GetProduccionesListForSelect();
+                    $data['data_show']['articulos'] = GetArticulosListForSelect();
+                    $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+                    break;
                 break;
                 case 'locaciones':
                     $vista = 'locaciones';
+                    $consultaselect = "SELECT u.id_ubicacion,
+                        a.almacen AS kid_almacen,
+                        u.codigo_localizacion,
+                        u.descripcion,
+                        c.email AS kid_creacion,
+                        u.fecha_creacion
+                    FROM ubicacion_almacen u
+                    LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
+                    LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
+                    WHERE u.kid_estatus != 3";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->execute();
+                
+                    $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
+                    $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
                     break;
       
         case 'comentarios_almacenes':

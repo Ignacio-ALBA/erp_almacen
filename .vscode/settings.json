@@ -1,3 +1,8 @@
 {
-    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "timeline.pageSize": 150,
+    "git.timeline.showUncommitted": true,
+    "github.copilot.chat.edits.temporalContext.enabled": true,
+    "github.copilot.chat.editor.temporalContext.enabled": true,
+    "workbench.localHistory.maxFileEntries": 150
 }

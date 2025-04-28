@@ -232,7 +232,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $ColumnsCheck = [];
                     break;
-
+                    case 'ubicacion_almacen':
+                        $tabla = 'ubicacion_almacen';
+                        $idcolumn = "id_ubicacion";
+                    
+                        /*-------------------- Obtener Tablas Foráneas --------------------*/
+                        $formDataJson['kid_almacen'] = isset($formDataJson['kid_almacen']) ? GetIDAlmacenByName($formDataJson['kid_almacen']) : null;
+                        /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                    
+                        $editformDataJson = CleanJson($formDataJson);
+                        $newformDataJson = $formDataJson;
+                        $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                        $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                        $newformDataJson['kid_estatus'] = 1;
+                    
+                        $consultaselect = "SELECT u.id_ubicacion,
+                            a.almacen AS kid_almacen,
+                            u.codigo_localizacion,
+                            u.descripcion,
+                            c.email AS kid_creacion,
+                            u.fecha_creacion
+                        FROM ubicacion_almacen u
+                        LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
+                        LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
+                        WHERE u.kid_estatus != 3 AND $idcolumn = :$idcolumn";
+                    
+                        $ColumnsCheck = [
+                            ['column' => "codigo_localizacion", "check_similar" => true],
+                            ['column' => "descripcion", "check_similar" => false],
+                        ];
+                        break;
                 case 'listas_compras':
                     $tabla = 'listas_compras';
                     $idcolumn = "id_lista_compra";
