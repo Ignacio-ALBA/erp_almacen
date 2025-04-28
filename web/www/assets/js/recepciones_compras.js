@@ -4,20 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGenerarQR = document.getElementById('btn_generar_qr');
     const btnGenerarPDF = document.getElementById('btn_generar_pdf');
 
-    // Lógica para conectar con la balanza
+    // Lógica para conectar con la báscula
     btnConectarBalanza.addEventListener('click', async () => {
         try {
             // Solicitar permisos para acceder al puerto serial
             const port = await navigator.serial.requestPort();
-
-            // Verificar si el puerto seleccionado es "COM4"
-            const portInfo = port.getInfo();
-            const isCOM4 = portInfo?.usbProductId === 4 || portInfo?.usbVendorId === 4; // Ajustar según cómo se identifique COM4 en tu entorno
-
-            if (!isCOM4) {
-                alert('Seleccione el puerto COM4 para conectar la balanza por favor.');
-                return;
-            }
 
             // Configurar el puerto serial
             await port.open({
@@ -28,18 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 flowControl: "none"
             });
 
-            const decoder = new TextDecoderStream();
-            const inputDone = port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable;
-
-            const reader = inputStream.getReader();
-
             console.log('Conectado al puerto serial.');
 
             // Cambiar el estado del botón para indicar conexión activa
             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
             btnConectarBalanza.classList.remove('btn-info');
             btnConectarBalanza.classList.add('btn-success');
+
+            const decoder = new TextDecoderStream();
+            const inputDone = port.readable.pipeTo(decoder.writable);
+            const inputStream = decoder.readable;
+
+            const reader = inputStream.getReader();
 
             // Leer continuamente desde el puerto
             while (true) {
@@ -61,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error al conectar con la balanza: ' + err.message);
         }
     });
-
     // Lógica para generar el Código QR
     btnGenerarQR.addEventListener('click', () => {
         const pesoActual = pesoBascula.value || '0.00';
