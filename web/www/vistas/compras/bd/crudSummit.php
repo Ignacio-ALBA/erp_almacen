@@ -237,94 +237,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $tabla = 'listas_compras';
                     $idcolumn = "id_lista_compra";
 
-                    // Eliminar campos no necesarios
-                    unset($formDataJson['num_articulos']);
+                    $editformDataJson = CleanJson($formDataJson);
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                    $newformDataJson['kid_estatus'] = 1;
 
-                    // Opción 3: Eliminar lista de compras
-                    if ($opcion == 3) {
-                        try {
-                            if (isset($_POST['firstColumnValue']) && !empty($_POST['firstColumnValue'])) {
-                                $id = $_POST['firstColumnValue'];
-                                
-                                // Iniciar transacción
-                                $conexion->beginTransaction();
-                                
-                                // Marcar los detalles de la lista como eliminados
-                                $detalles_query = "UPDATE detalles_listas_compras SET kid_estatus = 3 WHERE kid_lista_compras = :id";
-                                $resultado_detalles = $conexion->prepare($detalles_query);
-                                $resultado_detalles->bindParam(':id', $id);
-                                $resultado_detalles->execute();
-                                
-                                // Marcar la lista como eliminada
-                                $consulta = "UPDATE listas_compras SET kid_estatus = 3 WHERE id_lista_compra = :id";
-                                $resultado = $conexion->prepare($consulta);
-                                $resultado->bindParam(':id', $id);
-                                
-                                if ($resultado->execute()) {
-                                    // Confirmar transacción
-                                    $conexion->commit();
-                                    
-                                    $data = ['status' => 'success', 'message' => 'Lista de compras eliminada correctamente'];
-                                    echo json_encode($data);
-                                    exit;
-                                } else {
-                                    throw new Exception("No se pudo eliminar la lista de compras");
-                                }
-                            } else {
-                                throw new Exception("ID de lista de compras no válido");
-                            }
-                        } catch (Exception $e) {
-                            // Revertir transacción en caso de error
-                            $conexion->rollBack();
-                            $data = ['status' => 'error', 'message' => 'Error al eliminar la lista de compras: ' . $e->getMessage()];
-                            echo json_encode($data);
-                            exit;
-                        }
-                    }
-                    
-                    // Opción 4: Cargar datos para edición
+                    // Si es edición (opción 4), cargar también los detalles
                     if ($opcion == 4) {
                         try {
                             if (isset($_POST['firstColumnValue']) && !empty($_POST['firstColumnValue'])) {
                                 $id = $_POST['firstColumnValue'];
                                 
-                                // Consulta para obtener datos de la lista de compras
-                                $consulta = "SELECT 
-                                    lc.id_lista_compra,
-                                    lc.lista_compra,
-                                    lc.orden,
-                                    lc.kid_estatus,
-                                    lc.kid_cuenta_bancaria,
-                                    lc.kid_proyecto
-                                FROM listas_compras lc
-                                WHERE lc.kid_estatus != 3 AND lc.id_lista_compra = :id";
+                                // Obtener información de la lista
+                                $lista_query = "SELECT * FROM listas_compras WHERE id_lista_compra = :id";
+                                $resultado_lista = $conexion->prepare($lista_query);
+                                $resultado_lista->bindParam(':id', $id);
+                                $resultado_lista->execute();
+                                $lista_data = $resultado_lista->fetch(PDO::FETCH_ASSOC);
                                 
-                                $resultado = $conexion->prepare($consulta);
-                                $resultado->bindParam(':id', $id);
-                                $resultado->execute();
-                                $lista_data = $resultado->fetch(PDO::FETCH_ASSOC);
-                                
-                                if (!$lista_data) {
-                                    throw new Exception("Lista de compras no encontrada");
-                                }
-                                
-                                // Consulta para obtener detalles de la lista de compras
-                                $consulta_detalles = "SELECT 
-                                    dlc.id_detalle_lista_compras,
-                                    dlc.kid_articulo,
-                                    a.articulo,
-                                    dlc.cantidad,
-                                    dlc.costo_unitario_total,
-                                    dlc.costo_unitario_neto,
-                                    dlc.monto_total,
-                                    dlc.monto_neto,
-                                    dlc.porcentaje_descuento
-                                FROM detalles_listas_compras dlc
-                                LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
-                                WHERE dlc.kid_estatus != 3 AND dlc.kid_lista_compras = :id
-                                ORDER BY dlc.id_detalle_lista_compras ASC";
-                                
-                                $resultado_detalles = $conexion->prepare($consulta_detalles);
+                                // Obtener detalles de la lista
+                                $detalles_query = "SELECT dlc.*, a.articulo as nombre_articulo 
+                                                   FROM detalles_listas_compras dlc
+                                                   LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
+                                                   WHERE dlc.kid_lista_compras = :id AND dlc.kid_estatus != 3";
+                                $resultado_detalles = $conexion->prepare($detalles_query);
                                 $resultado_detalles->bindParam(':id', $id);
                                 $resultado_detalles->execute();
                                 $detalles_data = $resultado_detalles->fetchAll(PDO::FETCH_ASSOC);
@@ -349,76 +286,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             exit;
                         }
                     }
-
-                    $editformDataJson = CleanJson($formDataJson);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-
-                    // Editar lista de compras y sus detalles
-                    if ($opcion == 2) {
+                    
+                    // Para operación 2 (actualizar), revisar si hay artículos para actualizar/insertar
+                    if ($opcion == 2 && isset($_POST['articulos'])) {
                         try {
-                            // Iniciar transacción para actualización de lista y detalles
+                            // Obtener el ID de la lista de compras
+                            $id_lista_compra = $_POST['firstColumnValue'];
+                            
+                            // Decodificar los artículos
+                            $articulos = json_decode($_POST['articulos'], true);
+                            if (!is_array($articulos)) {
+                                throw new Exception("Formato de artículos inválido");
+                            }
+                            
+                            // Iniciar transacción para asegurar la integridad de los datos
                             $conexion->beginTransaction();
                             
-                            // Obtener ID de la lista a editar
-                            if (!isset($_POST['firstColumnValue']) || empty($_POST['firstColumnValue'])) {
-                                throw new Exception("ID de lista de compras no proporcionado");
-                            }
-                            
-                            $id = $_POST['firstColumnValue'];
-                            
-                            // Extraer los artículos del formData si existen
-                            $articulos = [];
-                            if (isset($formDataJson['articulos']) && is_string($formDataJson['articulos'])) {
-                                $articulos = json_decode($formDataJson['articulos'], true);
-                                unset($newformDataJson['articulos']);
-                            } else if (isset($formDataJson['articulos']) && is_array($formDataJson['articulos'])) {
-                                $articulos = $formDataJson['articulos'];
-                                unset($newformDataJson['articulos']);
-                            }
-                            
-                            // Actualizar la lista de compras
-                            $setPart = [];
-                            foreach ($editformDataJson as $key => $value) {
-                                if ($key !== 'id_lista_compra') { // No incluir el ID en el SET
-                                    $setPart[] = "$key = :$key";
-                                }
-                            }
-                            
-                            $consulta = "UPDATE $tabla SET " . implode(', ', $setPart) . " WHERE $idcolumn = :id";
-                            $resultado = $conexion->prepare($consulta);
-                            
-                            foreach ($editformDataJson as $key => $value) {
-                                if ($key !== 'id_lista_compra') {
-                                    $resultado->bindValue(":$key", $value);
-                                }
-                            }
-                            
-                            $resultado->bindValue(":id", $id);
-                            $resultado->execute();
-                            
-                            // Actualizar los detalles de los artículos
-                            foreach ($articulos as $articulo) {
-                                // Asegurarse de que kid_articulo sea un ID numérico
-                                if (!is_numeric($articulo['kid_articulo'])) {
-                                    $query = "SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1";
-                                    $stmt = $conexion->prepare($query);
-                                    $stmt->bindParam(':articulo', $articulo['kid_articulo']);
-                                    $stmt->execute();
-                                    $idArticulo = $stmt->fetchColumn();
-
-                                    if ($idArticulo) {
-                                        $articulo['kid_articulo'] = $idArticulo;
-                                    } else {
-                                        throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
-                                    }
-                                }
+                            // 1. Actualizar los datos básicos de la lista de compras
+                            $updateListaQuery = "UPDATE listas_compras SET 
+                                lista_compra = :lista_compra,
+                                orden = :orden,
+                                kid_estatus = :kid_estatus,
+                                kid_cuenta_bancaria = :kid_cuenta_bancaria,
+                                kid_proyecto = :kid_proyecto
+                                WHERE id_lista_compra = :id_lista_compra";
                                 
-                                // Si tiene ID de detalle, actualizar; de lo contrario, insertar nuevo
-                                if (isset($articulo['id_detalle_lista_compras']) && $articulo['id_detalle_lista_compras']) {
-                                    $updateQuery = "UPDATE detalles_listas_compras SET 
+                            $stmtLista = $conexion->prepare($updateListaQuery);
+                            $stmtLista->bindParam(':lista_compra', $editformDataJson['lista_compra']);
+                            $stmtLista->bindParam(':orden', $editformDataJson['orden']);
+                            $stmtLista->bindParam(':kid_estatus', $editformDataJson['kid_estatus']);
+                            $stmtLista->bindParam(':kid_cuenta_bancaria', $editformDataJson['kid_cuenta_bancaria']);
+                            $stmtLista->bindParam(':kid_proyecto', $editformDataJson['kid_proyecto']);
+                            $stmtLista->bindParam(':id_lista_compra', $id_lista_compra);
+                            
+                            if (!$stmtLista->execute()) {
+                                throw new Exception("Error al actualizar la lista de compras");
+                            }
+                            
+                            // 2. Procesar cada artículo
+                            foreach ($articulos as $articulo) {
+                                // Verificar si el campo ID está presente y no está vacío
+                                $hasId = isset($articulo['id_detalle_lista_compra']) && !empty($articulo['id_detalle_lista_compra']);
+                                
+                                if ($hasId) {
+                                    // Actualizar artículo existente
+                                    $updateDetalleQuery = "UPDATE detalles_listas_compras SET 
                                         kid_articulo = :kid_articulo,
                                         cantidad = :cantidad,
                                         costo_unitario_total = :costo_unitario_total,
@@ -426,27 +338,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         monto_total = :monto_total,
                                         monto_neto = :monto_neto,
                                         porcentaje_descuento = :porcentaje_descuento
-                                    WHERE id_detalle_lista_compras = :id_detalle_lista_compras";
+                                        WHERE id_detalle_lista_compras = :id_detalle_lista_compras";
+                                        
+                                    $stmtDetalle = $conexion->prepare($updateDetalleQuery);
+                                    $stmtDetalle->bindParam(':kid_articulo', $articulo['kid_articulo']);
+                                    $stmtDetalle->bindParam(':cantidad', $articulo['cantidad']);
+                                    $stmtDetalle->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
+                                    $stmtDetalle->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
+                                    $stmtDetalle->bindParam(':monto_total', $articulo['monto_total']);
+                                    $stmtDetalle->bindParam(':monto_neto', $articulo['monto_neto']);
+                                    $stmtDetalle->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
+                                    $stmtDetalle->bindParam(':id_detalle_lista_compras', $articulo['id_detalle_lista_compras']);
                                     
-                                    $stmt = $conexion->prepare($updateQuery);
-                                    $stmt->bindParam(':kid_articulo', $articulo['kid_articulo']);
-                                    $stmt->bindParam(':cantidad', $articulo['cantidad']);
-                                    $stmt->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
-                                    $stmt->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
-                                    $stmt->bindParam(':monto_total', $articulo['monto_total']);
-                                    $stmt->bindParam(':monto_neto', $articulo['monto_neto']);
-                                    $stmt->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
-                                    $stmt->bindParam(':id_detalle_lista_compras', $articulo['id_detalle_lista_compras']);
-                                    $stmt->execute();
+                                    if (!$stmtDetalle->execute()) {
+                                        throw new Exception("Error al actualizar el detalle de artículo");
+                                    }
                                 } else {
-                                    $insertQuery = "INSERT INTO detalles_listas_compras (
-                                        kid_lista_compras, 
-                                        kid_articulo, 
-                                        cantidad, 
-                                        costo_unitario_total, 
-                                        costo_unitario_neto, 
-                                        monto_total, 
-                                        monto_neto, 
+                                    // Insertar nuevo artículo
+                                    $insertDetalleQuery = "INSERT INTO detalles_listas_compras (
+                                        kid_lista_compras,
+                                        kid_articulo,
+                                        cantidad,
+                                        costo_unitario_total,
+                                        costo_unitario_neto,
+                                        monto_total,
+                                        monto_neto,
                                         porcentaje_descuento,
                                         fecha_creacion,
                                         kid_creacion,
@@ -465,169 +381,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         :kid_estatus
                                     )";
                                     
-                                    $stmt = $conexion->prepare($insertQuery);
-                                    $stmt->bindParam(':kid_lista_compras', $id);
-                                    $stmt->bindParam(':kid_articulo', $articulo['kid_articulo']);
-                                    $stmt->bindParam(':cantidad', $articulo['cantidad']);
-                                    $stmt->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
-                                    $stmt->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
-                                    $stmt->bindParam(':monto_total', $articulo['monto_total']);
-                                    $stmt->bindParam(':monto_neto', $articulo['monto_neto']);
-                                    $stmt->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
+                                    $stmtDetalle = $conexion->prepare($insertDetalleQuery);
+                                    $stmtDetalle->bindParam(':kid_lista_compras', $id_lista_compra);
+                                    $stmtDetalle->bindParam(':kid_articulo', $articulo['kid_articulo']);
+                                    $stmtDetalle->bindParam(':cantidad', $articulo['cantidad']);
+                                    $stmtDetalle->bindParam(':costo_unitario_total', $articulo['costo_unitario_total']);
+                                    $stmtDetalle->bindParam(':costo_unitario_neto', $articulo['costo_unitario_neto']);
+                                    $stmtDetalle->bindParam(':monto_total', $articulo['monto_total']);
+                                    $stmtDetalle->bindParam(':monto_neto', $articulo['monto_neto']);
+                                    $stmtDetalle->bindParam(':porcentaje_descuento', $articulo['porcentaje_descuento']);
                                     $fecha_creacion = date('Y-m-d H:i:s');
-                                    $stmt->bindParam(':fecha_creacion', $fecha_creacion);
-                                    $stmt->bindParam(':kid_creacion', $_SESSION["s_id"]);
+                                    $stmtDetalle->bindParam(':fecha_creacion', $fecha_creacion);
+                                    $stmtDetalle->bindParam(':kid_creacion', $_SESSION["s_id"]);
                                     $kid_estatus = 1;
-                                    $stmt->bindParam(':kid_estatus', $kid_estatus);
-                                    $stmt->execute();
+                                    $stmtDetalle->bindParam(':kid_estatus', $kid_estatus);
+                                    
+                                    if (!$stmtDetalle->execute()) {
+                                        throw new Exception("Error al insertar el detalle de artículo");
+                                    }
                                 }
                             }
                             
-                            // Confirmar transacción
+                            // Confirmar todos los cambios
                             $conexion->commit();
                             
-                            // Obtener los datos actualizados para responder
-                            $resultado = $conexion->prepare("SELECT * FROM $tabla WHERE $idcolumn = :id AND kid_estatus != 3");
-                            $resultado->bindParam(":id", $id);
+                            // Obtener los datos actualizados para mostrar
+                            $resultado = $conexion->prepare($consultaselect);
+                            $resultado->bindParam(":$idcolumn", $id_lista_compra, PDO::PARAM_INT);
                             $resultado->execute();
-                            $data_resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                            $data = $resultado->fetch(PDO::FETCH_ASSOC);
                             
-                            $data = [
-                                'status' => 'success', 
-                                'message' => 'Lista de compras actualizada correctamente',
-                                'data' => $data_resultado
-                            ];
-                            
-                            echo json_encode($data);
+                            echo json_encode(['status' => 'success', 'data' => $data]);
                             exit;
+                            
                         } catch (Exception $e) {
-                            // Revertir transacción en caso de error
+                            // Si hay error, revertir los cambios
                             $conexion->rollBack();
-                            
-                            $data = [
-                                'status' => 'error', 
-                                'message' => 'Error al actualizar la lista de compras: ' . $e->getMessage()
-                            ];
-                            
-                            echo json_encode($data);
+                            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
                             exit;
                         }
                     }
+                    
+                    // Consulta para detalles básicos de la lista
+                    $consultaselect = "SELECT lc.id_lista_compra, 
+                        lc.orden, 
+                        lc.lista_compra,
+                        CASE 
+                            WHEN lc.kid_estatus = 1 THEN 'Activo' 
+                            WHEN lc.kid_estatus = 2 THEN 'En proceso' 
+                            ELSE 'Eliminado' 
+                        END AS kid_estatus,
+                        CONCAT(u1.nombre, ' ', u1.apellido_paterno) AS kid_creacion,
+                        CONCAT(u2.nombre, ' ', u2.apellido_paterno) AS kid_autorizacion,
+                        lc.fecha_creacion
+                    FROM 
+                        listas_compras lc
+                    LEFT JOIN 
+                        colaboradores u1 ON lc.kid_creacion = u1.id_colaborador
+                    LEFT JOIN 
+                        colaboradores u2 ON lc.kid_autorizacion = u2.id_colaborador
+                    WHERE lc.kid_estatus != 3 AND $idcolumn = :$idcolumn";
 
-                    // Antes de insertar en la tabla `listas_compras`, verificar y asignar un valor predeterminado para `kid_proyecto`
-                    if (empty($newformDataJson['kid_proyecto'])) {
-                        $newformDataJson['kid_proyecto'] = GetDefaultProjectId();
-                    }
-
-                    // Antes de insertar en la tabla `listas_compras`, verificar y asignar un valor predeterminado para `kid_cuenta_bancaria`
-                    if (empty($newformDataJson['kid_cuenta_bancaria'])) {
-                        $newformDataJson['kid_cuenta_bancaria'] = GetDefaultBankAccountId();
-                    }
-
-                    // Validate kid_cuenta_bancaria to ensure it is an integer
-                    if (!is_numeric($newformDataJson['kid_cuenta_bancaria'])) {
-                        $newformDataJson['kid_cuenta_bancaria'] = GetDefaultBankAccountId();
-                    }
-                    if (!is_numeric($newformDataJson['kid_proyecto'])) {
-                        $newformDataJson['kid_proyecto'] = GetDefaultProjectId();
-                    }
-                    // Extraer los artículos del formData si existen
-                    $articulos = [];
-                    foreach ($formDataJson as $key => $value) {
-                        if (preg_match('/^(kid_articulo|cantidad|costo_unitario_total|costo_unitario_neto|monto_total|monto_neto|porcentaje_descuento)_(\d+)$/', $key, $matches)) {
-                            $index = $matches[2];
-                            $field = $matches[1];
-                            $articulos[$index][$field] = $value;
-                            unset($newformDataJson[$key]); // Remover del formData principal
-                        }
-                    }
-
-                    // Convertir el nombre del artículo a su ID antes de la inserción
-                    foreach ($articulos as $index => $articulo) {
-                        if (!is_numeric($articulo['kid_articulo'])) {
-                            $query = "SELECT id_articulo FROM articulos WHERE articulo = :articulo LIMIT 1";
-                            $stmt = $conexion->prepare($query);
-                            $stmt->bindParam(':articulo', $articulo['kid_articulo']);
-                            $stmt->execute();
-                            $idArticulo = $stmt->fetchColumn();
-
-                            if ($idArticulo) {
-                                $articulos[$index]['kid_articulo'] = $idArticulo;
-                            } else {
-                                throw new Exception("El artículo '{$articulo['kid_articulo']}' no existe en la base de datos.");
-                            }
-                        }
-                    }
-
-                    try {
-                        // Iniciar transacción
-                        $conexion->beginTransaction();
-
-                        // Insertar la lista de compras
-                        $columns = implode(", ", array_keys($newformDataJson));
-                        $placeholders = ":" . implode(", :", array_keys($newformDataJson));
-                        $query = "INSERT INTO $tabla ($columns) VALUES ($placeholders)";
-                        $stmt = $conexion->prepare($query);
-                        $stmt->execute($newformDataJson);
-                        $lastInsertId = $conexion->lastInsertId();
-
-                        // Insertar los detalles de los artículos
-                        foreach ($articulos as $articulo) {
-                            $articulo['kid_lista_compras'] = $lastInsertId;
-                            $articulo['fecha_creacion'] = date('Y-m-d H:i:s');
-                            $articulo['kid_creacion'] = $_SESSION["s_id"];
-                            $articulo['kid_estatus'] = 1;
-
-                            $columns = implode(", ", array_keys($articulo));
-                            $placeholders = ":" . implode(", :", array_keys($articulo));
-                            $query = "INSERT INTO detalles_listas_compras ($columns) VALUES ($placeholders)";
-                            $stmt = $conexion->prepare($query);
-                            $stmt->execute($articulo);
-                        }
-
-                        // Confirmar transacción
-                        $conexion->commit();
-                        echo json_encode(['status' => 'success', 'message' => 'Lista de compras creada exitosamente', 'id_lista_compra' => $lastInsertId]);
-                        $data = ['status' => 'success', 'message' => 'Lista de compras creada exitosamente', 'id_lista_compra' => $lastInsertId];
-                        exit; // Finalizar el script inmediatamente después de enviar la respuesta JSON
-                    } catch (Exception $e) {
-                        // Revertir transacción en caso de error
-                        $conexion->rollBack();
-                        $data = ['status' => 'error', 'message' => 'Error al guardar la lista de compras: ' . $e->getMessage()];
-                        echo json_encode(['status' => 'error', 'message' => 'Error al guardar la lista de compras: ' . $e->getMessage()]);
-                        exit; // Finalizar el script inmediatamente después de enviar la respuesta JSON
-                    }
+                    $ColumnsCheck = [
+                        ['column' => "lista_compra", "check_similar" => true]
+                    ];
                     break;
 
                 case 'detalles_listas_compras':
                     $tabla = 'detalles_listas_compras';
-                    $idcolumn= "id_detalle_lista_compras";
+                    $idcolumn = "id_detalle_lista_compras";
 
-                    /*-------------------- Obtener Tablas Foráneas --------------------*/
-                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+                    /* Obtener Tablas Foráneas */
                     $formDataJson['kid_lista_compras'] = isset($formDataJson['kid_lista_compras']) ? GetIDListaCompraByName($formDataJson['kid_lista_compras']) : null;
-                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+                    /* Fin Obtener Tablas Foráneas */
 
                     $editformDataJson = CleanJson($formDataJson);
-                    //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                     $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                     $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                     $newformDataJson['kid_estatus'] = 1;
-                    $consultaselect = "SELECT dlc.id_detalle_lista_compras,
-                        lc.lista_compra AS kid_lista_compras,
+
+                    $consultaselect = "SELECT dlc.id_detalle_lista_compra, 
+                        lc.lista_compra AS kid_lista_compras, 
                         a.articulo AS kid_articulo,
                         dlc.cantidad,
                         dlc.costo_unitario_total,
                         dlc.costo_unitario_neto,
-                        CONCAT(dlc.porcentaje_descuento,' %'),
                         dlc.monto_total,
                         dlc.monto_neto,
                         dlc.fecha_creacion
-                    FROM detalles_listas_compras dlc
-                    LEFT JOIN listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
-                    LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
-                    WHERE dlc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
+                    FROM 
+                        detalles_listas_compras dlc
+                    LEFT JOIN 
+                        listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
+                    LEFT JOIN 
+                        articulos a ON dlc.kid_articulo = a.id_articulo
+                    WHERE dlc.kid_estatus != 3 AND $idcolumn = :$idcolumn";
 
                     $ColumnsCheck = [];
                     break;
@@ -1505,21 +1355,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-
-// Define the $respuesta variable to avoid undefined variable errors
-$respuesta = $data ?? ['status' => 'error', 'message' => 'No response data available'];
-// Limpia cualquier salida anterior
-if (ob_get_level()) {
-    ob_clean();
-}
-
-// Asegurar que siempre se devuelva un objeto JSON válido
-if (!isset($respuesta)) {
-    $respuesta = ['status' => 'error', 'message' => 'Respuesta no definida'];
-}
-
-// Enviar la respuesta JSON
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-exit;
 ?>

@@ -168,6 +168,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
+            case 'lista_compras_detalles':
+                // Devuelve tanto los datos de la lista como los artículos asociados
+                $consultaselect = "SELECT lc.id_lista_compra,
+                    lc.orden,
+                    lc.lista_compra,
+                    es.estatus AS kid_estatus,
+                    lc.fecha_creacion
+                FROM listas_compras lc
+                LEFT JOIN estatus es ON lc.kid_estatus = es.id_estatus
+                WHERE lc.kid_estatus != 3 AND lc.id_lista_compra = :id";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID);
+                $resultado->execute();
+                $lista = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                // Consulta para obtener los artículos con sus nombres
+                $consultaselect = "SELECT dlc.id_detalle_lista_compras,
+                    dlc.kid_articulo,
+                    a.articulo as nombre_articulo,
+                    dlc.cantidad,
+                    dlc.costo_unitario_total,
+                    dlc.costo_unitario_neto,
+                    dlc.monto_total,
+                    dlc.monto_neto,
+                    dlc.porcentaje_descuento
+                FROM detalles_listas_compras dlc
+                LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
+                WHERE dlc.kid_estatus != 3 AND dlc.kid_lista_compras = :id";
+
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID);
+                $resultado->execute();
+                $articulos = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                // Consulta para obtener todos los artículos disponibles
+                $consultaselect = "SELECT id_articulo, articulo FROM articulos WHERE kid_estatus != 3 ORDER BY articulo ASC";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $todos_articulos = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($lista) {
+                    print json_encode([
+                        'status' => 'success',
+                        'lista' => $lista,
+                        'articulos' => $articulos,
+                        'todos_articulos' => $todos_articulos
+                    ], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
             case 'cotizaciones_compras':
                 $consultaselect = "SELECT cc.id_cotizacion_compra,
                     cc.cotizacion_compras,
@@ -555,36 +607,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'GETArticulosProyecto':
-                /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $consultaselect = "SELECT id_proyecto FROM proyectos WHERE proyecto = :Proyecto";
+                // Consulta para obtener todos los artículos disponibles
+                $consultaselect = "SELECT id_articulo, articulo FROM articulos WHERE kid_estatus != 3 ORDER BY articulo ASC";
                 $resultado = $conexion->prepare($consultaselect);
-                $resultado->bindParam(':Proyecto', $elementID);
                 $resultado->execute();
-                $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                $elementID = $data['id_proyecto'];
-                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                
+                if ($data) {
+                    print json_encode([
+                        'status' => 'success',
+                        'data' => $data
+                    ], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron artículos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
 
-                $consultaselect = "SELECT a.articulo
-                    FROM listas_compras lc
-                    JOIN detalles_listas_compras dlc ON lc.id_lista_compra = dlc.kid_lista_compras
-                    JOIN articulos a ON dlc.kid_articulo = a.id_articulo
-                    WHERE a.kid_estatus != 3 AND lc.kid_proyecto = :id AND lc.kid_estatus = 5  
-                    ORDER BY a.articulo ASC";
+            case 'getArticuloById':
+                // Consulta para obtener los detalles de un artículo específico por su ID
+                $consultaselect = "SELECT id_articulo, articulo FROM articulos WHERE kid_estatus != 3 AND id_articulo = :id";
                 $resultado = $conexion->prepare($consultaselect);
                 $resultado->bindParam(':id', $elementID);
                 $resultado->execute();
-                $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-                $data = array_map(fn($item) => [
-                    'valor'=> $item['articulo'],
-                    'pordefecto' => 0,
-                ], $data);
-
-                // Verifica si se encontraron datos
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                
                 if ($data) {
-                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                    print json_encode([
+                        'status' => 'success',
+                        'data' => $data
+                    ], JSON_UNESCAPED_UNICODE);
                 } else {
-                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                    print json_encode(['status' => 'error', 'message' => 'No se encontró el artículo'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
 

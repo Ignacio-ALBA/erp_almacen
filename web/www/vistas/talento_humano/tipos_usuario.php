@@ -51,7 +51,7 @@
           ],
           $tabla['permisos']
         )];
-        debug($tabla);
+        //debug($tabla);
       }
       
 

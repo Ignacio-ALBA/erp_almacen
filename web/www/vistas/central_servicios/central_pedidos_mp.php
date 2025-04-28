@@ -84,7 +84,7 @@
 
   $id = 'central_mp';
   $ButtonAddLabel = "";
-  $titulos = ['ID','Almacén','Artículo','Categoria','Cantidad','Peso','Medida de peso','Existencia','Fecha de creación'];
+  $titulos = ['ID','Almacén','Materia Prima','Categoria','Cantidad','Peso','Medida de peso','Existencia','Fecha de creación'];
 
   CreateTable($id, $ButtonAddLabel, $titulos, $data,false, []);
 

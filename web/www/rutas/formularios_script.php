@@ -936,7 +936,6 @@ $(document).ready(function() {
                                     console.log($(`#${id+subfix}`));
                                     
                                     valor = $(`#${id+subfix}`).val();
-                                    $(`#${id+subfix}`).val("");
                                     $(`#error_${id+subfix}`).text(`El valor "${valor}" ya existe.`);
                                     $(`#form${modalCRUD}`).removeAttr('alertdatasimilar');
                                 }
@@ -2219,10 +2218,6 @@ $(document).ready(function() {
         console.log('Eliminar botón clickeado con ID:', modalCRUD);
         console.log('Valor de la primera columna:', firstColumnValue);
         
-        // Verificar si es un proveedor
-        var isProveedor = modalCRUD === 'proveedores';
-        console.log('¿Es proveedor?', isProveedor);
-        
         if (!row) {
             console.error('Fila no válida.');
             return;
@@ -2233,66 +2228,36 @@ $(document).ready(function() {
             return;
         }
         
-        if (isProveedor) {
-            // Para proveedores, usamos una configuración específica
-            $.ajax({
-                url: `/vistas/${formbloque}bd/crudSummit.php`, 
-                type: "POST",
-                // No especificamos dataType para que jQuery detecte automáticamente el tipo de respuesta
-                data: {
-                    opcion: 3, 
-                    formDataJson: [1,1], 
-                    modalCRUD: modalCRUD, 
-                    firstColumnValue: firstColumnValue, 
-                    AlertDataSimilar: false
-                },
-                success: function(response) {
-                    // Asumimos que la operación tuvo éxito si llegamos aquí
-                    alert('Proveedor eliminado correctamente. La página se recargará.');
-                    setTimeout(function() {
-                        window.location.reload(true);
-                    }, 300);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error en la solicitud:', error);
-                    
-                    // Si el error es por un problema de formato HTML, recargar de todos modos
-                    if (xhr.responseText && xhr.responseText.includes('<div')) {
-                        alert('El proveedor podría haberse eliminado. La página se recargará para verificar.');
-                        setTimeout(function() {
-                            window.location.reload(true);
-                        }, 300);
-                    } else {
-                        alert(`Error al eliminar el proveedor. Por favor, inténtelo de nuevo.`);
-                    }
+        // Lógica unificada para todos los módulos
+        $.ajax({
+            url: `/vistas/${formbloque}bd/crudSummit.php`, 
+            type: "POST",
+            dataType: "json", 
+            data: {
+                opcion: 3, 
+                formDataJson: [1,1], 
+                modalCRUD: modalCRUD, 
+                firstColumnValue: firstColumnValue, 
+                AlertDataSimilar: false
+            },
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                // Elimina la fila visualmente si aplica
+                if(response.data) {
+                    DeleteRow(modalCRUD, row);
                 }
-            });
-        } else {
-            // Para otras entidades, usamos el manejo estándar
-            $.ajax({
-                url: `/vistas/${formbloque}bd/crudSummit.php`, 
-                type: "POST",
-                dataType: "json", 
-                data: {
-                    opcion: 3, 
-                    formDataJson: [1,1], 
-                    modalCRUD: modalCRUD, 
-                    firstColumnValue: firstColumnValue, 
-                    AlertDataSimilar: false
-                },
-                success: function(response) {
-                    console.log('Respuesta del servidor:', response);
-                    if(response.data) {
-                        DeleteRow(modalCRUD, row);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error en la solicitud:', error);
-                    alert(`Error al eliminar. Por favor, inténtelo de nuevo.`);
-                }
-            });
-        }
+                // Recarga la página tras eliminar (para todos los módulos)
+                setTimeout(function() {
+                    window.location.reload(true);
+                }, 300);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la solicitud:', error);
+                alert(`Error al eliminar. Por favor, inténtelo de nuevo.`);
+            }
+        });
     });
+
 
     /************************************** Validaciones de inputs **************************************/
     //Validar Correo

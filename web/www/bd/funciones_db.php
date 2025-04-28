@@ -697,15 +697,30 @@ function GetAlmacenesListForSelect($condiciones  = []){
     return $data;
 }
 
-function GetArticulosListForSelect($condiciones  = []){
+function GetArticulosListForSelect2($condiciones  = []){
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);
-    $consulta = "SELECT articulo FROM articulos WHERE kid_estatus != 3 $condiciones_str";
+    $consulta = "SELECT id_articulo, articulo FROM articulos WHERE kid_estatus != 3 $condiciones_str";
     $resultado = $conexion->prepare($consulta);
     $resultado->execute();
     $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
     $data = array_map(fn($item) => [
-        'valor' => $item['articulo'],
+        'valor' => $item['id_articulo'],
+        'text' => $item['articulo'],
+        'pordefecto' => 0
+    ], $data);
+    return $data;
+}
+function GetArticulosListForSelect($condiciones  = []){
+    global $conexion;
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
+    $consulta = "SELECT id_articulo, articulo FROM articulos WHERE kid_estatus != 3 $condiciones_str";
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute();
+    $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    $data = array_map(fn($item) => [
+        'valor' => $item['id_articulo'],
+        'text' => $item['articulo'],
         'pordefecto' => 0
     ], $data);
     return $data;

@@ -105,7 +105,16 @@
   echo '<div class="card" style="margin-bottom: 20px;">
   <div class="card-body">
       <div class="row align-items-end">
-          <div class="col-md-3">'; // Reduced from col-md-4
+          <div class="col-md-4">'; // Reduced from col-md-4
+              // Añadir botón de conectar balanza
+              echo CreateButtonP([
+                  'id' => 'btn_conectar_balanza',
+                  'type' => 'button',
+                  'class' => 'btn btn-info btn-sm mb-2',
+                  'text' => '<i class="bi bi-bluetooth"></i> Conectar Balanza',
+                  'html' => true
+              ]);
+              
               echo CreateWeightLabel(['id' => 'peso_bascula', 'etiqueta' => 'Peso en Báscula']);
               echo CreateWeightInput([
                   'id' => 'peso_bascula',
@@ -113,7 +122,7 @@
                   'value' => '0.00'
               ]);
           echo '</div>
-          <div class="col-md-3">'; // Reduced from col-md-4
+          <div class="col-md-4">'; // Reduced from col-md-4
               echo CreateInput([ 
                   'type' => 'text',
                   'id' => 'num_pedido',
@@ -123,7 +132,7 @@
                   'class' => 'form-control form-control-sm'
               ]);
           echo '</div>
-          <div class="col-md-3">'; // Reduced from col-md-4
+          <div class="col-md-4">'; // Reduced from col-md-4
           echo CreateSelect([
             'type' => 'text',
             'id' => 'producto_peso',

@@ -17,13 +17,16 @@ $PageSection = "Dashboard";
   <div class="row">
 
     <!-- Left side columns -->
+
     <div class="col-lg-8">
       <div class="row">
-
+  
         <!-- Sales Card -->
+        <!--
         <div class="col-xxl-4 col-md-6">
           <div class="card info-card sales-card">
-            <!--
+          
+          
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -37,7 +40,7 @@ $PageSection = "Dashboard";
               </ul>
             </div>-->
 
-            <div class="card-body">
+            <!-- <div class="card-body">
               <h5 class="card-title">Proyectos Activos<span>| Este mes</span></h5>
 
               <div class="d-flex align-items-center">
@@ -56,25 +59,11 @@ $PageSection = "Dashboard";
         </div><!-- End Sales Card -->
 
         <!-- Revenue Card -->
+        <!--
         <div class="col-xxl-4 col-md-6">
           <div class="card info-card revenue-card">
-
-            <!--<div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>-->
-
             <div class="card-body">
               <h5 class="card-title">Ganancia <span>|Este mes</span></h5>
-
               <div class="d-flex align-items-center">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="bi bi-currency-dollar"></i>
@@ -82,16 +71,14 @@ $PageSection = "Dashboard";
                 <div class="ps-3">
                   <h6>$3,264</h6>
                   <span class="text-success small pt-1 fw-bold">15%</span> <span class="text-muted small pt-2 ps-1">incremento</span>
-
                 </div>
               </div>
             </div>
-
           </div>
-        </div><!-- End Revenue Card -->
-        
+        </div>
+        -->
 
-        <!-- Customers Card -->
+        <!--
         <div class="col-xxl-4 col-xl-12">
 
           <div class="card info-card customers-card">
@@ -128,12 +115,14 @@ $PageSection = "Dashboard";
 
         </div><!-- End Customers Card -->
 
+        <!-- Cuentas con mas gastos -->
+        <!--
         <div class="col-12">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Cuentas con mas gastos <span>| En este mes</span></h5>
 
-              <!-- Progress Bars with Striped Backgrounds-->
+              <!-- Progress Bars with Striped Backgrounds
               <span>Manuel Badillo Moreno:</span>
               <div style="display: flex; justify-content:space-between; align-items:center;">
                 <div class="progress col-10">
@@ -155,10 +144,10 @@ $PageSection = "Dashboard";
                 </div>
                 <div class="col-2"> $ 20000</div>
               </div>
-
             </div>
           </div>
         </div>
+        -->
 
         <!-- Proveedores -->
         <div class="col-12">
@@ -403,6 +392,7 @@ $PageSection = "Dashboard";
     <div class="col-lg-4">
 
           <!-- Recent Activity -->
+          <!--
           <div class="card">
 
             <div class="card-body">
@@ -440,6 +430,7 @@ $PageSection = "Dashboard";
 
 
           <!-- Recent Persosal con mas de 80 % de completado -->
+          <!--
           <div class="card">
 
             <div class="card-body">
@@ -501,6 +492,7 @@ $PageSection = "Dashboard";
           </div><!-- End Budget Report -->
 
           <!-- News & Updates Traffic -->
+          <!--
           <div class="card">
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>

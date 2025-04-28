@@ -536,7 +536,7 @@ if($resultado){
             $data_script[$optionkey] =['data_list_column'=>[]];
 
             $data_script[$optionkey] =['data_list_column'=>[]];
-
+            $data['list_js_scripts']['../vistas/compras/recepciones_compras_script'] =['data'=> $data_script];
             break;
 
             case 'recepciones_pedidos':
