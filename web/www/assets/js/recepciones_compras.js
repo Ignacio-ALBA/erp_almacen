@@ -78,55 +78,72 @@ btnGenerarPDF.addEventListener('click', () => {
     }
 
     const { jsPDF } = window.jspdf;
-    
-    // Crear el PDF en formato horizontal (landscape)
+
+    // Crear el PDF en orientación vertical (portrait)
     const pdf = new jsPDF({
-        orientation: 'landscape', // Cambiar la orientación del PDF a horizontal
+        orientation: 'landscape', // Orientación horizontal
         unit: 'pt',
-        format: 'letter' // Tamaño de página estándar (puedes ajustarlo si necesitas)
+        format: [15 * 28.35, 9 * 28.35] // Tamaño de página de ancho 15 cm por 9 de largo
     });
+
+    const pageWidth = pdf.internal.pageSize.getWidth(); // Ancho de la página
+    const pageHeight = pdf.internal.pageSize.getHeight(); // Alto de la página
 
     const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
 
-    // Dimensiones del QR ampliado para que sea más grande
-    const qrWidth = 150; // Ancho del QR en puntos
-    const qrHeight = 150; // Alto del QR en puntos
-    const qrX = pdf.internal.pageSize.getWidth() - qrWidth - 50; // Posición X (a la derecha)
-    const qrY = 50; // Posición Y (margen superior)
-
-    // Insertar el QR en el PDF
-    pdf.addImage(imgData, 'PNG', qrX, qrY, qrWidth, qrHeight);
-
-    // Estilo de fuente para encabezados
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(18);
+    // Dimensiones del QR
+    const qrWidth = 100; // Ancho del QR en puntos
+    const qrHeight = 100; // Alto del QR en puntos
+    const qrX = 50; // Posición X (a la izquierda)
+    const qrY = 150; // Posición Y (un poco más arriba de la información)
 
     // Encabezado "FORCIP"
-    pdf.text('FORCIP', 50, 50); // Posición (X, Y)
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(25); // Tamaño de fuente grande para el encabezado
+    const titleText = 'FORCIP';
+    const titleX = (pageWidth - pdf.getTextWidth(titleText)) / 2; // Centrar el encabezado horizontalmente
+    const titleY = 40; // Margen superior
+    pdf.text(titleText, titleX, titleY);
 
     // Subtítulo "Supersaco de polipropileno negro"
-    pdf.setFontSize(14);
+    pdf.setFontSize(15);
     pdf.setTextColor(255, 255, 255); // Configurar el color del texto a blanco
-    pdf.setFillColor(0, 0, 0); // Fondo negro
-    pdf.rect(50, 70, 400, 20, 'F'); // Dibujar un rectángulo negro para el texto
-    pdf.text('Supersaco de polipropileno negro', 55, 85); // Texto dentro del rectángulo
+    pdf.setFillColor(0, 0, 0); // Fondo negro 
+    //linea negra que cubra todo
+    pdf.rect(0, 0, pageWidth, 5, 'F');
+    const subtitleText = 'Supersaco de polipropileno negro';
+    const subtitleX = (pageWidth - pdf.getTextWidth(subtitleText)) / 2; // Centrar el subtítulo horizontalmente
+    const subtitleY = titleY + 50; // Debajo del encabezado
+    pdf.rect(subtitleX - 10, subtitleY - 25, pdf.getTextWidth(subtitleText) + 20, 40, 'F'); // Dibujar un rectángulo negro
+    pdf.text(subtitleText, subtitleX, subtitleY);
 
     // Fecha y hora
     const currentDate = new Date();
     const date = currentDate.toLocaleDateString(); // Obtener fecha en formato local
     const time = currentDate.toLocaleTimeString(); // Obtener hora en formato local
     pdf.setTextColor(0, 0, 0); // Cambiar color de texto a negro
-    pdf.setFontSize(12);
-    pdf.text(`Fecha: ${date}`, 50, 120); // Mostrar la fecha
-    pdf.text(`Hora: ${time}`, 50, 140); // Mostrar la hora
+    pdf.setFontSize(15);
+
+    const dateText = `Fecha: ${date}`;
+    const timeText = `Hora: ${time}`;
+    const dateX = qrX + qrWidth + 20; // A la derecha del QR
+    const dateY = qrY + 20; // Alineado con la parte superior del QR
+    pdf.text(dateText, dateX, dateY);
+
+    const timeY = dateY + 30; // Debajo de la fecha
+    pdf.text(timeText, dateX, timeY);
 
     // Peso en negritas
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
     const peso = pesoBascula.value || '0.00'; // Obtener el peso del input
-    pdf.text(`Peso: ${peso} kg`, 50, 160); // Mostrar el peso
+    const pesoText = `Peso: ${peso} kg`;
+    const pesoY = timeY + 30; // Debajo de la hora
+    pdf.text(pesoText, dateX, pesoY);
+
+    // Insertar el QR en la parte izquierda
+    pdf.addImage(imgData, 'PNG', qrX, qrY, qrWidth, qrHeight);
 
     // Descargar el archivo PDF
-    pdf.save('codigo_qr_peso.pdf');
+    pdf.save('codigo_qr_peso_vertical.pdf');
 });
 }); 
