@@ -157,7 +157,7 @@
           echo '</div>
       </div>
       <div class="row mt-3">
-          <div class="col-12 text-center">';
+          <div class="col-12 d-flex justify-content-center">';
               // Existing register weight button
               echo CreateButtonP([
                   'id' => 'btn_guardar_materia',

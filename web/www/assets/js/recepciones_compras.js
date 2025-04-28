@@ -88,10 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
+    // Ajustar la imagen del QR para que sea más pequeña y centrada en el ticket
+    const qrWidth = 80; // Ajustar el ancho del QR en puntos
+    const qrHeight = 80; // Ajustar el alto del QR en puntos
+    const xOffset = (pdfWidth - qrWidth) / 2; // Centrar horizontalmente
+    const yOffset = (pdfHeight - qrHeight) / 2; // Centrar verticalmente
 
-        // Ajustar la imagen para que ocupe todo el espacio del ticket
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, qrWidth, qrHeight);
         // Descargar el archivo PDF optimizado para el ticket
         pdf.save('codigo_qr_ticket.pdf');
     });
