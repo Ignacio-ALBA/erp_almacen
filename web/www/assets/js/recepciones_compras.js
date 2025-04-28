@@ -78,20 +78,53 @@ btnGenerarPDF.addEventListener('click', () => {
     }
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
+    
+    // Crear el PDF en formato horizontal (landscape)
+    const pdf = new jsPDF({
+        orientation: 'landscape', // Cambiar la orientación del PDF a horizontal
+        unit: 'pt',
+        format: 'letter' // Tamaño de página estándar (puedes ajustarlo si necesitas)
+    });
 
     const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
 
-    // Dimensiones originales del QR en el PDF
-    const originalWidth = 50; // Ancho original
-    const originalHeight = 50; // Alto original
+    // Dimensiones del QR ampliado para que sea más grande
+    const qrWidth = 150; // Ancho del QR en puntos
+    const qrHeight = 150; // Alto del QR en puntos
+    const qrX = pdf.internal.pageSize.getWidth() - qrWidth - 50; // Posición X (a la derecha)
+    const qrY = 50; // Posición Y (margen superior)
 
-    // Duplicar las dimensiones para hacer el QR un 100% más grande
-    const newWidth = originalWidth * 3; // Duplicar ancho
-    const newHeight = originalHeight * 3; // Duplicar alto
+    // Insertar el QR en el PDF
+    pdf.addImage(imgData, 'PNG', qrX, qrY, qrWidth, qrHeight);
 
-    // Insertar el QR en el PDF con las nuevas dimensiones
-    pdf.addImage(imgData, 'PNG', 10, 20, newWidth, newHeight);
+    // Estilo de fuente para encabezados
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(18);
+
+    // Encabezado "FORCIP"
+    pdf.text('FORCIP', 50, 50); // Posición (X, Y)
+
+    // Subtítulo "Supersaco de polipropileno negro"
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255); // Configurar el color del texto a blanco
+    pdf.setFillColor(0, 0, 0); // Fondo negro
+    pdf.rect(50, 70, 400, 20, 'F'); // Dibujar un rectángulo negro para el texto
+    pdf.text('Supersaco de polipropileno negro', 55, 85); // Texto dentro del rectángulo
+
+    // Fecha y hora
+    const currentDate = new Date();
+    const date = currentDate.toLocaleDateString(); // Obtener fecha en formato local
+    const time = currentDate.toLocaleTimeString(); // Obtener hora en formato local
+    pdf.setTextColor(0, 0, 0); // Cambiar color de texto a negro
+    pdf.setFontSize(12);
+    pdf.text(`Fecha: ${date}`, 50, 120); // Mostrar la fecha
+    pdf.text(`Hora: ${time}`, 50, 140); // Mostrar la hora
+
+    // Peso en negritas
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(14);
+    const peso = pesoBascula.value || '0.00'; // Obtener el peso del input
+    pdf.text(`Peso: ${peso} kg`, 50, 160); // Mostrar el peso
 
     // Descargar el archivo PDF
     pdf.save('codigo_qr_peso.pdf');

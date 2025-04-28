@@ -14,10 +14,16 @@
     .weight-container {
         position: relative;
         margin: 10px 0;
-        max-width: 250px; /* Reducir el ancho máximo */
+        max-width: 600px; /* Reducir el ancho máximo */
     display: inline-block; /* Hacer que el contenedor sea inline */
 
     }
+    #peso_bascula {
+    width: 600px; /* Aumentar el ancho en un 30% */
+    height: calc(31px * 4.5); /* Aumentar la altura en un 30% (basado en la altura original de 31px) */
+    font-size: 18.1rem; /* Ajustar el tamaño de la fuente proporcionalmente */
+    padding: 0.35rem 0.7rem; /* Ajustar el padding para que el contenido no se vea comprimido */
+}
     
     .weight-unit {
         position: absolute;
@@ -30,6 +36,10 @@
         font-weight: bold;
         border-radius: 3px;
         margin-left: 5px;
+        max-width: 450px; /* Ajustar el ancho máximo */
+        font-size: 1.5rem; /* Aumentar el tamaño de fuente */
+       
+        
     }
    
 .mb-3 {
@@ -64,7 +74,7 @@
   }
   
   .weight-container {
-    max-width: 250px; /* Reducir aún más el ancho */
+    max-width: 450px; /* Reducir aún más el ancho */
   }
   
   .form-group {
@@ -80,6 +90,7 @@
         background-color: #001f3f !important;
         color: #7fdbff !important;
         opacity: 1;
+
     }
     </style>
 
