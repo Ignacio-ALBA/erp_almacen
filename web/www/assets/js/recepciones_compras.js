@@ -5,17 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGenerarPDF = document.getElementById('btn_generar_pdf');
     let qrCanvas = null; // Variable para almacenar el canvas del QR generado
 
-    // Comprobación de las bibliotecas
-    if (typeof QRCode === 'undefined') {
-        console.error('La biblioteca QRCode no está disponible. Verifica que se haya importado correctamente.');
-        alert('Error: La biblioteca QRCode no está disponible. Contacta al administrador del sistema.');
-        return; // Detener la ejecución si QRCode no está presente
-    }
-    if (typeof window.jspdf === 'undefined') {
-        console.error('La biblioteca jsPDF no está disponible. Verifica que se haya importado correctamente.');
-        alert('Error: La biblioteca jsPDF no está disponible. Contacta al administrador del sistema.');
-        return; // Detener la ejecución si jsPDF no está presente
-    }
 
     // Lógica para conectar con la báscula
     btnConectarBalanza.addEventListener('click', async () => {
@@ -28,29 +17,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 parity: "none",
                 flowControl: "none"
             });
-
+    
             console.log('Conectado al puerto serial.');
             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
             btnConectarBalanza.classList.remove('btn-info');
             btnConectarBalanza.classList.add('btn-success');
-
+    
             const decoder = new TextDecoderStream();
             const inputStream = decoder.readable;
             const reader = inputStream.getReader();
-
+    
             while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                if (value) pesoBascula.value = value.trim();
+                try {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        console.log('Conexión cerrada.');
+                        break;
+                    }
+                    if (value) {
+                        console.log('Peso recibido:', value.trim()); // Depurar los datos
+                        pesoBascula.value = value.trim(); // Actualizar el input con los datos recibidos
+                    }
+                } catch (err) {
+                    console.error('Error al leer desde el puerto:', err.message);
+                    break;
+                }
             }
-
+    
             await reader.releaseLock();
         } catch (err) {
             console.error('Error:', err.message);
-            alert('Error al conectar con la balanza: ' + err.message);
+            alert('Error al conectar con la báscula: ' + err.message);
         }
     });
-
+    
     // Lógica para generar el Código QR
     btnGenerarQR.addEventListener('click', () => {
         const pesoActual = pesoBascula.value || '0.00';
