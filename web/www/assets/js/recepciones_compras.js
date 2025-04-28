@@ -70,19 +70,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lógica para generar el archivo PDF con el Código QR
-    btnGenerarPDF.addEventListener('click', () => {
+     // Lógica para generar el archivo PDF con el Código QR para impresión en la Zebra ZD220
+     btnGenerarPDF.addEventListener('click', () => {
         if (!qrCanvas) {
             alert('Primero debes generar el código QR.');
             return;
         }
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
+
+        // Configurando dimensiones del papel: 104mm x 50.8mm (en puntos: 1 mm ≈ 2.83465 puntos)
+        const pdfWidth = 104 * 2.83465; // 104 mm a puntos
+        const pdfHeight = 50.8 * 2.83465; // 50.8 mm a puntos
+        const pdf = new jsPDF({
+            unit: 'pt', // Puntos como unidad
+            format: [pdfWidth, pdfHeight] // Formato personalizado
+        });
+
         const imgData = qrCanvas.toDataURL('image/png'); // Convertir el canvas a imagen
 
-        pdf.text('Código QR para el peso actual', 10, 10);
-        pdf.addImage(imgData, 'PNG', 10, 20, 50, 50); // Insertar la imagen del QR en el PDF
-        pdf.save('codigo_qr_peso.pdf'); // Descargar el archivo PDF
+        // Ajustar la imagen para que ocupe todo el espacio del ticket
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+        // Descargar el archivo PDF optimizado para el ticket
+        pdf.save('codigo_qr_ticket.pdf');
     });
 });
