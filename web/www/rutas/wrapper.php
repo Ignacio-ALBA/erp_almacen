@@ -11,6 +11,8 @@ $nonce = base64_encode(random_bytes(16));
 //header("Content-Security-Policy: script-src 'self' 'nonce-$nonce';");
 //header("Content-Security-Policy: script-src 'self' 'nonce-$nonce' https://cdn.datatables.net https://code.jquery.com https://cdnjs.cloudflare.com 'unsafe-eval';");
 header("Content-Security-Policy: script-src 'self' 'nonce-$nonce' https://cdn.datatables.net https://code.jquery.com https://cdnjs.cloudflare.com 'unsafe-eval';");
+header("Content-Security-Policy: script-src 'self' 'nonce-$nonce' https://cdn.datatables.net https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval';");
+
 
 
 $SERVERURL = getServerUrl();
