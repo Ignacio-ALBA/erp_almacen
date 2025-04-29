@@ -23,7 +23,7 @@
 
     }
     #peso_bascula {
-    width: 400px !important; /* Aumentar el ancho en un 30% */
+    width: 360px !important; /* Aumentar el ancho en un 30% */
     height: calc(31px * 4.5); /* Aumentar la altura en un 30% (basado en la altura original de 31px) */
     /*font-size: 18.58rem; /* Ajustar el tamaño de la fuente proporcionalmente */
     padding: 0.35rem 0.7rem; /* Ajustar el padding para que el contenido no se vea comprimido */
@@ -33,7 +33,7 @@
     
     .weight-unit {
         position: absolute;
-        right: -50px;
+        right: -85px;
         top: 50%;
         transform: translateY(-50%);
         background-color: #001f3f;
@@ -43,7 +43,7 @@
         border-radius: 3px;
         margin-left: 5px;
         max-width: 450px; /* Ajustar el ancho máximo */
-        font-size: 1.5rem; /* Aumentar el tamaño de fuente */
+        font-size: 3.5rem; /* Aumentar el tamaño de fuente */
        
         
     }
