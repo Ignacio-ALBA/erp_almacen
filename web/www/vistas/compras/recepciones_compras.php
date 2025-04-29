@@ -9,8 +9,12 @@
     @font-face {
         font-family: 'Digital-7';
         src: url('/assets/fonts/digital_7/digital-7.ttf') format('truetype');
+     
     }
-    
+    .digital-font {
+      font-family: 'Digital-7', sans-serif; /* Usa la fuente Digital-7 */
+    font-size: 4.58rem; /* Aplica el tamaño de fuente */
+}
     .weight-container {
         position: relative;
         margin: 10px 0;
@@ -19,15 +23,17 @@
 
     }
     #peso_bascula {
-    width: 600px; /* Aumentar el ancho en un 30% */
+    width: 400px !important; /* Aumentar el ancho en un 30% */
     height: calc(31px * 4.5); /* Aumentar la altura en un 30% (basado en la altura original de 31px) */
-    font-size: 18.1rem; /* Ajustar el tamaño de la fuente proporcionalmente */
+    /*font-size: 18.58rem; /* Ajustar el tamaño de la fuente proporcionalmente */
     padding: 0.35rem 0.7rem; /* Ajustar el padding para que el contenido no se vea comprimido */
-}
+    font-family: 'Digital-7', sans-serif; /* Usa la fuente Digital-7 */
+    font-size: 7.58rem !important; /* Tamaño de fuente */
+  }
     
     .weight-unit {
         position: absolute;
-        right: 10px;
+        right: -50px;
         top: 50%;
         transform: translateY(-50%);
         background-color: #001f3f;
@@ -115,8 +121,8 @@
   $ButtonAddLabel = "Nueva materia prima";
   echo '<div class="card" style="margin-bottom: 20px;">
   <div class="card-body">
-      <div class="row align-items-end">
-          <div class="col-md-4">'; // Reduced from col-md-4
+      <div class="row justify-content-start"> 
+          <div class="col-12 text-start">'; // Centrar el contenedor del peso
               // Añadir botón de conectar balanza
               echo CreateButtonP([
                   'id' => 'btn_conectar_balanza',
@@ -130,10 +136,13 @@
               echo CreateWeightInput([
                   'id' => 'peso_bascula',
                   'readonly' => 'readonly',
-                  'value' => '0.00'
+                  'value' => '0.00',
+                  'style' => 'font-family: Digital-7, sans-serif; font-size: 4.58rem; text-align: start; color: #7fdbff; background: #001f3f; border: none; width: 300px;' // Estilo inline para centrar y aumentar el tamaño del peso
               ]);
           echo '</div>
-          <div class="col-md-4">'; // Reduced from col-md-4
+      </div>
+      <div class="row mt-4 justify-content-center">'; // Nueva fila para los inputs y selects
+          echo '<div class="col-6">'; // Reduced from col-md-4
               echo CreateInput([ 
                   'type' => 'text',
                   'id' => 'num_pedido',
@@ -142,32 +151,44 @@
                   'value' => '001',
                   'class' => 'form-control form-control-sm'
               ]);
-          echo '</div>
-          <div class="col-md-4">'; // Reduced from col-md-4
+        
           echo CreateSelect([
             'type' => 'text',
-            'id' => 'producto_peso',
-            'etiqueta' => 'Producto pesado',
+            'id' => 'insumo_peso',
+            'etiqueta' => 'Insumo pesado',
             'required' => 'true',
             'class' => 'form-control form-control-sm'
         ], [
-            ['valor' => 'PET METALICO', 'texto' => 'PET METALICO', 'pordefecto' => 0],
-            ['valor' => 'PET PLASTIFICADO', 'texto' => 'PET PLASTIFICADO', 'pordefecto' => 0]
-        ]);
+            ['valor' => 'POLIPROPILENO NEGRO', 'texto' => 'POLIPROPILENO NEGRO', 'pordefecto' => 0],
+            ['valor' => 'POLIPROPILENO BLANCO', 'texto' => 'POLIPROPILENO BLANCO', 'pordefecto' => 0],
+            ['valor' => 'POLIPROPILENO MULTICOLOR', 'texto' => 'POLIPROPILENO MULTICOLOR', 'pordefecto' => 0]
+          ]);
           echo '</div>
-          <div class="col-md-3">'; // New column for kg input
-              echo CreateInput([
-                  'type' => 'number',
-                  'id' => 'kg_producto',
-                  'etiqueta' => 'Peso estimado (Kg)',
+     <div class="col-6">';  // Primera columna con dos elementos
+          echo CreateSelect([
+                  'type' => 'text',
+                  'id' => 'almacen_destino',
+                  'etiqueta' => 'Almacén de destino',
                   'required' => 'true',
-                  'step' => '0.01',
-                  'min' => '0',
                   'class' => 'form-control form-control-sm'
+              ], [
+                  ['valor' => 'ALMACEN MP', 'texto' => 'ALMACEN DE MATERIA PRIMA', 'pordefecto' => 0],
+                  ['valor' => 'ALMACEN DE PRODUCCION', 'texto' => 'ALMACEN DE PRODUCCION', 'pordefecto' => 0]
+              ]);
+          
+              echo CreateSelect([
+                  'type' => 'text',
+                  'id' => 'contenedor_destino',
+                  'etiqueta' => 'Contenedor de destino',
+                  'required' => 'true',
+                  'class' => 'form-control form-control-sm'
+              ], [
+                  ['valor' => 'A-1', 'texto' => 'A-1', 'pordefecto' => 0],
+                  ['valor' => 'A-2', 'texto' => 'A-2', 'pordefecto' => 0]
               ]);
           echo '</div>
       </div>
-      <div class="row mt-3">
+      <div class="row mt-4">
           <div class="col-12 d-flex justify-content-center">';
               // Existing register weight button
               echo CreateButtonP([
