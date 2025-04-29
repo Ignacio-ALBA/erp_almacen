@@ -33,8 +33,8 @@
     
     .weight-unit {
         position: absolute;
-        right: -85px;
-        top: 50%;
+        right: -118px;
+        top: 50.5%;
         transform: translateY(-50%);
         background-color: #001f3f;
         color: #7fdbff;
@@ -43,7 +43,7 @@
         border-radius: 3px;
         margin-left: 5px;
         max-width: 450px; /* Ajustar el ancho máximo */
-        font-size: 3.5rem; /* Aumentar el tamaño de fuente */
+        font-size: 5.8rem; /* Aumentar el tamaño de fuente */
        
         
     }
