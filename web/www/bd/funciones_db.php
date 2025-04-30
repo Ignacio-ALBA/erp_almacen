@@ -56,7 +56,14 @@ function GetIDProyectoByName($valor){
     return $resultado->fetchColumn() ?: null;
 }
 
-
+function GetIDTiempoEntregaByName($valor){
+    global $conexion;
+    $consult = "SELECT id_tiempo_entrega  FROM tiempos_entregas WHERE kid_estatus != 3 AND tiempo_entrega =:valor";
+    $resultado = $conexion->prepare($consult);
+    $resultado->bindParam(':valor', $valor);
+    $resultado->execute();
+    return $resultado->fetchColumn() ?: null;
+}
 function GetIDProveedorByName($valor){
     global $conexion;
     $consult = "SELECT id_proveedor FROM proveedores WHERE kid_estatus != 3 AND proveedor =:valor";
@@ -1354,20 +1361,21 @@ function GetPermsListByModulos($condiciones  = []){
 }
 
 
-function  GetAllowPermsList($kid_tipo_usuario, $condiciones  = []){
+function GetAllowPermsList($kid_tipo_usuario, $condiciones = []) {
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);
-    $consulta = "SELECT 
-    p.permiso
+    $consulta = "SELECT DISTINCT p.permiso
     FROM tipos_usuarios_permisos tup
     INNER JOIN permisos p ON tup.kid_permiso = p.id_permiso
     INNER JOIN tablas t ON p.kid_tabla = t.id_tabla
     INNER JOIN modulos m ON t.kid_modulo = m.id_modulo
-    WHERE tup.kid_estatus NOT IN (3, 12,0) AND tup.kid_tipo_usuario = $kid_tipo_usuario AND p.kid_estatus NOT IN (3, 12,0) AND t.kid_estatus = 1 AND m.kid_estatus = 1
+    WHERE tup.kid_estatus = 1 
+    AND tup.kid_tipo_usuario = :kid_tipo_usuario 
+    AND p.kid_estatus = 1 
     ORDER BY m.modulo, t.tablas;";
 
-   // $consulta = "SELECT tipo_reporte_cb, pordefecto FROM tipos_reportes_cb WHERE kid_estatus != 3 $condiciones_str ORDER BY tipo_reporte_cb ASC, orden ASC, pordefecto DESC;";
     $resultado = $conexion->prepare($consulta);
+    $resultado->bindParam(':kid_tipo_usuario', $kid_tipo_usuario);
     $resultado->execute();
     $data_perms_allow = $resultado->fetchAll(PDO::FETCH_COLUMN);
     return $data_perms_allow;

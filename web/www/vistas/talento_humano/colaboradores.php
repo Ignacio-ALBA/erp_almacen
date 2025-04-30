@@ -72,7 +72,7 @@
       CreateInput(['type'=>'date','id'=>'fecha_firma','etiqueta'=>'Fecha de Firma']),
       CreateInput(['type'=>'number','id'=>'sueldo','etiqueta'=>'Sueldo']),
       CreateInput(['type'=>'text','id'=>'sueldo_texto','etiqueta'=>'Sueldo en Texto']),
-      CreateInput(['type'=>'text','maxlength'=>'17','id'=>'puesto','etiqueta'=>'Puesto']),
+      CreateInput(['type'=>'text','maxlength'=>'60','id'=>'puesto','etiqueta'=>'Puesto']),
       //CreateSelect(['id'=>'pais','etiqueta'=>'País','readonly' => '','disabled' => ''],$paises),
       //CreatSwitchCheck(['id'=>'pordefecto','etiqueta'=>'Por defecto'])
       

@@ -148,8 +148,7 @@ if($resultado){
                 cc.id_cotizacion_compra,
                 cc.cotizacion_compras,
                 cc.grupo,
-                (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = cc.kid_proyecto LIMIT 1) AS kid_proyecto,
-                (SELECT razon_social FROM proveedores prov WHERE prov.id_proveedor = cc.kid_proveedor LIMIT 1) AS kid_proveedor,
+                (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = cc.kid_proveedor LIMIT 1) AS kid_proveedor,
                 cc.kid_estatus,
                 (SELECT email FROM colaboradores u WHERE u.id_colaborador = cc.kid_creacion LIMIT 1) AS kid_creacion,
                 COALESCE((SELECT email FROM colaboradores u2 WHERE u2.id_colaborador = cc.kid_autorizo LIMIT 1), 'Sin Autorizar') AS kid_autorizo,
@@ -166,24 +165,24 @@ if($resultado){
                 global $data_script, $estatus, $estatus_name;
                 $botones_acciones = $data_script['botones_acciones'];
 
-                $bloque = 'compras';
-                $modalCRUD =  'update_estatus_cotizaciones_compras';
-                if(!in_array($row['kid_estatus'], [5,6,7])){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }else if($row['kid_estatus'] == 6){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }if($row['kid_estatus'] == 7){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }
+             //   $bloque = 'compras';
+               // $modalCRUD =  'update_estatus_cotizaciones_compras'; // Uncommented the line
+              //  if(!in_array($row['kid_estatus'], [5,6,7])){
+               //     $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
+              //      array_unshift($botones_acciones,$nuevo_boton);
+              //  }else if($row['kid_estatus'] == 6){
+               //     $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
+               //     array_unshift($botones_acciones,$nuevo_boton);
+              //  }if($row['kid_estatus'] == 7){
+              //      $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
+             //       array_unshift($botones_acciones,$nuevo_boton);
+             //   }
                 
                 $hashed_id = codificar($row['id_cotizacion_compra']);
                 $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
                 array_push($botones_acciones, $nuevo_boton);
-                $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" form="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                array_push($botones_acciones, $nuevo_boton);
+                //$nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" form="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
+              //  array_push($botones_acciones, $nuevo_boton);
                 $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
                 $row['kid_estatus'] = $estatus[$row['kid_estatus']];
                 return $row;
@@ -197,9 +196,12 @@ if($resultado){
             $data['data_show']['tipos_pago'] = GetTiposPagoListForSelect();
             $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
 
+         
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             $optionkey = 'NewAdd3';
             $data_script[$optionkey] =['data_list_column'=>[]];
+            $data['list_js_scripts']['../vistas/compras/cotizaciones_compras_script'] = ['data' => $data_script];
+        
             break;
         case 'detalles_cotizaciones_compras':
             $perms = [
@@ -244,7 +246,7 @@ if($resultado){
                 $data['data_show']['breadcrumb'] = $breadcrumb;
                 $data['data_show']['valor_id'] = $breadcrumb_data['cotizacion_compras'];
                 $data['data_show']['articulos'] = GetArticulosListForSelect();
-
+                $data['list_js_scripts']['../vistas/compras/detalles_listas_compras_script'] = ['data' => $data_script];
             }else{
                 $consultaselect = "SELECT dcc.id_detalle_cotizacion_compras,
                 cc.cotizacion_compras AS kid_cotizacion_compra,
@@ -267,7 +269,7 @@ if($resultado){
             $resultado->execute();
 
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            
+            $data['list_js_scripts']['../vistas/compras/detalles_listas_compras_script'] = ['data' => $data_script];
             break;
             case 'ordenes_compras':
                 $perms = [

@@ -328,9 +328,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'cotizaciones_compras':
                 $tabla = 'cotizaciones_compras';
                 $idcolumn= "id_cotizacion_compra";
-
+                $defaultProjectId = GetDefaultProjectId();
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? GetIDProyectoByName($formDataJson['kid_proyecto']) : null;
+                $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? 
+                GetIDProyectoByName($formDataJson['kid_proyecto']) : $defaultProjectId;
                 $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ?GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
                 //$formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ?GetIDArticuloByName($formDataJson['kid_articulo']) : null;
                 $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;

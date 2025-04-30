@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $consultaselect = "SELECT dlc.id_detalle_lista_compras,
                         lc.lista_compra AS kid_lista_compras,
                         a.articulo AS kid_articulo,
-d                        a.id_articulo,
+                        a.id_articulo,
                         dlc.cantidad,
                         dlc.costo_unitario_total,
                         dlc.costo_unitario_neto,
@@ -192,7 +192,7 @@ d                        a.id_articulo,
                     cc.cotizacion_compras,
                     cc.grupo,
                     p.proyecto AS kid_proyecto,
-                    prov.razon_social AS kid_proveedor,
+                    prov.proveedor AS kid_proveedor,
                     es.estatus AS kid_estatus,
                     cc.fecha_cotizacion,
                     te.tiempo_entrega AS kid_tiempo_entrega,
@@ -205,7 +205,7 @@ d                        a.id_articulo,
                 LEFT JOIN estatus es ON cc.kid_estatus = es.id_estatus
                 LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
                 LEFT JOIN tipos_pagos tp ON cc.kid_tipo_pago = tp.id_tipo_pago 
-                WHERE cc.kid_estatus != 3 AND cc.id_cotizacion_compra  = :id";
+                WHERE cc.kid_estatus != 3 AND cc.id_cotizacion_compra = :id";
                 $resultado = $conexion->prepare($consultaselect);
                 $resultado->bindParam(':id', $elementID);
                 $resultado->execute();
@@ -236,8 +236,8 @@ d                        a.id_articulo,
                     FROM detalles_cotizaciones_compras dcc
                     LEFT JOIN cotizaciones_compras cc ON dcc.kid_cotizacion_compra = cc.id_cotizacion_compra 
                     LEFT JOIN articulos a ON dcc.kid_articulo = a.id_articulo
-                    WHERE dcc.kid_estatus != 3 AND dcc.kid_cotizacion_compra  = :id";
-                    $resultado = $conexion->prepare($consultaselect);
+                    WHERE dcc.kid_estatus != 3 AND id_detalle_cotizacion_compras  = :id";
+                   $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
@@ -352,8 +352,7 @@ d                        a.id_articulo,
                         AND oc.kid_proyecto = (
                             SELECT cc.kid_proyecto 
                             FROM cotizaciones_compras cc 
-                            WHERE doc.kid_orden_compras = :id AND 
-                            cc.kid_estatus != 3 LIMIT 1
+                            WHERE doc.kid_orden_compras = :id
                         ) 
                         ORDER BY a.articulo ASC;";
                     $resultado = $conexion->prepare($consultaselect);

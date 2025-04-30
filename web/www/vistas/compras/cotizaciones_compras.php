@@ -22,7 +22,7 @@
 
   $id = 'cotizaciones_compras';
   $ButtonAddLabel = "Nueva Cotización";
-  $titulos = ['ID', 'Cotización','Grupo','Proyecto','Proveedor','Estado','La Creo','La Autorizo','Fecha de creación'];
+  $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true,'ButtonsInRow');
   CreateModalForm(
     [
@@ -33,16 +33,19 @@
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
-      'bloque'=>'compras'
+      'bloque'=>'compras',
+      'data-select-column'=>'[3]',
+      'data-input-fill'=>'[kid_proveedor]'
     ],
     [
       CreateInput(['type'=>'text','maxlength'=>'97','id'=>'cotizacion_compras','etiqueta'=>'Cotización','required' => '']),
-      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','required' => '','class'=>'OnEditReadOnly DataGET Data-GETArticulosProyecto'],$proyectos),
+      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
       CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Proveedor','required' => ''],$proveedores),
       CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
       CreateSelect(['id'=>'kid_tiempo_entrega','etiqueta'=>'Tiempo de Entrega','required' => ''],$tiempos_entrega),
       CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago','required' => ''],$tipos_pago),
       CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '']),
+      
       CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
     ]);
     $id = 'ordenes_compras';

@@ -34,8 +34,8 @@
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
       'bloque'=>'compras',
-      'data-select-column'=>'[2]',
-      'data-input-fill'=>'[kid_articulo]'
+      'data-select-column'=>'[1,2]',
+      'data-input-fill'=>'[kid_lista_compras,kid_articulo]'
     ],
     [
       CreateSelect(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','class'=>'OnEditReadOnly'],$listas_compras),
