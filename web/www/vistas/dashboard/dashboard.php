@@ -158,12 +158,12 @@ $PageSection = "Dashboard";
               <?php 
                 echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
                 .CreateButton(['id'=>'btactividades','etiqueta'=>'Producción', 'class'=>'btn btn-primary'],false)
-                .CreateButton(['id'=>'btclientes','etiqueta'=>'Recepciones', 'class'=>'btn btn-outline-primary'],false)
+                .CreateButton(['id'=>'btclientes','etiqueta'=>'Listas de compras', 'class'=>'btn btn-outline-primary'],false)
                 .'</div>';
 
                 echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
-                .CreateButton(['id'=>'btcomentariosproveedores','etiqueta'=>'Recibir pedido', 'class'=>'btn btn-primary'],false)
-                .CreateButton(['id'=>'btproveedores','etiqueta'=>'Listas de compras', 'class'=>'btn btn-outline-primary'],false)
+                .CreateButton(['id'=>'btcomentariosproveedores','etiqueta'=>'Cotizaciones', 'class'=>'btn btn-primary'],false)
+                .CreateButton(['id'=>'btproveedores','etiqueta'=>'Ordenes de compras', 'class'=>'btn btn-outline-primary'],false)
                 .'</div> ';
 
                 echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
