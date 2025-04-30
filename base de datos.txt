@@ -21,8 +21,8 @@ GRANT ALL PRIVILEGES ON alba_almacen.* TO 'alba_almacen'@'%' IDENTIFIED BY 'alba
 
 ```
 SELECT user,host FROM mysql.user;
-SHOW GRANTS FOR 'alba_erp'@'localhost';
-SHOW GRANTS FOR 'alba_erp'@'127.0.0.1';
+SHOW GRANTS FOR 'alba_almacen'@'localhost';
+SHOW GRANTS FOR 'alba_almacen'@'127.0.0.1';
 ```
 
 Salir de mysql
@@ -30,3 +30,5 @@ Salir de mysql
 ```
 exit;
 ```
+Para poder importar la base de datos desde powershell solo se copia esta linea, reemplaza la ruta del archivo sql
+Get-Content "C:\ruta\archivo.sql" | docker exec -i erp_almacen_web /opt/lampp/bin/mysql -u root -p'Gx#8dLpM4eJ9aG$eK' alba_almacen
