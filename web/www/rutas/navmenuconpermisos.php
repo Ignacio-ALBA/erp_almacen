@@ -503,3 +503,54 @@ $navItems = [
     ]
   ];
 ?>
+
+<?php
+require_once('navmenulist.php');
+
+// Filter menu items based on user permissions
+$filteredNavItems = filterMenuItems($navItems);
+
+foreach ($filteredNavItems as $item) {
+    echo '<li class="nav-item">';
+    if (isset($item['subitems'])) {
+        echo '<a class="nav-link collapsed" data-bs-target="#' . str_replace(' ', '', strtolower($item['label'])) . '-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">';
+        echo '<i class="' . $item['icon'] . '"></i>';
+        echo '<span>' . $item['label'] . '</span><i class="bi bi-chevron-down ms-auto"></i>';
+        echo '</a>';
+        echo '<ul id="' . str_replace(' ', '', strtolower($item['label'])) . '-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">';
+        foreach ($item['subitems'] as $subitem) {
+            if (isset($subitem['subitems'])) {
+                // Handle nested subitems
+                echo '<li>';
+                echo '<a href="#' . str_replace(' ', '', strtolower($subitem['label'])) . '-subnav" data-bs-toggle="collapse">';
+                echo '<i class="bi bi-circle"></i><span>' . $subitem['label'] . '</span><i class="bi bi-chevron-down ms-auto"></i>';
+                echo '</a>';
+                echo '<ul id="' . str_replace(' ', '', strtolower($subitem['label'])) . '-subnav" class="nav-content collapse">';
+                foreach ($subitem['subitems'] as $nestedItem) {
+                    echo '<li>';
+                    echo '<a href="' . $nestedItem['href'] . '">';
+                    echo '<i class="bi bi-circle"></i><span>' . $nestedItem['label'] . '</span>';
+                    echo '</a>';
+                    echo '</li>';
+                }
+                echo '</ul>';
+                echo '</li>';
+            } else {
+                // Regular subitem
+                echo '<li>';
+                echo '<a href="' . $subitem['href'] . '">';
+                echo '<i class="bi bi-circle"></i><span>' . $subitem['label'] . '</span>';
+                echo '</a>';
+                echo '</li>';
+            }
+        }
+        echo '</ul>';
+    } else {
+        echo '<a class="nav-link collapsed" href="' . $item['href'] . '">';
+        echo '<i class="' . $item['icon'] . '"></i>';
+        echo '<span>' . $item['label'] . '</span>';
+        echo '</a>';
+    }
+    echo '</li>';
+}
+?>
