@@ -22,7 +22,7 @@
 
   $id = 'detalles_listas_compras';
   $ButtonAddLabel = "Nuevo Detalle";
-  $titulos = ['ID', 'Lista de Compras','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Descuento','Monto Total','Monto Neto','Fecha de creación'];
+  $titulos = ['ID', 'Lista de Compras','Insumo','Cantidad','Costo Unitario Total','Costo Unitario Neto','Descuento','Monto Total','Monto Neto','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data);
   CreateModalForm(
     [
@@ -33,11 +33,13 @@
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
-      'bloque'=>'compras'
+      'bloque'=>'compras',
+      'data-select-column'=>'[2]',
+      'data-input-fill'=>'[kid_articulo]'
     ],
     [
       CreateSelect(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','class'=>'OnEditReadOnly'],$listas_compras),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Articulo','required' => '','class'=>'OnEditReadOnly'],$articulos),
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','class'=>'MUL-2']),

@@ -3,23 +3,23 @@
         // Asociar el evento click al botón
         $('#btactividades').on('click', function() {
         // Redirigir a la URL especificada
-        window.location.href = '/rutas/ingenieria_servicios.php/actividades';
+        window.location.href = '/rutas/produccion.php/capturar_produccion';
         });
 
         // Asociar el evento click al botón
         $('#btproyectos').on('click', function() {
         // Redirigir a la URL especificada
-        window.location.href = '/rutas/administracion.php/proyectos';
+        window.location.href = '/rutas/compras.php/recepciones_compras';
         });
         // Asociar el evento click al botón
         $('#btcuentas').on('click', function() {
         // Redirigir a la URL especificada
-        window.location.href = '/rutas/contabilidad.php/cuentas_bancarias';
+        window.location.href = '/rutas/compras.php/recepciones_pedidos';
         });
         // Asociar el evento click al botón
         $('#btclientes').on('click', function() {
         // Redirigir a la URL especificada
-        window.location.href = '/rutas/planeacion.php/clientes';
+        window.location.href = '/rutas/compras.php/clientes';
         });
         // Asociar el evento click al botón
         $('#btproveedores').on('click', function() {

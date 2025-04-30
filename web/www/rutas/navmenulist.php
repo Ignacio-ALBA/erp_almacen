@@ -321,7 +321,7 @@ $navItems = [
             "eliminar_listas_compras"
             ]
         ],
-        /*[
+        [
           "label" => "Contenido de Lista de Compras",
           "href" => "/detalles_listas_compras",
           "permiso" => [
@@ -330,7 +330,7 @@ $navItems = [
             "ver_detalles_listas_compras",
             "eliminar_detalles_listas_compras"
             ]
-        ],*/
+        ],
         [
           "label" => "Cotizaciones",
           "href" => "/cotizaciones_compras",

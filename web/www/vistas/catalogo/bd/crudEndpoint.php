@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'comentarios_proveedores':
                 if(isset($_POST['opcion'])) {
                     $consultaselect = "SELECT cp.id_comentario_proveedor, 
-                        p.nombre_comercial AS kid_proveedor, 
+                        p.proveedor AS kid_proveedor, 
                         cp.comentario_proveedor,
                         tc.tipo_comentario AS kid_tipo_comentario,
                         cp.fecha_creacion
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ], $select);
 
                 }else{
-                    $consultaselect = "SELECT p.nombre_comercial AS kid_proveedor, 
+                    $consultaselect = "SELECT p.proveedor AS kid_proveedor, 
                         cp.comentario_proveedor,
                         tc.tipo_comentario AS kid_tipo_comentario
                     FROM 

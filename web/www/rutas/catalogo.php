@@ -96,8 +96,8 @@ if($resultado){
                     }
                 }
             $vista = 'comentarios_proveedores';
-            $consultaselect = "SELECT cp.id_comentario_proveedor , 
-                p.nombre_comercial AS kid_proveedor, 
+            $consultaselect = "SELECT cp.id_comentario_proveedor, 
+                p.proveedor AS kid_proveedor, 
                 cp.comentario_proveedor,
                 tc.tipo_comentario AS kid_tipo_comentario,
                 cp.fecha_creacion

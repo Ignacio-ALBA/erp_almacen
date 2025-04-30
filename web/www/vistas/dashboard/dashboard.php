@@ -148,7 +148,30 @@ $PageSection = "Dashboard";
           </div>
         </div>
         -->
+ <!-- Accesos ditrectos -->
+ <div class="card">
+            
 
+            <div class="card-body pb-0">
+              <h5 class="card-title">Acesos Directos</h5>
+
+              <?php 
+                echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
+                .CreateButton(['id'=>'btactividades','etiqueta'=>'Producción', 'class'=>'btn btn-primary'],false)
+                .CreateButton(['id'=>'btclientes','etiqueta'=>'Recepciones', 'class'=>'btn btn-outline-primary'],false)
+                .'</div>';
+
+                echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
+                .CreateButton(['id'=>'btcomentariosproveedores','etiqueta'=>'Recibir pedido', 'class'=>'btn btn-primary'],false)
+                .CreateButton(['id'=>'btproveedores','etiqueta'=>'Listas de compras', 'class'=>'btn btn-outline-primary'],false)
+                .'</div> ';
+
+                echo '<div class="btn-group" role="group" aria-label="Basic example" style="margin-bottom: 10px; width:100%;">'
+                .CreateButton(['id'=>'btproyectos','etiqueta'=>'Central de materia prima', 'class'=>'btn btn-primary'],false)
+                .CreateButton(['id'=>'btcuentas','etiqueta'=>'Central de productos', 'class'=>'btn btn-outline-primary'],false)
+                .'</div>';
+              ?>
+              
         <!-- Proveedores -->
         <div class="col-12">
           <div class="card overflow-auto">

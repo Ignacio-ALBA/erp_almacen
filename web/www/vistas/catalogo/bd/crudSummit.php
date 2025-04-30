@@ -103,12 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tabla = 'proveedores';
                 $idcolumn= "id_proveedor";
 
-                /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_estado'] = GetIDEstadoByName($formDataJson['kid_estado']);
-                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+               /*-------------------- Obtener Tablas Foráneas --------------------*/
+               $estados = GetEstadosListById();
+               /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
+               if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
+                   $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
+               }
                 $editformDataJson = CleanJson($formDataJson);
-                
+                $editformDataJson = $formDataJson;
 
                 $newformDataJson = $formDataJson;
                 $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
@@ -139,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'comentarios_proveedores':
                 $tabla = 'comentarios_proveedores';
                 $idcolumn= "id_comentario_proveedor";
-
+                                             
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
                 $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
@@ -155,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newformDataJson['kid_estatus'] = 1;
 
                 $consultaselect = "SELECT cp.id_comentario_proveedor, 
-                    p.nombre_comercial AS kid_proveedor, 
+                    p.proveedor AS kid_proveedor, 
                     cp.comentario_proveedor,
                     tc.tipo_comentario AS kid_tipo_comentario,
                     cp.fecha_creacion

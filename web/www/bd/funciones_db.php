@@ -59,7 +59,7 @@ function GetIDProyectoByName($valor){
 
 function GetIDProveedorByName($valor){
     global $conexion;
-    $consult = "SELECT id_proveedor FROM proveedores WHERE kid_estatus != 3 AND razon_social =:valor";
+    $consult = "SELECT id_proveedor FROM proveedores WHERE kid_estatus != 3 AND proveedor =:valor";
     $resultado = $conexion->prepare($consult);
     $resultado->bindParam(':valor', $valor);
     $resultado->execute();
@@ -1018,12 +1018,12 @@ function GetListaComprasForSelect($condiciones  = []){
 function GetProvedoresListForSelect($condiciones  = []){
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);
-    $consulta = "SELECT pordefecto, razon_social  FROM proveedores WHERE kid_estatus != 3 $condiciones_str ORDER BY pordefecto DESC,orden ASC, proveedor ASC";
+    $consulta = "SELECT pordefecto, proveedor  FROM proveedores WHERE kid_estatus != 3 $condiciones_str ORDER BY pordefecto DESC,orden ASC, proveedor ASC";
     $resultado = $conexion->prepare($consulta);
     $resultado->execute();
     $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
     $data = array_map(fn($item) => [
-        'valor'=> $item['razon_social'],
+        'valor'=> $item['proveedor'],
         'pordefecto' => $item['pordefecto']
     ], $data);
     return $data;

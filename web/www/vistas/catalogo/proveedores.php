@@ -37,7 +37,7 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'16','id'=>'codigo','etiqueta'=>'Código','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
-      CreateInput(['type'=>'text','maxlength'=>'100','id'=>'proveedor','etiqueta'=>'Categoría','required' => '']),
+      CreateInput(['type'=>'text','maxlength'=>'100','id'=>'proveedor','etiqueta'=>'Proveedor','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'razon_social','etiqueta'=>'Razón Social','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'nombre_comercial','etiqueta'=>'Nombre Comercial','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'13','id'=>'rfc','etiqueta'=>'RFC','class'=>'ValidateRFC','required' => '']),

@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             color: rgb(0, 0, 0), // Color negro
         });
 
-        page.drawText('      Supersaco de polipropileno negro', {
+        page.drawText('      Super saco de polipropileno negro', {
             x: 14, // Texto alineado dentro del rectángulo
             y: height - 120, // Posición del texto
             size: 20, // Tamaño del texto

@@ -1,29 +1,22 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
-
-
-    
-
     $PageSection = "Listas de Compras";
 ?>
 
-
-<!-- Begin Page Title -->
-<div class="pagetitle">
+  <div class="pagetitle">
     <h1><?php echo $PageSection; ?></h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
         <li class="breadcrumb-item">Compras</li>
         <li class="breadcrumb-item active" ><?php echo $PageSection; ?></li>
       </ol>
     </nav>
-</div>
-<!-- End Page Title -->
-
+  </div><!-- End Page Title -->
 <?php 
+
   $id = 'listas_compras';
-  $ButtonAddLabel = "Nueva lista de compras";
+  $ButtonAddLabel = "Nuevo Lista";
   $titulos = ['ID', 'Orden','Lista','Estado','La Creo','La Autorizo','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
@@ -40,27 +33,15 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Lista de Compra','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
-      CreateInput([
-        'type'=>'number',
-        'id'=>'num_articulos',
-        'etiqueta'=>'Número de Insumos',
-        'required' => '',
-        'min'=>'1',
-        'div_style'=>'display:none;',
-        'class'=>'OnlyInEdit'
-      ]),
-      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
       CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$cuentas_bancarias),
       CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
-    '<div id="articulos_container"></div>' // Container for dynamic articles
+      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus)
     ]);
-
 
     $id='detalles_listas_compras';
     $ButtonAddLabel = "Nuevo Detalle";
-    $titulos = ['ID', 'Lista de Compras','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+    $titulos = ['ID', 'Lista de Compras','Insumos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
   
-
     ob_start();
     CreateTable($id, $ButtonAddLabel, $titulos, [],true,[],'',$atributos = ['data-select-column'=>2]);
     $detailsTableOutput = ob_get_clean();
@@ -79,38 +60,6 @@
     $detailsTableOutput
   ],
   ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
-  
-  // Agregar botón para ver detalles en la tabla principal
-  $modalCRUD = 'detalles_listas_compras';
-  $nuevo_boton = '
-      <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>
-  ';
-  $data_script['botones_acciones'] = array();
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-if(!isset($data_script['botones_acciones']) || !is_array($data_script['botones_acciones'])) {
-    $data_script['botones_acciones'] = array();
-}
-array_push($data_script['botones_acciones'], $nuevo_boton);
-  $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-  $optionkey = 'NewAdd3';
-  $data_script[$optionkey] =['data_list_column'=>[]];
 
   CreateModalForm(
   [
@@ -127,14 +76,16 @@ array_push($data_script['botones_acciones'], $nuevo_boton);
   ],
   [
     CreateInput(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
-    CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Articulo','required' => '','class'=>'OnEditReadOnly'],$articulos),
-    CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad','required' => '','class'=>'MUL-1 MUL-2']),
+    CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly','data-validation'=>'required'],$articulos),
+    CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
     CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-    CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','class'=>'MUL-2']),
+    CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
     CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
     CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
     CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4']),
   ]);
+
+
 
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
 
