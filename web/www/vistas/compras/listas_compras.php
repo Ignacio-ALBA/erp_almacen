@@ -40,7 +40,7 @@
 
     $id='detalles_listas_compras';
     $ButtonAddLabel = "Nuevo Detalle";
-    $titulos = ['ID', 'Lista de Compras','Insumos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+    $titulos = ['ID', 'Lista de Compras','Insumos','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
   
     ob_start();
     CreateTable($id, $ButtonAddLabel, $titulos, [],true,[],'',$atributos = ['data-select-column'=>2]);

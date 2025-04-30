@@ -269,78 +269,6 @@ if($resultado){
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             
             break;
-            case 'recepcion_orden':
-
-                $vista = 'recepcion_orden';
-                $estatus = GetEstatusLabels();
-                $estatus_name = GetEstatusList();
-            
-                // Consulta inicial
-                $consultaselect = "SELECT oc.id_orden_compras,
-                    oc.orden_compras,
-                    oc.codigo_externo,
-                    oc.grupo_cotizacion,
-                    (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = oc.kid_proyecto LIMIT 1) AS kid_proyecto,
-                    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
-                    oc.monto_total,
-                    oc.monto_neto,
-                    oc.kid_estatus,
-                    oc.fecha_creacion
-                FROM ordenes_compras oc
-                WHERE oc.kid_estatus != 3";
-            
-                $resultado = $conexion->prepare($consultaselect);
-                $resultado->execute();
-                $ordenes_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            
-                // Mapear los datos y agregar botones
-                $ordenes_compras = array_map(function ($row) {
-                    global $data_script, $estatus, $estatus_name;
-                    $botones_acciones = $data_script['botones_acciones'];
-            
-                    $bloque = 'compras';
-                    $modalCRUD = 'update_estatus_ordenes_compras';
-            
-                    // Agregar botones según el estado
-                    if(!in_array($row['kid_estatus'], [5,6,9])) {
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
-                        array_unshift($botones_acciones, $nuevo_boton);
-                    } else if($row['kid_estatus'] == 6) {
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                        array_unshift($botones_acciones, $nuevo_boton);
-                    }
-            
-                    // Agregar botones de contenido y reporte
-                    $hashed_id = codificar($row['id_orden_compras']);
-                    $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id='.$hashed_id.'" class="btn btn-secondary"><i class="bi bi-journal-text"></i> Contenido</a>';
-                    array_push($botones_acciones, $nuevo_boton);
-                    
-                    $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="ordenes_compras_reporte" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Generar PDF</button>';
-                    array_push($botones_acciones, $nuevo_boton);
-            
-                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'ordenes_compras');
-                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                    return $row;
-                }, $ordenes_compras);
-            
-                // Configurar data_show
-                $data['data_show'] = [
-                    'data' => $ordenes_compras,
-                    'AllowADDButton' => true,
-                    'proyectos' => GetProyectosListForSelect(),
-                    'proveedores' => GetProvedoresListForSelect(),
-                    'estatus' => GetEstatusListForSelect(),
-                    'tiempos_entrega' => GetTiemposEntregaListForSelect(),
-                    'tipos_pago' => GetTiposPagoListForSelect(),
-                    'colaboradores' => GetUsuariosListForSelect(),
-                    'almacenes' => GetAlmacenesListForSelect(), // Agregar esta línea
-                    'botones_acciones' => $data_script['botones_acciones']
-                ];
-            
-                // Configurar NewAdd3 si es necesario
-                $optionkey = 'NewAdd3';
-                $data_script[$optionkey] = ['data_list_column'=>[]];
-                break;
             case 'ordenes_compras':
                 $perms = [
                     "crear_ordenes_compras",
@@ -497,6 +425,91 @@ if($resultado){
             $data['data_show']['cotizaciones'] = GetCotizacionesListForSelect();
             $data['data_show']['articulos'] = GetArticulosListForSelect();
             break;
+            case 'recepcion_orden':
+                $perms = [
+                    "crear_recepciones_compras",
+                    "editar_recepciones_compras",
+                    "ver_recepciones_compras",
+                    "eliminar_recepciones_compras"
+                        ];
+            
+                        checkPerms($perms);
+                        $acciones = ['ver_', 'editar_', 'eliminar_'];
+                        foreach ($acciones as $index => $accion) {
+                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                                unset($data_script['botones_acciones'][$index]);
+                            }
+                        }
+                $vista = 'recepcion_orden';
+                $estatus = GetEstatusLabels();
+                $estatus_name = GetEstatusList();
+            
+                // Consulta inicial
+                $consultaselect = "SELECT oc.id_orden_compras,
+                    oc.orden_compras,
+                    oc.codigo_externo,
+                    oc.grupo_cotizacion,
+                    (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = oc.kid_proyecto LIMIT 1) AS kid_proyecto,
+                    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
+                    oc.monto_total,
+                    oc.monto_neto,
+                    oc.kid_estatus,
+                    oc.fecha_creacion
+                FROM ordenes_compras oc
+                WHERE oc.kid_estatus != 3";
+            
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                $ordenes_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            
+                // Mapear los datos y agregar botones
+                $ordenes_compras = array_map(function ($row) {
+                    global $data_script, $estatus, $estatus_name;
+                    $botones_acciones = $data_script['botones_acciones'];
+            
+                    $bloque = 'compras';
+                    $modalCRUD = 'update_estatus_ordenes_compras';
+            
+                    // Agregar botones según el estado
+                    if(!in_array($row['kid_estatus'], [5,6,9])) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    } else if($row['kid_estatus'] == 6) {
+                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
+                        array_unshift($botones_acciones, $nuevo_boton);
+                    }
+            
+                    // Agregar botones de contenido y reporte
+                    $hashed_id = codificar($row['id_orden_compras']);
+                    $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id='.$hashed_id.'" class="btn btn-secondary"><i class="bi bi-journal-text"></i> Contenido</a>';
+                    array_push($botones_acciones, $nuevo_boton);
+                    
+                    $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="ordenes_compras_reporte" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Generar PDF</button>';
+                    array_push($botones_acciones, $nuevo_boton);
+            
+                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'ordenes_compras');
+                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
+                    return $row;
+                }, $ordenes_compras);
+            
+                // Configurar data_show
+                $data['data_show'] = [
+                    'data' => $ordenes_compras,
+                    'AllowADDButton' => true,
+                    'proyectos' => GetProyectosListForSelect(),
+                    'proveedores' => GetProvedoresListForSelect(),
+                    'estatus' => GetEstatusListForSelect(),
+                    'tiempos_entrega' => GetTiemposEntregaListForSelect(),
+                    'tipos_pago' => GetTiposPagoListForSelect(),
+                    'colaboradores' => GetUsuariosListForSelect(),
+                    'almacenes' => GetAlmacenesListForSelect(), // Agregar esta línea
+                    'botones_acciones' => $data_script['botones_acciones']
+                ];
+            
+                // Configurar NewAdd3 si es necesario
+                $optionkey = 'NewAdd3';
+                $data_script[$optionkey] = ['data_list_column'=>[]];
+                break;
         case 'recepciones_compras':
             $perms = [
                 "crear_recepciones_compras",
@@ -549,8 +562,21 @@ if($resultado){
             $data_script[$optionkey] =['data_list_column'=>[]];
             $data['list_js_scripts']['../vistas/compras/recepciones_compras_script'] =['data'=> $data_script];
             break;
-
             case 'recepciones_pedidos':
+                $perms = [
+                    "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
+                       ];
+            
+                        checkPerms($perms);
+                        $acciones = ['ver_', 'editar_', 'eliminar_'];
+                        foreach ($acciones as $index => $accion) {
+                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                                unset($data_script['botones_acciones'][$index]);
+                            }
+                        }
                 $vista = 'recepciones_pedidos';
                 $estatus = GetEstatusLabels();
                 $caseEstatus = "CASE \n";

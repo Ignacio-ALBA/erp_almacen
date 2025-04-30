@@ -440,8 +440,21 @@ if($resultado){
                 }
             $vista = 'almacenes';
             break;
-            case 'mermas':
                 case 'mermas':
+                    $perms = [
+                        "crear_mermas",
+                            "editar_mermas",
+                            "ver_mermas",
+                            "eliminar_mermas"
+                       ];
+            
+                        checkPerms($perms);
+                        $acciones = ['ver_', 'editar_', 'eliminar_'];
+                        foreach ($acciones as $index => $accion) {
+                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                                unset($data_script['botones_acciones'][$index]);
+                            }
+                        }
                     $vista = 'mermas';
                     $consultaselect = "SELECT m.id_merma,
                         p.id_produccion AS kid_produccion,
@@ -467,6 +480,20 @@ if($resultado){
                     break;
                 break;
                 case 'locaciones':
+                    $perms = [
+                        "crear_locaciones",
+                            "editar_locaciones",
+                            "ver_locaciones",
+                            "eliminar_locaciones"
+                       ];
+            
+                        checkPerms($perms);
+                        $acciones = ['ver_', 'editar_', 'eliminar_'];
+                        foreach ($acciones as $index => $accion) {
+                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                                unset($data_script['botones_acciones'][$index]);
+                            }
+                        }
                     $vista = 'locaciones';
                     $consultaselect = "SELECT u.id_ubicacion,
                         a.almacen AS kid_almacen,

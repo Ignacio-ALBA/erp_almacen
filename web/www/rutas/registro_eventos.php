@@ -27,9 +27,37 @@ if($resultado){
 
     switch ($pathResult) {
         case 'registro_eventos':
+            $perms = [
+                "crear_registro_eventos",
+            "editar_registro_eventos",
+            "ver_registro_eventos",
+            "eliminar_registro_eventos"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'registro_eventos';
             break;
             case 'detalles_registro_eventos':
+                $perms = [
+                    "crear_detalles_registro_eventos",
+                    "ver_detalles_registro_eventos",
+                    "editar_detalles_registro_eventos",
+                    "eliminar_detalles_registro_eventos"
+                ];
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
+
                 $vista = 'detalles_registro_eventos';
                 break;
                 case 'comentarios_registro_eventos':

@@ -27,6 +27,20 @@ if($resultado){
 
     switch ($pathResult) {
         case 'capturar_produccion':
+            $perms = [
+                "ver_capturar_produccion",
+                  "editar_capturar_produccion",
+                  "eliminar_capturar_produccion",
+                  "crear_capturar_produccion"
+               ];
+    
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
+                    }
+                }
             $vista = 'capturar_produccion';
             $consultaselect = "SELECT p.id_produccion,
                 p.fecha_produccion,
@@ -49,6 +63,20 @@ if($resultado){
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             break;
             case 'reporte_produccion':
+                $perms = [
+                    "ver_reporte_produccion",
+                    "editar_reporte_produccion",
+                    "eliminar_reporte_produccion",
+                    "crear_reporte_produccion"
+                   ];
+        
+                    checkPerms($perms);
+                    $acciones = ['ver_', 'editar_', 'eliminar_'];
+                    foreach ($acciones as $index => $accion) {
+                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                            unset($data_script['botones_acciones'][$index]);
+                        }
+                    }
                 $vista = 'reporte_produccion';
                 
                 $consultaselect = "SELECT dp.id_detalle_produccion,

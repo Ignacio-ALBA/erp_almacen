@@ -372,17 +372,17 @@ $navItems = [
             ]
         ],
         [
-          "label" => "Recibir Orden",
-          "href" => "/recepcion_orden",
+          "label" => "Pesaje de Producción",
+          "href" => "/recepcion_produccion",
           "permiso" => [
-            "crear_recibir_orden",
-            "editar_recibir_orden",
-            "ver_recibir_orden",
-            "eliminar_recibir_orden"
+            "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
             ]
         ],
         [
-          "label" => "Recepciones",
+          "label" => "Pesaje de Materia Prima",
           "href" => "/recepciones_compras",
           "permiso" => [
             "crear_recepciones_compras",
@@ -391,13 +391,13 @@ $navItems = [
             "eliminar_recepciones_compras"
             ]
         ], [
-          "label" => "Recibir Pedido",
+          "label" => "Recibir Pedido para Producción",
           "href" => "/recepciones_pedidos",
           "permiso" => [
-            "crear_recepciones_pedidos",
-            "editar_recepciones_pedidos",
-            "ver_recepciones_pedidos",
-            "eliminar_recepciones_pedidos"
+            "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
             ]
         ],
         [
@@ -500,15 +500,23 @@ $navItems = [
                 "label" => "Capturar producción",
                 "href" => "/capturar_produccion",
                 "permiso" => [
-                  "ver_capturar_produccion"
+                  "ver_capturar_produccion",
+                  "editar_capturar_produccion",
+                  "eliminar_capturar_produccion",
+                  "crear_capturar_produccion"
+                  ]
                 ]
                 ],
                 [
                   "label" => "Reporte de producción",
                   "href" => "/reporte_produccion",
                   "permiso" => [
-                    "ver_reporte_produccion"
-                    ]
+                    "ver_reporte_produccion",
+                    "editar_reporte_produccion",
+                    "eliminar_reporte_produccion",
+                    "crear_reporte_produccion"
+                    
+     
                   ]
                   ]
                 ],
