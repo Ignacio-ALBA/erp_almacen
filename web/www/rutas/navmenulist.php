@@ -1,41 +1,5 @@
 <?php
-function hasPermission($requiredPermissions) {
-    if (empty($requiredPermissions)) {
-        return true;
-    }
-    if (isset($_SESSION["permisos"]) && in_array("all", $_SESSION["permisos"])) {
-        return true;
-    }
-    if (!isset($_SESSION["permisos"])) {
-        return false;
-    }
-    foreach ($requiredPermissions as $permission) {
-        if (in_array($permission, $_SESSION["permisos"])) {
-            return true;
-        }
-    }
-    return false;
-}
 
-function filterMenuItems($items) {
-    $filteredItems = [];
-    foreach ($items as $item) {
-        // Check if item has subitems
-        if (isset($item['subitems'])) {
-            $filteredSubitems = filterMenuItems($item['subitems']);
-            if (!empty($filteredSubitems)) {
-                $item['subitems'] = $filteredSubitems;
-                $filteredItems[] = $item;
-            }
-        } else {
-            // Check permissions for leaf items
-            if (isset($item['permiso']) && hasPermission($item['permiso'])) {
-                $filteredItems[] = $item;
-            }
-        }
-    }
-    return $filteredItems;
-}
 
 $navItems = [
     /* Módulo de Administración comentado
