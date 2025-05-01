@@ -645,7 +645,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idcolumn= "id_detalle_cotizacion_compras";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null; 
+                // Remove unnecessary conversion since the form already sends the ID
+                //$formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null; 
                 $formDataJson['kid_cotizacion_compra'] = isset($formDataJson['kid_cotizacion_compra']) ? GetIDCotizacionComprasByName($formDataJson['kid_cotizacion_compra']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 

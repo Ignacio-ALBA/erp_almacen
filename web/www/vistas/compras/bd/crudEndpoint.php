@@ -267,6 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $consultaselect = "SELECT dcc.id_detalle_cotizacion_compras,
                         cc.cotizacion_compras AS kid_cotizacion_compra,
                         a.articulo AS kid_articulo,
+                        a.id_articulo,
                         dcc.cantidad,
                         dcc.costo_unitario_total,
                         dcc.costo_unitario_neto,
@@ -282,6 +283,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    if ($data) {
+                        $data['options'] = [
+                            'kid_articulo' => [
+                                [
+                                    'valor' => $data['id_articulo'],
+                                    'texto' => $data['kid_articulo'],
+                                    'pordefecto' => 1
+                                ]
+                            ]
+                        ];
+                        // Mantener el valor original para el campo kid_articulo
+                        $data['kid_articulo'] = $data['id_articulo'];
+                    }
                     $data['id_detalle_cotizacion_compras'] = null;
                 }
 

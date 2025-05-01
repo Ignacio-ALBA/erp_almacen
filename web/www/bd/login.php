@@ -45,6 +45,7 @@ if($resultado->rowCount() >= 1){
 		
 		$_SESSION["permisos"] =  $_SESSION["s_id_tipoUsuario"] == 1 ? ["all"] : GetAllowPermsList($_SESSION["s_id_tipoUsuario"]) ;
 		$nombre = $data[0]['nombre'];
+		debug ($_SESSION["permisos"]);
 		if($data[0]['apellido_paterno']){$nombre .= " ".$data[0]['apellido_paterno'];}
 		if($data[0]['apellido_materno']){$nombre .= " ".$data[0]['apellido_materno'];}
 		$_SESSION["s_nombre"] = $nombre;

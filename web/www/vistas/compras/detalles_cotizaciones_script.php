@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const montoTotal = form.querySelector('input[name="monto_total"], #monto_total');
         const montoNeto = form.querySelector('input[name="monto_neto"], #monto_neto');
         const porcentajeDescuento = form.querySelector('input[name="porcentaje_descuento"], #porcentaje_descuento');
+        const kidArticulo = form.querySelector('select[name="kid_articulo"], #kid_articulo');
 
         const camposRequeridos = {
             cantidad,
@@ -18,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
             costoUnitarioNeto,
             montoTotal,
             montoNeto,
-            porcentajeDescuento
+            porcentajeDescuento,
+            kidArticulo
         };
 
         const camposFaltantes = Object.entries(camposRequeridos)
@@ -61,6 +63,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Silently handle errors
             }
         }
+
+        // Ensure article ID is properly handled when form is submitted
+        form.addEventListener('submit', function(e) {
+            // Make sure kid_articulo is included in the form data
+            if (kidArticulo && !kidArticulo.disabled) {
+                const articuloInput = document.createElement('input');
+                articuloInput.type = 'hidden';
+                articuloInput.name = 'kid_articulo';
+                articuloInput.value = kidArticulo.value;
+                form.appendChild(articuloInput);
+            }
+        });
 
         // Configurar event listeners para los campos que desencadenan cálculos
         [cantidad, costoUnitarioTotal, porcentajeDescuento].forEach(campo => {

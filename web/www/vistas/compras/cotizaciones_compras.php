@@ -89,7 +89,9 @@
         'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
         'method'=>'POST',
         'action'=>'bd/crudSummit.php',
-        'bloque'=>'compras'
+        'bloque'=>'compras',
+        'data-select-column'=>'[2]',
+        'data-input-fill'=>'[kid_articulo]'
       ],
       [
         $detailsTableOutput
@@ -111,8 +113,8 @@
         ],
         [
           CreateInput(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','readonly'=>'','class'=>'OnEditReadOnly']),
-          CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Articulo','required' => '','readonly'=>'','class'=>'OnEditReadOnly'],[]),
-          CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad','required' => '','class'=>'MUL-1 MUL-2']),
+          CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','readonly'=>'','class'=>'OnEditReadOnly'],[]),
+          CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
           CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
           CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','class'=>'MUL-2']),
           CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
