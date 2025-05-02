@@ -16,7 +16,7 @@
 <?php 
 
   $id = 'listas_compras';
-  $ButtonAddLabel = "Nuevo Lista";
+  $ButtonAddLabel = "Nueva Lista";
   $titulos = ['ID', 'Orden','Lista','Estado','La Creo','La Autorizo','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
