@@ -946,10 +946,10 @@ $navItems = [
               "label" => "Locaciones de almacen",
               "href" => "/locaciones",
               "permiso" => [
-                "crear_locaciones",
-                "editar_locaciones",
-                "ver_locaciones",
-                "eliminar_locaciones"
+                "crear_locaciones_almacen",
+                "editar_locaciones_almacen",
+                "ver_locaciones_almacen",
+                "eliminar_locaciones_almacen"
                 ]
             ],/*
             [
