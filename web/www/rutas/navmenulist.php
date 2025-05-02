@@ -372,7 +372,7 @@ $navItems = [
             "ver_detalles_ordenes_compras",
             "eliminar_detalles_ordenes_compras"
             ]
-        ],
+        ],/*
         [
           "label" => "Pesaje de Producción",
           "href" => "/recepcion_produccion",
@@ -382,7 +382,7 @@ $navItems = [
             "ver_recepciones_compras",
             "eliminar_recepciones_compras"
             ]
-        ],
+        ],*/
         [
           "label" => "Pesaje de Materia Prima",
           "href" => "/recepciones_compras",
