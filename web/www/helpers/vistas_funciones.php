@@ -46,19 +46,31 @@ function RenderMenuLateral($items, $baseId, $level, $route = '') {
     // Comienza el contenedor del menú
     $show_element = GetSection();
     foreach ($items as $item) {
+        
         //debug($item);
         //debug(array_intersect($items['permiso'], $_SESSION["permisos"]));
-        if(isset($item['permiso']) && !in_array("all",$_SESSION["permisos"]) && empty(array_intersect($items['permiso'], $_SESSION["permisos"]))){
+
+        if(isset($item['permiso']) && !in_array("all",$_SESSION["permisos"]) && empty(array_intersect($item['permiso'], $_SESSION["permisos"]))){
             continue;
         }else if(isset($item['subitems'])){
             $count_parts = 0;
             foreach ($item['subitems'] as $subitem) {
+                
+                if(isset($subitem['subitems'])) {
+                    $count_parts2 = 0;
+                    foreach ($subitem['subitems'] as $subsubitem) {
+                        if(isset($subsubitem['permiso']) && !in_array( "all",$_SESSION["permisos"]) && empty(array_intersect($subsubitem['permiso'], $_SESSION["permisos"]))){
+                            $count_parts2++;
+                        }           
+                    }
+                    if(isset($subsubitem['permiso']) && $count_parts2 >= count($subitem['subitems'])){continue;}
+                }
+
                 if(isset($subitem['permiso']) && !in_array( "all",$_SESSION["permisos"]) && empty(array_intersect($subitem['permiso'], $_SESSION["permisos"]))){
                     $count_parts++;
                 }
             }
             if(isset($subitem['permiso']) && $count_parts >= count($item['subitems'])){continue;}
-
         }
         
         $is_collapsed = 'collapsed';
@@ -87,11 +99,28 @@ function RenderMenuLateral($items, $baseId, $level, $route = '') {
             
             echo '<ul class="collapse '. $is_show.'" id="' . str_replace(' ', '_', $item['label']). $baseId . $level . '">';
             // Llama a la función recursivamente para renderizar subelementos
+            
             foreach ($item['subitems'] as $subitem) {
-                
-                if(isset($subitem['permiso']) && !in_array("all",$_SESSION["permisos"]) && empty(array_intersect($subitem['permiso'], $_SESSION["permisos"]))){
+
+                if(!isset($subitem['subitems'])  && isset($subitem['permiso']) && !in_array("all",$_SESSION["permisos"]) && empty(array_intersect($subitem['permiso'], $_SESSION["permisos"]))){
                     continue;
                 }
+                $count_parts3= 0;
+                if(isset($subitem['subitems'])) {
+                    foreach ($subitem['subitems'] as $subsubitem) {
+                        
+                        if(isset($subsubitem['permiso']) && !in_array("all",$_SESSION["permisos"]) && empty(array_intersect($subsubitem['permiso'], $_SESSION["permisos"]))){
+                            $count_parts3++;
+                        }        
+                    }
+                    if(isset($subitem['permiso']) && $count_parts3 >= count($subitem['subitems'])){continue;}
+                }
+                
+                
+
+                //debug($subitem);
+                
+                
                 
                 $is_collapsed = 'collapsed';
                 $is_show = '';
