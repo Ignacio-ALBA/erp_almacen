@@ -24,7 +24,7 @@
   $id = 'detalles_cotizaciones_compras';
   $ButtonAddLabel = "Nuevo Detalle de Cotización";
   $titulos = ['ID', 'Cotización','Insumos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data, true); // Set AllowADDButton to true
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, $AllowADDButton); 
   CreateModalForm(
     [
       'id'=> $id, 
@@ -40,27 +40,16 @@
       'onSubmit'=>'return validateDetallesCotizacion(this);'
     ],
     [
-      CreateInput(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','readonly' => '','class'=>'OnEditReadOnly','value'=>isset($valor_id)?$valor_id:'']),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => 'required','class'=>'OnEditReadOnly'],$articulos),
+      CreateSelect(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','class'=>'OnEditReadOnly'],$cotizaciones),
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','class'=>'MUL-2','readonly'=>'readonly']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly'=>'readonly','class'=>'MUL-2']),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly'=>'readonly']),
       CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly'=>'readonly']),
       CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4'])
     ]);
-?>
-<script>
-function validateDetallesCotizacion(form) {
-    const articuloSelect = form.querySelector('#kid_articulo');
-    if (!articuloSelect.value) {
-        alert('Por favor seleccione un artículo');
-        return false;
-    }
-    return true;
-}
-</script>
-<?php
+
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
 
   include 'wrapper.php'; // Incluye el wrapper

@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idcolumn= "id_proveedor";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_estado'] = GetIDEstadoByName($formDataJson['kid_estado']);
+                $formDataJson['kid_estado'] = GetIDEstatusByName($formDataJson['kid_estado']);
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $editformDataJson = CleanJson($formDataJson);
