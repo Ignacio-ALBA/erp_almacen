@@ -317,87 +317,70 @@ if($resultado){
         case 'ordenes_compras':
             $perms = [
                 "crear_ordenes_compras",
-                    "editar_ordenes_compras",
-                    "ver_ordenes_compras",
-                    "eliminar_ordenes_compras"
-                   ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
-                        }
-                    }
+                "editar_ordenes_compras",
+                "ver_ordenes_compras",
+                "eliminar_ordenes_compras"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+
             $vista = 'ordenes_compras';
             $estatus = GetEstatusLabels();
             $estatus_name = GetEstatusList();
-        
-            // Consulta inicial
             $consultaselect = "SELECT oc.id_orden_compras,
-                oc.orden_compras,
                 oc.codigo_externo,
-                oc.grupo_cotizacion,
-                (SELECT proyecto FROM proyectos p WHERE p.id_proyecto = oc.kid_proyecto LIMIT 1) AS kid_proyecto,
+                oc.orden_compras,
+                oc.tipo_orden,
                 (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
                 oc.monto_total,
                 oc.monto_neto,
-                oc.kid_estatus,
                 oc.fecha_creacion
             FROM ordenes_compras oc
             WHERE oc.kid_estatus != 3";
-        
+
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
             $ordenes_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
-        
-            // Mapear los datos y agregar botones
-            $ordenes_compras = array_map(function ($row) {
-                global $data_script, $estatus, $estatus_name;
+
+            $ordenes_compras = array_map(function ($row) use ($data_script) {
                 $botones_acciones = $data_script['botones_acciones'];
-        
-                $bloque = 'compras';
-                $modalCRUD = 'update_estatus_ordenes_compras';
-        
-                // Agregar botones según el estado
-                if(!in_array($row['kid_estatus'], [5,6,9])) {
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar</button>';
-                    array_unshift($botones_acciones, $nuevo_boton);
-                } else if($row['kid_estatus'] == 6) {
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'.$bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                    array_unshift($botones_acciones, $nuevo_boton);
+
+                $nuevo_boton_detalles = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="detalles_ordenes_compras"><i class="bi bi-eye"></i> Ver Detalles</button>';
+                $nuevo_boton_pesaje = '<button class="ModalNewAddPesaje btn btn-success" modalCRUD="recepciones_compras"><i class="bi bi-balance-scale"></i> Iniciar Pesaje</button>';
+
+                if (!in_array($nuevo_boton_detalles, $botones_acciones)) {
+                    array_push($botones_acciones, $nuevo_boton_detalles);
                 }
-        
-                // Agregar botones de contenido y reporte
-                $hashed_id = codificar($row['id_orden_compras']);
-                $nuevo_boton = '<a href="/rutas/compras.php/detalles_ordenes_compras?id='.$hashed_id.'" class="btn btn-secondary"><i class="bi bi-journal-text"></i> Contenido</a>';
-                array_push($botones_acciones, $nuevo_boton);
-                
-                $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="ordenes_compras_reporte" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Generar PDF</button>';
-                array_push($botones_acciones, $nuevo_boton);
-        
+                if (!in_array($nuevo_boton_pesaje, $botones_acciones)) {
+                    array_push($botones_acciones, $nuevo_boton_pesaje);
+                }
+
                 $row['botones'] = GenerateCustomsButtons($botones_acciones, 'ordenes_compras');
-                $row['kid_estatus'] = $estatus[$row['kid_estatus']];
+
                 return $row;
             }, $ordenes_compras);
-        
-            // Configurar data_show
+
             $data['data_show'] = [
                 'data' => $ordenes_compras,
                 'AllowADDButton' => true,
-                'proyectos' => GetProyectosListForSelect(),
+                //'proyectos' => GetProyectosListForSelect(),
                 'proveedores' => GetProvedoresListForSelect(),
-                'estatus' => GetEstatusListForSelect(),
-                'tiempos_entrega' => GetTiemposEntregaListForSelect(),
-                'tipos_pago' => GetTiposPagoListForSelect(),
+                //'estatus' => GetEstatusListForSelect(),
+               // 'tipos_pago' => GetTiposPagoListForSelect(),
+                //'tiempos_entrega' => GetTiemposEntregaListForSelect(),
+                'almacenes' => GetAlmacenesListForSelect(),
                 'colaboradores' => GetUsuariosListForSelect(),
-                'almacenes' => GetAlmacenesListForSelect(), // Agregar esta línea
-                'botones_acciones' => $data_script['botones_acciones']
+               // 'botones_acciones' => $data_script['botones_acciones']
             ];
-        
-            // Configurar NewAdd3 si es necesario
+
             $optionkey = 'NewAdd3';
-            $data_script[$optionkey] = ['data_list_column'=>[]];
+            $data_script[$optionkey] = ['data_list_column' => []];
             break;
         case 'detalles_ordenes_compras':
             $perms = [

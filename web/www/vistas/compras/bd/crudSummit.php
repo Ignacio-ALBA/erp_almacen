@@ -146,14 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $estatus = GetEstatusLabels();
 
         switch ($modalCRUD) {
-            case 'proveedores':
+           /* case 'proveedores':
                 $tabla = 'proveedores';
                 $idcolumn= "id_proveedor";
-
-                /*-------------------- Obtener Tablas Foráneas --------------------*/
+*/
+                /*-------------------- Obtener Tablas Foráneas --------------------
                 $formDataJson['kid_estado'] = GetIDEstatusByName($formDataJson['kid_estado']);
-                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-
+                ------------------- Fin Obtener Tablas Foráneas ------------------*/
+/*
                 $editformDataJson = CleanJson($formDataJson);
                 
 
@@ -186,14 +186,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'comentarios_proveedores':
                 $tabla = 'comentarios_proveedores';
                 $idcolumn= "id_comentario_proveedor";
-
+*/
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
-                $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+             /*    $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
                 $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;  
-                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+               */
+               /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
-
+/*
                 $editformDataJson = CleanJson($formDataJson);
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
@@ -216,6 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $ColumnsCheck = [];
                 break;
+                */
 
             case 'listas_compras':
                 $tabla = 'listas_compras';
@@ -442,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $resultado->execute();
                 $cotizacion = $resultado->fetch(PDO::FETCH_ASSOC);
 
-                /*$tabla = 'detalles_actividades';
+                $tabla = 'detalles_actividades';
                 $idcolumn= "id_detalle_actividad";
                 $fuc_mapping = getButtonstoDetallesActividades();
 
@@ -465,7 +467,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 LEFT JOIN actividades a ON da.kid_actividad = a.id_actividad 
                 LEFT JOIN proyectos p ON a.kid_proyecto = p.id_proyecto 
                 LEFT JOIN colaboradores u ON da.kid_personal_asignado = u.id_colaborador
-                WHERE da.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;*/
+                WHERE da.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
 
                 $formDataJson['kid_estatus'] = isset($formDataJson['UpdateEstatus']) ? GetIDEstatusByName($formDataJson['UpdateEstatus']) : null;
 
@@ -675,24 +677,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'ordenes_compras':
                 $tabla = 'ordenes_compras';
                 $idcolumn= "id_orden_compras";
-                $custombt = true;
+                $custombt = false;
+                $defaultProjectId = GetDefaultProjectId();
+
+                // Function to get the tipo_orden based on kid_almacen from the colaborador
+                function GetTipoOrdenByKidAlmacen($kid_colaborador) {
+                    global $conexion;
+                    $query = "SELECT kid_almacen FROM colaboradores WHERE id_colaborador = :kid_colaborador LIMIT 1";
+                    $stmt = $conexion->prepare($query);
+                    $stmt->bindParam(':kid_colaborador', $kid_colaborador, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $kid_almacen = $stmt->fetchColumn();
+                    
+                    // Determine tipo_orden based on kid_almacen value
+                    if ($kid_almacen == 1) {
+                        return "orden_materia_prima";
+                    } else if ($kid_almacen == 2) {
+                        return "orden_produccion";
+                    } else {
+                        return "orden_materia_prima"; // Default value if kid_almacen doesn't match expected values
+                    }
+                }
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_proyecto'] = (isset($formDataJson['kid_proyecto']) && !is_numeric($formDataJson['kid_proyecto']) ? GetIDProyectoByName($formDataJson['kid_proyecto']) : null);
-                $formDataJson['kid_proveedor'] = (isset($formDataJson['kid_proveedor']) && !is_numeric($formDataJson['kid_proveedor'])) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+                $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? 
+                GetIDProyectoByName($formDataJson['kid_proyecto']) : $defaultProjectId;
+                
+                // Use GetTipoOrdenByKidAlmacen with the session user ID, not with tipo_orden
+                // The tipo_orden will be determined by the function based on the user's kid_almacen
+                $formDataJson['tipo_orden'] = GetTipoOrdenByKidAlmacen($_SESSION["s_id"]);
+                
+                $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ?GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+                //$formDataJson['kid_proveedor'] = (isset($formDataJson['kid_proveedor']) && !is_numeric($formDataJson['kid_proveedor'])) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
                 $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $editformDataJson = CleanJson($formDataJson);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
+                
+                // Set default value for grupo_cotizacion if not present
+                $newformDataJson['grupo_cotizacion'] = isset($newformDataJson['grupo_cotizacion']) ? $newformDataJson['grupo_cotizacion'] : 1;
+                
+                // Set tipo_orden based on the colaborador's kid_almacen
+                $newformDataJson['tipo_orden'] = GetTipoOrdenByKidAlmacen($_SESSION["s_id"]);
 
-                $consultaselect = "SELECT oc.id_orden_compras ,
+                $consultaselect = "SELECT oc.id_orden_compras,
                     oc.orden_compras,
                     oc.codigo_externo,
                     oc.grupo_cotizacion,
+                    oc.tipo_orden,
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     oc.monto_total,
@@ -737,7 +773,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
 
                 $nuevo_boton = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
-                //array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
+                array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
                 array_push($data_script['botones_acciones'], $nuevo_boton);
 
                 $modalCRUD = 'ordenes_compras';
@@ -749,17 +785,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (isset($formDataJson['UpdateEstatus'])) {
                     $statusMap = [
-                        'revisar' => 6,
-                        'autorizar' => 5
+                       'revisar' => 6,
+                       'autorizar' => 5
                     ];
                     
                     if (array_key_exists($formDataJson['UpdateEstatus'], $statusMap)) {
                         $editformDataJson['kid_estatus'] = $statusMap[$formDataJson['UpdateEstatus']];
-                        $ColumnsCheck = [];
+                       $ColumnsCheck = [];
                         unset($editformDataJson['UpdateEstatus']);
-                    }
+                   }
                 }
-                break;
+              break;
 
             case 'update_estatus_ordenes_compras':
 
@@ -775,10 +811,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tabla = 'ordenes_compras';
                 $idcolumn= "id_orden_compras";
     
-                $consultaselect = "SELECT oc.id_orden_compras ,
+                $consultaselect = "SELECT oc.id_orden_compras,
                     oc.orden_compras,
                     oc.codigo_externo,
                     oc.grupo_cotizacion,
+                    oc.tipo_orden,
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     oc.monto_total,

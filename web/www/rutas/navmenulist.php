@@ -232,7 +232,7 @@ $navItems = [
         ]
       ]
     ],*/
-    /*
+    
     [
       'label' => 'Tiempo Real',
       'icon' => 'bi bi-clock',
@@ -249,7 +249,7 @@ $navItems = [
             ]
         ],
         ]
-      ],*/
+      ],
     [
       'label' => 'Central de servicios',
       'icon' => 'bi bi-table',
@@ -876,7 +876,7 @@ $navItems = [
                 ]
             ],
             [
-              "label" => "Artículos",
+              "label" => "Materia Prima",
               "href" => "/articulos",
               "permiso" => [
                 "crear_articulos",

@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'detalles_cotizaciones_compras':
-                if(isset($_POST['opcion'])) {
+                if(isset($_POST['opcion']) && $_POST['opcion'] == "getDetails") {
                     $consultaselect = "SELECT dcc.id_detalle_cotizacion_compras,
                         cc.cotizacion_compras AS kid_cotizacion_compra,
                         a.articulo AS kid_articulo,
@@ -236,8 +236,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     FROM detalles_cotizaciones_compras dcc
                     LEFT JOIN cotizaciones_compras cc ON dcc.kid_cotizacion_compra = cc.id_cotizacion_compra 
                     LEFT JOIN articulos a ON dcc.kid_articulo = a.id_articulo
-                    WHERE dcc.kid_estatus != 3 AND id_detalle_cotizacion_compras  = :id";
-                   $resultado = $conexion->prepare($consultaselect);
+                    WHERE dcc.kid_estatus != 3 AND dcc.kid_cotizacion_compra = :id";
+                    $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
@@ -337,69 +337,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'detalles_ordenes_compras':
-                if(isset($_POST['opcion'])) {
+                if(isset($_POST['opcion']) && $_POST['opcion'] == "getDetails") {
+                    // Obtener detalles para la vista en el modal
                     $consultaselect = "SELECT doc.id_detalle_orden_compra,
-                        oc.orden_compras AS kid_orden_compras,
+                        oc.orden_compras,
                         doc.grupo_cotizacion,
-                        a.articulo AS kid_articulo,
+                        a.articulo,
                         doc.cantidad,
                         doc.costo_unitario_total,
                         doc.costo_unitario_neto,
                         doc.monto_total,
                         doc.monto_neto,
-                        doc.fecha_creacion,
-                        doc.porcentaje_descuento
+                        doc.fecha_creacion
                     FROM detalles_ordenes_compras doc
                     LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                     LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                    WHERE doc.kid_estatus  !=3 AND doc.kid_orden_compras  = :id";
+                    WHERE doc.kid_estatus !=3 AND doc.kid_orden_compras = :id";
+                    
                     $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
-                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                
-                    $consultaselect = "SELECT a.articulo
-                        FROM ordenes_compras oc
-                        LEFT JOIN detalles_ordenes_compras doc ON oc.id_orden_compras = doc.kid_orden_compras
-                        LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
-                        WHERE a.kid_estatus != 3 AND doc.kid_estatus != 3 AND oc.kid_estatus = 6
-                        AND oc.kid_proyecto = (
-                            SELECT cc.kid_proyecto 
-                            FROM cotizaciones_compras cc 
-                            WHERE doc.kid_orden_compras = :id
-                        ) 
-                        ORDER BY a.articulo ASC;";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':id', $elementID);
-                    $resultado->execute();
-                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-                    $data['options']['kid_articulo'] = array_map(fn($item) => [
-                        'valor'=> $item['articulo'],
-                        'pordefecto' => 0,
-                    ], $select);
-
-                }else{
-                    $consultaselect = "SELECT doc.id_detalle_orden_compra,
-                        oc.orden_compras AS kid_orden_compra,
-                        doc.grupo_cotizacion,
-                        a.articulo AS kid_articulo,
-                        doc.cantidad,
-                        doc.costo_unitario_total,
-                        doc.costo_unitario_neto,
-                        doc.monto_total,
-                        doc.monto_neto,
-                        doc.fecha_creacion,
-                        doc.porcentaje_descuento
+                    $data = $resultado->fetchAll(PDO::FETCH_NUM);
+                }
+                else {
+                    $consultaselect = "SELECT doc.*
                     FROM detalles_ordenes_compras doc
-                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
-                    LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                    WHERE doc.kid_estatus  !=3 AND doc.id_detalle_orden_compra  = :id";
+                    WHERE doc.kid_estatus !=3 AND doc.id_detalle_orden_compra = :id";
+                    
                     $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_detalle_cotizacion_compras'] = null;
                 }
 
                 // Verifica si se encontraron datos

@@ -312,7 +312,80 @@ echo '<div class="row mt-3">
       CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4']),
   ]);
 
+  // Add JavaScript to handle data passed from ordenes_compras.php
+  ob_start();
+?>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if we have data from ordenes_compras.php
+    const selectedOrdenCompra = localStorage.getItem('selected_orden_compra');
+    const selectedOrdenCompraId = localStorage.getItem('selected_orden_compra_id');
+    
+    if (selectedOrdenCompra) {
+      // Fill the num_pedido input with the selected orden_compra
+      const numPedidoInput = document.getElementById('num_pedido');
+      if (numPedidoInput) {
+        numPedidoInput.value = selectedOrdenCompra;
+      }
+      
+      // Get the insumos associated with this orden_compra
+      if (selectedOrdenCompraId) {
+        // Here you would typically make an AJAX call to get the insumos
+        // For this example, we'll simulate populating the dropdown
+        // In a real implementation, you would fetch this data from the server
+        
+        // Example AJAX call (commented out for now)
+        /*
+        fetch('/api/get_insumos_by_orden_compra?id=' + selectedOrdenCompraId)
+          .then(response => response.json())
+          .then(data => {
+            populateInsumoDropdown(data);
+          });
+        */
+        
+        // For now, we'll just simulate some insumos
+        // In a real implementation, replace this with actual data from the server
+        const sampleInsumos = [
+          { id: 1, nombre: 'Insumo 1 de Orden ' + selectedOrdenCompra },
+          { id: 2, nombre: 'Insumo 2 de Orden ' + selectedOrdenCompra },
+          { id: 3, nombre: 'Insumo 3 de Orden ' + selectedOrdenCompra }
+        ];
+        
+        populateInsumoDropdown(sampleInsumos);
+      }
+      
+      // Clear the localStorage to prevent filling the form on page refresh
+      localStorage.removeItem('selected_orden_compra');
+      localStorage.removeItem('selected_orden_compra_id');
+    }
+    
+    function populateInsumoDropdown(insumos) {
+      const insumoSelect = document.getElementById('insumo_peso');
+      if (insumoSelect) {
+        // Clear existing options
+        insumoSelect.innerHTML = '';
+        
+        // Add a default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Seleccione un insumo';
+        insumoSelect.appendChild(defaultOption);
+        
+        // Add insumos from the data
+        insumos.forEach(insumo => {
+          const option = document.createElement('option');
+          option.value = insumo.id;
+          option.textContent = insumo.nombre;
+          insumoSelect.appendChild(option);
+        });
+      }
+    }
+  });
+</script>
+<?php
+  $js_code = ob_get_clean();
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
+  $wrapper_dashboard .= $js_code;
 
   include 'wrapper.php'; // Incluye el wrapper
 ?>

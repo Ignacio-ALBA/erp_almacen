@@ -71,23 +71,67 @@
         $titulos = ['ID', 'Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
       
         ob_start();
-        CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = ['data-select-column'=>1]);
+        CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = [
+            'data-select-column'=>'1',
+            'data-input-fill'=>'[kid_cotizacion_compra]'
+        ]);
         $detailsTableOutput = ob_get_clean();
     
         CreateModal([
           'id'=> $id.'-View', 
           'Title'=>'Detalle de Cotización',
-          'Title2'=>'Editar Cotización',
-          'Title3'=>'Ver Cotización',
+          'Title2'=>'',
+          'Title3'=>'',
           'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
           'method'=>'POST',
           'action'=>'bd/crudSummit.php',
-          'bloque'=>'compras'
+          'bloque'=>'compras',
+          'data-select-column'=>'1',
+          'data-input-fill'=>'[kid_cotizacion_compra]'
         ],
         [
           $detailsTableOutput
         ],
         ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+
+        // Script específico para actualizar el título del modal
+        echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Capturar el evento de clic en el botón de ver detalles
+            document.querySelectorAll(".ModalNewAdd3").forEach(function(button) {
+                button.addEventListener("click", function(e) {
+                    // Obtener el nombre de la cotización de la fila actual
+                    const row = this.closest("tr");
+                    if (row) {
+                        const cells = row.querySelectorAll("td");
+                        if (cells.length >= 2) {
+                            const cotizacionName = cells[1].textContent.trim();
+                            
+                            // Actualizar el título inmediatamente
+                            const headerSpan = document.getElementById("cotizacion-nombre-header");
+                            if (headerSpan) {
+                                headerSpan.textContent = cotizacionName;
+                            }
+                            
+                            // También actualizar cuando el modal se muestre completamente
+                            $("#modalCRUDdetalles_cotizaciones_compras-View").on("shown.bs.modal", function() {
+                                const headerSpan = document.getElementById("cotizacion-nombre-header");
+                                if (headerSpan) {
+                                    headerSpan.textContent = cotizacionName;
+                                }
+                                
+                                // También actualizar directamente el título del modal
+                                const modalTitle = $(this).find(".modal-title");
+                                if (modalTitle.length && !modalTitle.text().includes(cotizacionName)) {
+                                    modalTitle.html("Detalle de Cotización: <strong>" + cotizacionName + "</strong>");
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        });
+        </script>';
 
         // Modal para agregar/editar detalles de cotización
         CreateModalForm([
@@ -135,6 +179,40 @@
 ?>
 <?php
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
+
+  // Agregar JavaScript personalizado para manejar el título del modal
+  $wrapper_dashboard .= '
+  <script>
+    // Cuando el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function() {
+      // Manejar el botón "Ver Detalles"
+      $(document).on("click", ".ModalNewAdd3", function(e) {
+        // Obtener el nombre de la cotización de la fila actual
+        const cotizacionName = $(this).closest("tr").find("td").eq(1).text().trim();
+        
+        // Almacenar el nombre para uso posterior
+        window.currentCotizacionName = cotizacionName;
+        
+        // Función para actualizar el título del modal
+        function updateModalTitle() {
+          if (window.currentCotizacionName) {
+            // Actualizar el título directamente
+            $("#cotizacion-nombre-header").text(window.currentCotizacionName);
+            
+            // También actualizar el título completo como respaldo
+            const modalTitle = $("#modalCRUDdetalles_cotizaciones_compras-View .modal-title");
+            if (modalTitle.length) {
+              modalTitle.html("<span>Detalle de Cotización: </span><strong>" + window.currentCotizacionName + "</strong>");
+            }
+          }
+        }
+        
+        // Ejecutar inmediatamente y también después de que el modal se muestre
+        setTimeout(updateModalTitle, 100);
+        $("#modalCRUDdetalles_cotizaciones_compras-View").on("shown.bs.modal", updateModalTitle);
+      });
+    });
+  </script>';
 
   include 'wrapper.php'; // Incluye el wrapper
 ?>
