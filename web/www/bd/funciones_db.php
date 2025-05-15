@@ -1021,7 +1021,19 @@ function GetListaComprasForSelect($condiciones  = []){
     ], $data);
     return $data;
 }
-
+function GetOrdenesComprasListForSelect($condiciones  = []){
+    global $conexion;
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
+    $consulta = "SELECT orden_compras FROM ordenes_compras WHERE kid_estatus != 3 $condiciones_str ORDER BY orden_compras ASC";
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute();
+    $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    $data = array_map(fn($item) => [
+        'valor'=> $item['orden_compras'],
+        'pordefecto' => 0
+    ], $data);
+    return $data;
+}
 function GetProvedoresListForSelect($condiciones  = []){
     global $conexion;
     list($condiciones_str, $parametros) = AddConditions($condiciones);

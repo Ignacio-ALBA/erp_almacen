@@ -141,6 +141,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Valor del ID de orden:", ordenId);
         console.log("Nombre de orden:", ordenName);
         
+        // Guardar en sessionStorage inmediatamente
+        sessionStorage.setItem('currentOrdenId', ordenId);
+        sessionStorage.setItem('currentOrdenName', ordenName);
+        
         // Actualizar el título del modal antes de mostrarlo
         updateModalTitle(ordenName);
         
@@ -220,101 +224,165 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Botón Nuevo Detalle clickeado");
         console.log("Orden de compra actual:", currentOrdenName);
         
-        // Guardar estos valores en variables de sesión para usarlos cuando se abra el nuevo modal
-        sessionStorage.setItem('currentOrdenId', currentOrdenId);
-        sessionStorage.setItem('currentOrdenName', currentOrdenName);
+        // Asegurarse de que tenemos el nombre de la orden actualizado
+        if (!currentOrdenName) {
+            currentOrdenName = sessionStorage.getItem('currentOrdenName') || '';
+        }
         
-        // Establecer un evento para cuando se abra el modal de nuevo detalle
-        $(document).one('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
-            console.log("Modal nuevo detalle abierto");
-            // Establecer el valor del campo kid_orden_compra con el nombre de la orden actual
-            if (currentOrdenName) {
-                $('#kid_orden_compra').val(currentOrdenName);
-            }
-        });
+        console.log("Usando nombre de orden:", currentOrdenName);
     });
     
-    // Este evento se dispara cuando se está abriendo el modal para nuevo detalle
+    // Asegurar que el valor se establece cuando se abre el modal para nuevo detalle
     $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
         console.log("Abriendo modal para nuevo detalle");
-        // Recuperar los valores guardados en el sessionStorage
-        const savedOrdenName = sessionStorage.getItem('currentOrdenName');
         
-        if (savedOrdenName) {
+        // Recuperar los valores guardados en el sessionStorage
+        const savedOrdenId = sessionStorage.getItem('currentOrdenId');
+        
+        console.log("ID de orden recuperado de sessionStorage:", savedOrdenId);
+        
+        if (savedOrdenId) {
             // Asignar el valor al campo después de un breve retraso para asegurar que el DOM esté listo
             setTimeout(function() {
-                $('#kid_orden_compra').val(savedOrdenName);
+                const selectOrden = document.getElementById('kid_orden_compras');
+                if (selectOrden) {
+                    // Primero intentamos buscar una opción con el valor exacto
+                    const option = Array.from(selectOrden.options).find(opt => opt.value === savedOrdenId);
+                    if (option) {
+                        selectOrden.value = savedOrdenId;
+                        console.log("Valor ID establecido en kid_orden_compras:", savedOrdenId);
+                    } else {
+                        // Si no se encuentra, intentamos buscar por el texto visible
+                        const savedOrdenName = sessionStorage.getItem('currentOrdenName');
+                        const optionByText = Array.from(selectOrden.options).find(opt => opt.text === savedOrdenName);
+                        if (optionByText) {
+                            selectOrden.value = optionByText.value;
+                            console.log("Valor establecido en kid_orden_compras por texto:", optionByText.value);
+                        } else {
+                            console.warn("No se encontró ninguna opción para la orden con ID", savedOrdenId, "o nombre", savedOrdenName);
+                        }
+                    }
+                    
+                    // Disparar evento de cambio para notificar a otros controladores
+                    const event = new Event('change', { bubbles: true });
+                    selectOrden.dispatchEvent(event);
+                }
             }, 300);
+        }
+    });
+    
+    // También asegurar que el valor se establece cuando el modal ya está completamente visible
+    $(document).on('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
+        console.log("Modal para nuevo detalle completamente visible");
+        
+        // Recuperar los valores guardados en el sessionStorage
+        const savedOrdenId = sessionStorage.getItem('currentOrdenId');
+        
+        console.log("ID de orden recuperado de sessionStorage (en shown):", savedOrdenId);
+        
+        if (savedOrdenId) {
+            const selectOrden = document.getElementById('kid_orden_compras');
+            if (selectOrden) {
+                // Primero intentamos buscar una opción con el valor exacto
+                const option = Array.from(selectOrden.options).find(opt => opt.value === savedOrdenId);
+                if (option) {
+                    selectOrden.value = savedOrdenId;
+                    console.log("Valor ID establecido en kid_orden_compras (en shown):", savedOrdenId);
+                } else {
+                    // Si no se encuentra, intentamos buscar por el texto visible
+                    const savedOrdenName = sessionStorage.getItem('currentOrdenName');
+                    const optionByText = Array.from(selectOrden.options).find(opt => opt.text === savedOrdenName);
+                    if (optionByText) {
+                        selectOrden.value = optionByText.value;
+                        console.log("Valor establecido en kid_orden_compras por texto (en shown):", optionByText.value);
+                    } else {
+                        console.warn("No se encontró ninguna opción para la orden con ID", savedOrdenId, "o nombre", savedOrdenName);
+                    }
+                }
+                
+                // Disparar evento de cambio para notificar a otros controladores
+                const event = new Event('change', { bubbles: true });
+                selectOrden.dispatchEvent(event);
+            }
         }
     });
 
     // Capturar el valor actual de la orden cuando se abra el modal de ver detalles
     $(document).on('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras-View', function(e) {
         // Almacenar el nombre de la orden actual en una variable global
-        currentOrdenName = $('#kid_orden_compra').val() || '';
+        const ordenSelect = document.getElementById('kid_orden_compras');
+        if (ordenSelect) {
+            const selectedOption = ordenSelect.options[ordenSelect.selectedIndex];
+            if (selectedOption) {
+                currentOrdenId = selectedOption.value;
+                currentOrdenName = selectedOption.text;
+            }
+        } else {
+            // Si no está en el DOM, intentar recuperarlo del sessionStorage
+            currentOrdenId = sessionStorage.getItem('currentOrdenId') || '';
+            currentOrdenName = sessionStorage.getItem('currentOrdenName') || '';
+        }
         
         // También almacenarlo en sessionStorage para mayor seguridad
+        if (currentOrdenId) {
+            sessionStorage.setItem('currentOrdenId', currentOrdenId);
+        }
         if (currentOrdenName) {
             sessionStorage.setItem('currentOrdenName', currentOrdenName);
         }
         
-        console.log("Modal de detalles abierto, orden actual:", currentOrdenName);
+        console.log("Modal de detalles abierto, orden actual ID:", currentOrdenId, "Nombre:", currentOrdenName);
     });
-
-    // Modificar directamente el botón en el modal de detalles
-    $(document).on('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras-View', function() {
-        // Obtener el nombre de la orden actual
-        if (currentOrdenName) {
-            console.log("Modal de detalles abierto, orden actual:", currentOrdenName);
-            
-            // Encontrar el botón "Nuevo Detalle" dentro del modal
-            const addButton = $('#modalCRUDdetalles_ordenes_compras-View .btn-primary');
-            
-            // Remover cualquier evento click previo para evitar duplicaciones
-            addButton.off('click.setOrden');
-            
-            // Agregar un nuevo evento al botón
-            addButton.on('click.setOrden', function() {
-                console.log("Botón Nuevo Detalle clickeado, estableciendo valor:", currentOrdenName);
+    
+    // Detectar cuando se abre el modal de editar un detalle de orden
+    $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras-Edit', function(e) {
+        console.log("Abriendo modal de edición");
+        
+        // Verificar si el sistema ya ha configurado el select
+        setTimeout(function() {
+            const ordenSelect = document.getElementById('kid_orden_compras');
+            if (ordenSelect) {
+                const selectedValue = ordenSelect.value;
+                console.log("En modal de edición, valor actual del select de orden:", selectedValue);
                 
-                // Usar MutationObserver para detectar cuando el modal de nuevo detalle se abra
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                            for (let i = 0; i < mutation.addedNodes.length; i++) {
-                                const node = mutation.addedNodes[i];
-                                // Verificar si el nodo añadido es el modal o contiene el modal
-                                if (node.nodeType === 1 && 
-                                    (node.id === 'modalCRUDdetalles_ordenes_compras' || 
-                                     node.querySelector && node.querySelector('#modalCRUDdetalles_ordenes_compras'))) {
-                                    console.log("Modal de nuevo detalle detectado en el DOM");
+                // Si no hay un valor seleccionado, verificar si hay datos de opciones disponibles
+                if (!selectedValue || selectedValue === "") {
+                    // Verificar si hay datos en el dataJson
+                    try {
+                        const dataJsonElem = document.querySelector('form input[name="dataJson"]');
+                        if (dataJsonElem) {
+                            const dataJson = JSON.parse(dataJsonElem.value || "{}");
+                            console.log("Datos JSON disponibles:", dataJson);
+                            
+                            // Verificar si tenemos opciones para kid_orden_compras
+                            if (dataJson.options && dataJson.options.kid_orden_compras && 
+                                dataJson.options.kid_orden_compras.length > 0) {
+                                
+                                const ordenData = dataJson.options.kid_orden_compras[0];
+                                console.log("Datos de orden encontrados:", ordenData);
+                                
+                                // Intentar configurar el select
+                                if (ordenData.valor) {
+                                    const option = Array.from(ordenSelect.options).find(opt => 
+                                        opt.value === ordenData.valor || opt.text === ordenData.texto);
                                     
-                                    // Encontrar el campo y establecer el valor
-                                    const inputField = document.querySelector('#kid_orden_compra');
-                                    if (inputField) {
-                                        console.log("Campo encontrado, estableciendo valor:", currentOrdenName);
-                                        inputField.value = currentOrdenName;
+                                    if (option) {
+                                        ordenSelect.value = option.value;
+                                        console.log("Valor establecido en el select:", option.value);
                                         
-                                        // Disparar evento de cambio para notificar a otros controladores
+                                        // Disparar evento de cambio
                                         const event = new Event('change', { bubbles: true });
-                                        inputField.dispatchEvent(event);
+                                        ordenSelect.dispatchEvent(event);
                                     }
-                                    
-                                    // Dejar de observar una vez que hemos actualizado el campo
-                                    observer.disconnect();
                                 }
                             }
                         }
-                    });
-                });
-                
-                // Comenzar a observar el documento para detectar cuando se añada el modal al DOM
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            });
-        }
+                    } catch (error) {
+                        console.error("Error procesando datos JSON:", error);
+                    }
+                }
+            }
+        }, 500);
     });
 });
 </script>

@@ -18,7 +18,7 @@
 
   $id = 'ordenes_compras';
   $ButtonAddLabel = "Nueva Orden de Compra";
-  $titulos = ['ID', 'Código Externo', 'Orden de Compra', 'Tipo de Orden', 'Proveedor', 'Monto Total', 'Monto Neto', 'Fecha de Creación'];
+  $titulos = ['ID', 'Código Externo', 'Orden de Compra', 'Proveedor', 'Monto Total', 'Monto Neto', 'Fecha de Creación'];
   
   // Define custom buttons for the table
   $botones_acciones = [
@@ -52,7 +52,7 @@
 
   $id='detalles_ordenes_compras';
   $ButtonAddLabel = "Nuevo Detalle";
-  $titulos = ['ID', 'Orden de Compra','Grupo Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+  $titulos = ['ID', 'Orden de Compra','Materia Prima','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
 
   ob_start();
   CreateTable($id, $ButtonAddLabel, $titulos, [],true,[],'',$atributos = ['data-select-column'=>2]);
@@ -85,13 +85,12 @@
       'action'=>'bd/crudSummit.php',
       'bloque'=>'compras',
       'data-select-column'=>'[1]',
-      'data-input-fill'=>'[kid_orden_compra]'
+      'data-input-fill'=>'[kid_orden_compras]'
     ],
     [
-      CreateInput(['id'=>'kid_orden_compra','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
-      CreateInput(['type'=>'text','id'=>'grupo_cotizacion','etiqueta'=>'Grupo Cotización','required' => '']),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Articulo','required' => ''],$articulos),
-      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad','required' => '','class'=>'MUL-1 MUL-2']),
+      CreateInput(['id'=>'kid_orden_compras','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => ''],$articulos),
+      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
@@ -124,7 +123,6 @@
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer
 
   // Incluir el script específico para órdenes de compra
-  include 'ordenes_compras_script.php';
 
   include 'wrapper.php'; // Incluye el wrapper
 ?>

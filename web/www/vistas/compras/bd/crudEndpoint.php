@@ -311,7 +311,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $consultaselect = "SELECT oc.id_orden_compras,
                     oc.orden_compras,
                     oc.codigo_externo,
-                    oc.grupo_cotizacion,
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     oc.monto_total,
@@ -340,15 +339,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if(isset($_POST['opcion']) && $_POST['opcion'] == "getDetails") {
                     // Obtener detalles para la vista en el modal
                     $consultaselect = "SELECT doc.id_detalle_orden_compra,
-                        oc.orden_compras,
-                        doc.grupo_cotizacion,
-                        a.articulo,
+                        oc.orden_compras AS kid_orden_compras,
+                        a.articulo AS kid_articulo,
                         doc.cantidad,
                         doc.costo_unitario_total,
                         doc.costo_unitario_neto,
                         doc.monto_total,
                         doc.monto_neto,
-                        doc.fecha_creacion
+                        doc.fecha_creacion,
+                        doc.grupo_cotizacion
                     FROM detalles_ordenes_compras doc
                     LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                     LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
@@ -357,17 +356,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
-                    $data = $resultado->fetchAll(PDO::FETCH_NUM);
+                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+                    
+                    // Fetch available articles for this order
+                    $consultaselect = "SELECT a.id_articulo, a.articulo
+                        FROM articulos a
+                        WHERE a.kid_estatus != 3
+                        ORDER BY a.articulo ASC";
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->execute();
+                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $data['options']['kid_articulo'] = array_map(fn($item) => [
+                        'valor'=> $item['id_articulo'],
+                        'texto'=> $item['articulo'],
+                        'pordefecto' => 0,
+                    ], $select);
                 }
                 else {
-                    $consultaselect = "SELECT doc.*
+                    $consultaselect = "SELECT doc.id_detalle_orden_compra,
+                        oc.orden_compras AS kid_orden_compras,
+                        oc.id_orden_compras,
+                        a.articulo AS kid_articulo,
+                        a.id_articulo,
+                        doc.cantidad,
+                        doc.costo_unitario_total,
+                        doc.costo_unitario_neto,
+                        doc.monto_total,
+                        doc.monto_neto,
+                        doc.grupo_cotizacion,
+                        doc.fecha_creacion
                     FROM detalles_ordenes_compras doc
+                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+                    LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
                     WHERE doc.kid_estatus !=3 AND doc.id_detalle_orden_compra = :id";
                     
                     $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    
+                    // If we have data, prepare the options for the article select
+                    if ($data) {
+                        $data['options'] = [
+                            'kid_articulo' => [
+                                [
+                                    'valor' => $data['id_articulo'],
+                                    'texto' => $data['kid_articulo'],
+                                    'pordefecto' => 1
+                                ]
+                            ],
+                            'kid_orden_compras' => [
+                                [
+                                    'valor' => $data['id_orden_compras'],
+                                    'texto' => $data['kid_orden_compras'],
+                                    'pordefecto' => 1
+                                ]
+                            ]
+                        ];
+                        // Keep the original ID for kid_articulo
+                        $data['kid_articulo'] = $data['id_articulo'];
+                        
+                        // Keep the original ID for kid_orden_compras
+                        $data['kid_orden_compras'] = $data['id_orden_compras'];
+                    }
                 }
 
                 // Verifica si se encontraron datos

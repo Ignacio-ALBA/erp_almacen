@@ -231,7 +231,7 @@ $navItems = [
             ]
         ]
       ]
-    ],*/
+    ],
     
     [
       'label' => 'Tiempo Real',
@@ -247,46 +247,31 @@ $navItems = [
             "ver_tiempo_real",
             "eliminar_tiempo_real"
             ]
-        ],
         ]
-      ],
+      ]
+    ],*/
+    
+    // 1. DASHBOARD - Mantener como está
+    /*
     [
-      'label' => 'Central de servicios',
-      'icon' => 'bi bi-table',
-      'route' =>'/rutas/central_servicios.php',
+      'label' => 'Dashboard',
+      'icon' => 'bi bi-speedometer2',
+      'route' =>'/rutas/tiempo_real.php',
       'subitems' => [
         [
-          "label" => "Central de materia prima",
-          "href" => "/central_mp",
+          "label" => "Tiempo Real",
+          "href" => "/tiempo_real",
           "permiso" => [
-            "crear_detalles_almacenes",
-            "editar_detalles_almacenes",
-            "ver_detalles_almacenes",
-            "eliminar_detalles_almacenes"
-            ]
-        ],/*
-        [
-          "label" => "Central de pedidos de materia prima",
-          "href" => "/central_pedidos_mp",
-          "permiso" => [
-            "crear_detalles_almacenes",
-            "editar_detalles_almacenes",
-            "ver_detalles_almacenes",
-            "eliminar_detalles_almacenes"
-            ]
-        ],*/
-        [
-          "label" => "Central de productos",
-          "href" => "/central_productos",
-          "permiso" => [
-            "crear_detalles_almacenes",
-            "editar_detalles_almacenes",
-            "ver_detalles_almacenes",
-            "eliminar_detalles_almacenes"
-            ]
-        ],
+            "crear_tiempo_real",
+            "editar_tiempo_real",
+            "ver_tiempo_real",
+            "eliminar_tiempo_real"
+          ]
         ]
-       ],
+      ]
+    ],
+    */
+    // 2. COMPRAS - Mantener como está
     [
       'label' => 'Compras',
       'icon' => 'bi bi-bag',
@@ -372,7 +357,7 @@ $navItems = [
             "ver_detalles_ordenes_compras",
             "eliminar_detalles_ordenes_compras"
             ]
-        ],/*
+        ]/*,
         [
           "label" => "Pesaje de Producción",
           "href" => "/recepcion_produccion",
@@ -382,7 +367,7 @@ $navItems = [
             "ver_recepciones_compras",
             "eliminar_recepciones_compras"
             ]
-        ],*/
+        ],
         [
           "label" => "Pesaje de Materia Prima",
           "href" => "/recepciones_compras",
@@ -392,7 +377,8 @@ $navItems = [
             "ver_recepciones_compras",
             "eliminar_recepciones_compras"
             ]
-        ], [
+        ],
+        [
           "label" => "Recibir Pedido para Producción",
           "href" => "/recepciones_pedidos",
           "permiso" => [
@@ -422,7 +408,6 @@ $navItems = [
             "eliminar_comentarios_recepciones"
             ]
         ],
-          /*
         [
           "label" => "Viáticos",
           "href" => "/asignacion_viaticos",
@@ -464,182 +449,176 @@ $navItems = [
             ]
         ]*/
       ]
-    ],/*
+    ],
+    
+    // 3. ALMACEN MP - Nuevo módulo
     [
-      'label' => 'Ventas',
-      'icon' => 'bi bi-cart',
-      'route' =>'/rutas/ventas.php',
+      'label' => 'Almacén MP',
+      'icon' => 'bi bi-box-seam',
+      'route' =>'/rutas/almacen_mp.php',
       'subitems' => [
         [
-          "label" => "Capturar venta",
-          "href" => "/capturar_venta",
+          "label" => "Pesaje De Materia Prima",
+          "href" => "/recepciones_materia_prima",
           "permiso" => [
-            "crear_capturar_ventas",
-            "ver_capturar_ventas",
-            "editar_capturar_ventas",
-            "eliminar_capturar_ventas"
-          ]
-          ],
-          [
-            "label" => "Reporte de ventas",
-            "href" => "/reporte_ventas",
-            "permiso" => [
-              "ver_reporte_ventas",
-              "editar_reporte_ventas",
-              "eliminar_reporte_ventas",
-              "crear_reporte_ventas"
-
-              ]
-            ]
-            ]
-          ],*/
-          [
-            'label' => 'Producción',
-            'icon' => 'bi bi-gear',
-            'route' =>'/rutas/produccion.php',
-            'subitems' => [
-              [
-                "label" => "Capturar producción",
-                "href" => "/capturar_produccion",
-                "permiso" => [
-                  "ver_capturar_produccion",
-                  "editar_capturar_produccion",
-                  "eliminar_capturar_produccion",
-                  "crear_capturar_produccion"
-                  ]
-                ]
-                ],
-                [
-                  "label" => "Reporte de producción",
-                  "href" => "/reporte_produccion",
-                  "permiso" => [
-                    "ver_reporte_produccion",
-                    "editar_reporte_produccion",
-                    "eliminar_reporte_produccion",
-                    "crear_reporte_produccion"
-                    
-     
-                  ]
-                  ]
-                ],
-      /*
-    [
-      'label' => 'Contabilidad',
-      'icon' => 'bi bi-journal-text',
-      'route' =>'/rutas/contabilidad.php',
-      'subitems' => [
-        [
-          "label" => "Bancos",
-          "href" => "/bancos",
-          "permiso" => [
-            "crear_bancos",
-            "editar_bancos",
-            "ver_bancos",
-            "eliminar_bancos"
+            "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
             ]
         ],
         [
-          "label" => "Tipos de Cuentas Bancarias",
-          "href" => "/tipos_cuentas_bancarias",
+          "label" => "Contenido de Recepciones",
+          "href" => "/detalles_recepciones_mp",
           "permiso" => [
-            "crear_tipos_cuentas_bancarias",
-            "editar_tipos_cuentas_bancarias",
-            "ver_tipos_cuentas_bancarias",
-            "eliminar_tipos_cuentas_bancarias"
+            "crear_detalles_recepciones_compras",
+            "editar_detalles_recepciones_compras",
+            "ver_detalles_recepciones_compras",
+            "eliminar_detalles_recepciones_compras"
             ]
         ],
         [
-          "label" => "Cuentas Bancarias",
-          "href" => "/cuentas_bancarias",
+          "label" => "Comentarios de Recepciones",
+          "href" => "/comentarios_recepciones_mp",
           "permiso" => [
-            "crear_cuentas_bancarias",
-            "editar_cuentas_bancarias",
-            "ver_cuentas_bancarias",
-            "eliminar_cuentas_bancarias"
+            "crear_comentarios_recepciones",
+            "editar_comentarios_recepciones",
+            "ver_comentarios_recepciones",
+            "eliminar_comentarios_recepciones"
             ]
         ],
         [
-          "label" => "Detalles de Cuentas Bancarias",
-          "href" => "/detalles_cuentas_bancarias",
+          "label" => "Reportes",
+          "href" => "/reportes_mp",
           "permiso" => [
-            "crear_detalles_cuentas_bancarias",
-            "editar_detalles_cuentas_bancarias",
-            "ver_detalles_cuentas_bancarias",
-            "eliminar_detalles_cuentas_bancarias"
+            "crear_reportes_mp",
+            "editar_reportes_mp",
+            "ver_reportes_mp",
+            "eliminar_reportes_mp"
             ]
         ],
         [
-          "label" => "Compras y Cuentas Bancarias",
-          "href" => "/compras_cuentas_bancarias",
+          "label" => "Mermas",
+          "href" => "/mermas_mp",
           "permiso" => [
-            "crear_compras_cuentas_bancarias",
-            "editar_compras_cuentas_bancarias",
-            "ver_compras_cuentas_bancarias",
-            "eliminar_compras_cuentas_bancarias"
-            ]
-        ],
-        [
-          "label" => "Facturas de Clientes",
-          "href" => "/facturas_clientes",
-          "permiso" => [
-            "crear_facturas_clientes",
-            "editar_facturas_clientes",
-            "ver_facturas_clientes",
-            "eliminar_facturas_clientes"
-            ]
-        ],
-        [
-          "label" => "Reportes de Cuentas Bancarias",
-          "href" => "/reportes_cuentas_bancarias",
-          "permiso" => [
-            "crear_reportes_cuentas_bancarias",
-            "editar_reportes_cuentas_bancarias",
-            "ver_reportes_cuentas_bancarias",
-            "eliminar_reportes_cuentas_bancarias"
-            ]
-        ],
-        [
-          "label" => "Monedas",
-          "href" => "/monedas",
-          "permiso" => [
-            "crear_monedas",
-            "editar_monedas",
-            "ver_monedas",
-            "eliminar_monedas"
-            ]
-        ],
-        [
-          "label" => "Contenido de Reportes de Cuentas Bancarias",
-          "href" => "/detalles_reportes_cb",
-          "permiso" => [
-            "crear_detalles_reportes_cb",
-            "editar_detalles_reportes_cb",
-            "ver_detalles_reportes_cb",
-            "eliminar_detalles_reportes_cb"
-            ]
-        ],
-        [
-          "label" => "Tipos de Reportes de Cuentas Bancarias",
-          "href" => "/tipos_reportes_cb",
-          "permiso" => [
-            "crear_tipos_reportes_cb",
-            "editar_tipos_reportes_cb",
-            "ver_tipos_reportes_cb",
-            "eliminar_tipos_reportes_cb"
-            ]
-        ],
-        [
-          "label" => "Observaciones de Reportes de Cuentas Bancarias",
-          "href" => "/observaciones_reportes_cb",
-          "permiso" => [
-            "crear_observaciones_reportes_cb",
-            "editar_observaciones_reportes_cb",
-            "ver_observaciones_reportes_cb",
-            "eliminar_observaciones_reportes_cb"
+            "crear_mermas",
+            "editar_mermas",
+            "ver_mermas",
+            "eliminar_mermas"
             ]
         ]
       ]
-    ],*/
+    ],
+    
+    // 4. ALMACEN PRODUCCIÓN - Nuevo módulo
+    [
+      'label' => 'Almacén Producción',
+      'icon' => 'bi bi-box2',
+      'route' =>'/rutas/almacen_produccion.php',
+      'subitems' => [
+        [
+          "label" => "Recepción MP",
+          "href" => "/recepciones_produccion",
+          "permiso" => [
+            "crear_recepciones_compras",
+            "editar_recepciones_compras",
+            "ver_recepciones_compras",
+            "eliminar_recepciones_compras"
+            ]
+        ],
+        [
+          "label" => "Contenido de Recepciones",
+          "href" => "/detalles_recepciones_mp",
+          "permiso" => [
+            "crear_detalles_recepciones_compras",
+            "editar_detalles_recepciones_compras",
+            "ver_detalles_recepciones_compras",
+            "eliminar_detalles_recepciones_compras"
+            ]
+        ],
+        [
+          "label" => "Comentarios de Recepciones",
+          "href" => "/comentarios_recepciones_mp",
+          "permiso" => [
+            "crear_comentarios_recepciones",
+            "editar_comentarios_recepciones",
+            "ver_comentarios_recepciones",
+            "eliminar_comentarios_recepciones"
+            ]
+        ],
+        [
+          "label" => "Producción",
+          "href" => "/produccion",
+          "permiso" => [
+            "crear_produccion",
+            "editar_produccion",
+            "ver_produccion",
+            "eliminar_produccion"
+            ]
+        ],
+        [
+          "label" => "Pesaje Producción",
+          "href" => "/pesaje_produccion",
+          "permiso" => [
+            "crear_pesaje_produccion",
+            "editar_pesaje_produccion",
+            "ver_pesaje_produccion",
+            "eliminar_pesaje_produccion"
+            ]
+        ],
+        [
+          "label" => "Producto Terminado",
+          "href" => "/producto_terminado",
+          "permiso" => [
+            "crear_producto_terminado",
+            "editar_producto_terminado",
+            "ver_producto_terminado",
+            "eliminar_producto_terminado"
+            ]
+        ]
+      ]
+    ],
+    
+    // 5. CENTRAL DE SERVICIOS - Mantener y complementar
+    [
+      'label' => 'Central de servicios',
+      'icon' => 'bi bi-table',
+      'route' =>'/rutas/central_servicios.php',
+      'subitems' => [
+        [
+          "label" => "Central de materia prima",
+          "href" => "/central_mp",
+          "permiso" => [
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
+            ]
+        ],/*
+        [
+          "label" => "Central de pedidos de materia prima",
+          "href" => "/central_pedidos_mp",
+          "permiso" => [
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
+            ]
+        ],*/
+        [
+          "label" => "Central de productos",
+          "href" => "/central_productos",
+          "permiso" => [
+            "crear_detalles_almacenes",
+            "editar_detalles_almacenes",
+            "ver_detalles_almacenes",
+            "eliminar_detalles_almacenes"
+            ]
+        ]
+      ]
+    ],
+
+    // 6. TALENTO HUMANO - Mantener como está
     [
       'label' => 'Talento Humano',
       'icon' => 'bi bi-person-lines-fill',
@@ -707,7 +686,9 @@ $navItems = [
             ]
         ]
       ]
-    ],  
+    ],
+    
+    // 7. REGISTRO DE EVENTOS - Actualizar
     [
       'label' => 'Registro de eventos',
       'icon' => 'bi bi-calendar',
@@ -732,7 +713,18 @@ $navItems = [
             "ver_detalles_registro_eventos",
             "eliminar_detalles_registro_eventos"
             ]
-        ],/*
+        ],
+        [
+          "label" => "Eventos de Sistema",
+          "href" => "/eventos_sistema",
+          "permiso" => [
+            "crear_eventos_sistema",
+            "editar_eventos_sistema",
+            "ver_eventos_sistema",
+            "eliminar_eventos_sistema"
+            ]
+        ]
+        /*
         [
           "label" => "Comentarios de Registro de Eventos",
           "href" => "/comentarios_registro_eventos",
@@ -745,6 +737,40 @@ $navItems = [
         ]*/
       ]
     ],
+    
+    // Elimino módulo de producción y lo reemplazo por los nuevos módulos
+    /* Comentado por la nueva estructura
+    [
+      'label' => 'Producción',
+      'icon' => 'bi bi-gear',
+      'route' =>'/rutas/produccion.php',
+      'subitems' => [
+        [
+          "label" => "Capturar producción",
+          "href" => "/capturar_produccion",
+          "permiso" => [
+            "ver_capturar_produccion",
+            "editar_capturar_produccion",
+            "eliminar_capturar_produccion",
+            "crear_capturar_produccion"
+            ]
+          ]
+          ],
+          [
+            "label" => "Reporte de producción",
+            "href" => "/reporte_produccion",
+            "permiso" => [
+              "ver_reporte_produccion",
+              "editar_reporte_produccion",
+              "eliminar_reporte_produccion",
+              "crear_reporte_produccion"
+              
+            ]
+            ]
+          ],
+    */
+    
+    // 8. CATÁLOGOS - Mantener como está
     [
       'label' => 'Catálogos',
       'icon' => 'bi bi-card-list',
@@ -813,16 +839,6 @@ $navItems = [
                 "editar_categorias",
                 "ver_categorias",
                 "eliminar_categorias"
-                ]
-            ],
-            [
-              "label" => "Mermas",
-              "href" => "/mermas",
-              "permiso" => [
-                "crear_mermas",
-                "editar_mermas",
-                "ver_mermas",
-                "eliminar_mermas"
                 ]
             ],
             [
@@ -904,7 +920,7 @@ $navItems = [
                 "ver_municipios",
                 "eliminar_municipios"
                 ]
-            ],/*
+            ]/*,
             [
               "label" => "Tipos de Comentarios",
               "href" => "/tipos_comentarios",
@@ -996,6 +1012,8 @@ $navItems = [
         ]
       ]
     ],
+    
+    // 9. CONFIGURACIONES - Mantener como está
     [
       'label' => 'Configuraciones',
       'icon' => 'bi bi-gear',
@@ -1007,7 +1025,7 @@ $navItems = [
           "permiso" => [
             "ver_permisos",
             "editar_permisos"
-          ],
+          ]
         ],
         [
           "label" => "Tipos de Comentarios",
@@ -1027,10 +1045,9 @@ $navItems = [
             "editar_estatus",
             "ver_estatus",
             "eliminar_estatus"
-            ]
-          ],
-          // Agrega más subitems según sea necesario
+          ]
+        ]
       ]
-      ]
+    ]
   ];
 ?>

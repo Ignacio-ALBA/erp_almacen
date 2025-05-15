@@ -15,10 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     tu.tipo_usuario AS kid_tipo_usuario,
                     e.estado AS kid_estado,
                     ie.internos_externos as kid_internos_externos,
+                    a.almacen as kid_almacen,
                     tc.tipo_costo as kid_tipo_cantidad
                 FROM colaboradores u
                 LEFT JOIN tipos_usuario tu ON u.kid_tipo_usuario = tu.id_tipo_usuario
                 LEFT JOIN estados e ON u.kid_estado = e.id_estados 
+                LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
                 LEFT JOIN internos_externos ie ON u.kid_internos_externos = ie.id_internos_externos
                 LEFT JOIN tipos_costo tc ON u.kid_tipo_cantidad = tc.id_tipo_costo
                 WHERE id_colaborador = :id";

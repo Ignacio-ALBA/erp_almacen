@@ -41,7 +41,7 @@
     ],
     [
       CreateSelect(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','class'=>'OnEditReadOnly'],$cotizaciones),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => '','class'=>'OnEditReadOnly'],$articulos),
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly'=>'readonly','class'=>'MUL-2']),

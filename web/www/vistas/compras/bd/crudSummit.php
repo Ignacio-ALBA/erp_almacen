@@ -646,9 +646,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tabla = 'detalles_cotizaciones_compras';
                 $idcolumn= "id_detalle_cotizacion_compras";
 
-                /*-------------------- Obtener Tablas Foráneas --------------------*/
-                // Remove unnecessary conversion since the form already sends the ID
-                //$formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null; 
+          
                 $formDataJson['kid_cotizacion_compra'] = isset($formDataJson['kid_cotizacion_compra']) ? GetIDCotizacionComprasByName($formDataJson['kid_cotizacion_compra']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
@@ -727,8 +725,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $consultaselect = "SELECT oc.id_orden_compras,
                     oc.orden_compras,
                     oc.codigo_externo,
-                    oc.grupo_cotizacion,
-                    oc.tipo_orden,
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     oc.monto_total,
@@ -815,7 +811,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     oc.orden_compras,
                     oc.codigo_externo,
                     oc.grupo_cotizacion,
-                    oc.tipo_orden,
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     oc.monto_total,
@@ -868,9 +863,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idcolumn= "id_detalle_orden_compra";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null; 
-                $formDataJson['kid_orden_compra'] = isset($formDataJson['kid_orden_compra']) ? GetIDOrdenComprasByName($formDataJson['kid_orden_compra']) : null;
+                // Check if kid_articulo is numeric (already an ID) or a name to be converted
+                if (isset($formDataJson['kid_articulo'])) {
+                    if (!is_numeric($formDataJson['kid_articulo'])) {
+                        // If not numeric, convert from name to ID
+                        $formDataJson['kid_articulo'] = GetIDArticuloByName($formDataJson['kid_articulo']);
+                    }
+                    // Otherwise leave it as is - it's already a numeric ID
+                }
+                
+                // Check if kid_orden_compras is numeric (already an ID) or a name to be converted
+                if (isset($formDataJson['kid_orden_compras'])) {
+                    if (!is_numeric($formDataJson['kid_orden_compras'])) {
+                        // If not numeric, convert from name to ID
+                        $formDataJson['kid_orden_compras'] = GetIDOrdenComprasByName($formDataJson['kid_orden_compras']);
+                    }
+                    // Otherwise leave it as is - it's already a numeric ID
+                }
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                
+                // Set a default value for grupo_cotizacion if not provided
+                if (!isset($formDataJson['grupo_cotizacion']) || $formDataJson['grupo_cotizacion'] === null || $formDataJson['grupo_cotizacion'] === '') {
+                    $formDataJson['grupo_cotizacion'] = 1; // Default value
+                }
 
                 $editformDataJson = CleanJson($formDataJson);
                 $newformDataJson = $formDataJson;
@@ -878,15 +893,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT doc.id_detalle_orden_compra,
-                    oc.orden_compras AS kid_orden_compra,
-                    doc.grupo_cotizacion,
+                    oc.orden_compras AS kid_orden_compras,
                     a.articulo AS kid_articulo,
                     doc.cantidad,
                     doc.costo_unitario_total,
                     doc.costo_unitario_neto,
                     doc.monto_total,
                     doc.monto_neto,
-                    doc.fecha_creacion
+                    doc.fecha_creacion,
+                    doc.grupo_cotizacion
                 FROM detalles_ordenes_compras doc
                 LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                 LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras

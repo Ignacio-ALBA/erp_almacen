@@ -39,6 +39,7 @@
       CreateInput(['type'=>'text','maxlength'=>'27','id'=>'apellido_materno','etiqueta'=>'Apellido Materno','required' => '']),
       CreatSwitchCheck(['id'=>'login','etiqueta'=>'Colaborador del sistema','class'=>'VerificarCambioMostrar']),
       CreateSelect(['id'=>'kid_tipo_usuario','etiqueta'=>'Tipo de Colaborador','required' => ''],$tipos_usuario),
+      CreateSelect(['id'=>'kid_almacen', 'etiqueta'=>'Zona de Trabajo', 'required' => ''],$almacenes),
       CreateSelect(['id'=>'kid_internos_externos','etiqueta'=>'Modalidad de Trabajo','required' => ''],$internos_externos),
       CreateSelect(['id'=>'kid_tipo_cantidad','etiqueta'=>'Tipo de Costo','required' => ''],$tipo_cantidad),
       CreateInput(['type'=>'number','id'=>'cantidad_periodo','etiqueta'=>'Cantidad','required' => '']),

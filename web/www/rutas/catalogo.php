@@ -440,45 +440,6 @@ if($resultado){
                 }
             $vista = 'almacenes';
             break;
-                case 'mermas':
-                    $perms = [
-                        "crear_mermas",
-                            "editar_mermas",
-                            "ver_mermas",
-                            "eliminar_mermas"
-                       ];
-            
-                        checkPerms($perms);
-                        $acciones = ['ver_', 'editar_', 'eliminar_'];
-                        foreach ($acciones as $index => $accion) {
-                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                                unset($data_script['botones_acciones'][$index]);
-                            }
-                        }
-                    $vista = 'mermas';
-                    $consultaselect = "SELECT m.id_merma,
-                        p.id_produccion AS kid_produccion,
-                        a.articulo AS kid_articulo,
-                        m.tipo_merma,
-                        m.titulo,
-                        m.descripcion,
-                        m.cantidad,
-                        c.email AS kid_creacion,
-                        m.fecha_creacion
-                    FROM mermas m
-                    LEFT JOIN produccion p ON m.kid_produccion = p.id_produccion
-                    LEFT JOIN articulos a ON m.kid_articulo = a.id_articulo
-                    LEFT JOIN colaboradores c ON m.kid_creacion = c.id_colaborador
-                    WHERE m.kid_estatus != 3";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->execute();
-                
-                    $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                    $data['data_show']['producciones'] = GetProduccionesListForSelect();
-                    $data['data_show']['articulos'] = GetArticulosListForSelect();
-                    $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-                    break;
-                break;
                 case 'locaciones':
                     $perms = [
                         "crear_locaciones_almacen",

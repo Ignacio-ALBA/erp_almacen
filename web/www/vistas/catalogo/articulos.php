@@ -30,7 +30,7 @@
   $formatos = GetFormatosListForSelect();
   $presentaciones = GetPresentacionesListForSelect();
   $dimensiones = GetDimensionesListForSelect(); 
-  $PageSection = "Artículos";
+  $PageSection = "Materia Prima";
 ?>
 
 
@@ -47,15 +47,15 @@
 <?php 
 
   $id = 'articulos';
-  $ButtonAddLabel = "Nuevo Artículo";
-  $titulos = ['ID', 'Código Interno','Artículo', 'Marca','Categoría','Subcategoria','Cantidad','Formato','Presentación','Dimensión','Fecha de creación'];
+  $ButtonAddLabel = "Nueva materia prima";
+  $titulos = ['ID', 'Código Interno','Materia Prima', 'Marca','Categoría','Subcategoria','Cantidad','Formato','Presentación','Dimensión','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true, []);
   CreateModalForm(
     [
       'id'=> $id, 
       'Title'=>$ButtonAddLabel,
-      'Title2'=>'Editar Artículo',
-      'Title3'=>'Ver Artículo',
+      'Title2'=>'Editar Materia Prima',
+      'Title3'=>'Ver Materia Prima',
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
@@ -64,7 +64,7 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'50','id'=>'codigo_interno','etiqueta'=>'Código interno','required' => '']),
       //CreateInput(['type'=>'text','maxlength'=>'50','id'=>'codigo_externo','etiqueta'=>'Código externo','required' => '']),
-      CreateInput(['type'=>'text','maxlength'=>'100','id'=>'articulo','etiqueta'=>'Artículo','required' => '']),
+      CreateInput(['type'=>'text','maxlength'=>'100','id'=>'articulo','etiqueta'=>'Materia Prima','required' => '']),
       CreateSelect(['id'=>'kid_marca','etiqueta'=>'Marca'],$marcas),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'no_serie','etiqueta'=>'Número de Serie','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'modelo','etiqueta'=>'Modelo','required' => '']),

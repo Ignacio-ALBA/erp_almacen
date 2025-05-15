@@ -155,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $estado_civil = GetEstadoCivilListById();
                 $formDataJson['kid_internos_externos'] = isset($formDataJson['kid_internos_externos']) ? GetIDInternosExternosByName($formDataJson['kid_internos_externos']): null;
                 $formDataJson['kid_tipo_cantidad'] = isset($formDataJson['kid_tipo_cantidad']) ? GetIDTiposCostosByName($formDataJson['kid_tipo_cantidad']): null;
+                $formDataJson['kid_almacen'] = isset($formDataJson['kid_almacen']) ? GetIDAlmacenByName($formDataJson['kid_almacen']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_tipo_usuario']) && isset($tipos_usuarios[$formDataJson['kid_tipo_usuario']])) {

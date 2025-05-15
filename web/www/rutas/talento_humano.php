@@ -71,6 +71,7 @@ if($resultado){
             $data['data_show']['estado_civil'] = GetEstadoCivilListForSelect();
             $data['data_show']['internos_externos'] = GetInternosExternosListForSelect();
             $data['data_show']['tipo_cantidad'] = GetTiposCostosListForSelect();
+            $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
 
             array_unshift($data_script['botones_acciones'], 
             '<button class="ModalDataEdit btn btn-success" modalCRUD="colaboradores-changepwd"><i class="bi bi-key-fill"></i> Cambiar Contraseña</button>');

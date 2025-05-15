@@ -1,12 +1,9 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
 
-
-    
-
     $PageSection = "Contenido de Ordenes de Compras";
+    $AllowADDButton = true; // Explicitly set to true to ensure the button is displayed
 ?>
-
 
   <div class="pagetitle">
     <h1><?php echo $PageSection; ?></h1>
@@ -27,8 +24,8 @@
 <?php 
   $id = 'detalles_ordenes_compras';
   $ButtonAddLabel = "Nuevo Detalle de Orden";
-  $titulos = ['ID', 'Orden de Compra','Grupo Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data,$AllowADDButton);
+  $titulos = ['ID', 'Orden de Compra','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, $AllowADDButton);
   CreateModalForm(
     [
       'id'=> $id, 
@@ -38,17 +35,21 @@
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
-      'bloque'=>'compras'
+      'bloque'=>'compras',
+      'data-select-column'=>'[1,2]',
+      'data-input-fill'=>'[kid_orden_compras,kid_articulo]',
+      'onSubmit'=>'return validateDetallesOrden(this);'
     ],
     [
-      CreateInput(['id'=>'kid_orden_compra','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly','value'=>isset($valor_id)?$valor_id:'']),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Articulo','required' => '','class'=>'OnEditReadOnly'],$articulos),
-      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad','required' => '','class'=>'MUL-1 MUL-2']),
+      CreateSelect(['id'=>'kid_orden_compras','etiqueta'=>'Orden de Compras','required' => '','class'=>'OnEditReadOnly'],$ordenes),
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => '','class'=>'OnEditReadOnly'],$articulos),
+      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','class'=>'MUL-2']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
       CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
       CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4']),
+      CreateInput(['type'=>'hidden','value'=>'1','id'=>'grupo_cotizacion'])
     ]);
 
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
