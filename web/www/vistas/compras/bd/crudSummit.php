@@ -860,38 +860,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'detalles_ordenes_compras':
                 $tabla = 'detalles_ordenes_compras';
-                $idcolumn= "id_detalle_orden_compra";
+                $idcolumn = "id_detalle_orden_compra";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
-                // Check if kid_articulo is numeric (already an ID) or a name to be converted
                 if (isset($formDataJson['kid_articulo'])) {
                     if (!is_numeric($formDataJson['kid_articulo'])) {
-                        // If not numeric, convert from name to ID
                         $formDataJson['kid_articulo'] = GetIDArticuloByName($formDataJson['kid_articulo']);
                     }
-                    // Otherwise leave it as is - it's already a numeric ID
                 }
                 
-                // Check if kid_orden_compras is numeric (already an ID) or a name to be converted
                 if (isset($formDataJson['kid_orden_compras'])) {
                     if (!is_numeric($formDataJson['kid_orden_compras'])) {
-                        // If not numeric, convert from name to ID
                         $formDataJson['kid_orden_compras'] = GetIDOrdenComprasByName($formDataJson['kid_orden_compras']);
                     }
-                    // Otherwise leave it as is - it's already a numeric ID
                 }
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
                 
-                // Set a default value for grupo_cotizacion if not provided
                 if (!isset($formDataJson['grupo_cotizacion']) || $formDataJson['grupo_cotizacion'] === null || $formDataJson['grupo_cotizacion'] === '') {
                     $formDataJson['grupo_cotizacion'] = 1; // Default value
                 }
 
                 $editformDataJson = CleanJson($formDataJson);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
+
                 $consultaselect = "SELECT doc.id_detalle_orden_compra,
                     oc.orden_compras AS kid_orden_compras,
                     a.articulo AS kid_articulo,
@@ -905,7 +899,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 FROM detalles_ordenes_compras doc
                 LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                 LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                WHERE doc.kid_estatus  !=3 and ".$idcolumn." = :".$idcolumn;
+                WHERE doc.kid_estatus != 3 AND ".$idcolumn." = :".$idcolumn;
 
                 $ColumnsCheck = [];
                 break;

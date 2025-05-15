@@ -3,7 +3,20 @@
    // $productos = GetProductosListForSelect(); // Función que debes crear
 //$proveedores = GetProveedoresListForSelect(); // Función que debes crear
 //$localizaciones = GetLocalizacionesListForSelect(); // Función que debes crear
-     ?>
+if (isset($_GET['id'])) {
+  $idOrdenCompra = $_GET['id'];
+
+  // Obtener los insumos relacionados a la orden de compra
+  $query = "SELECT a.articulo AS insumo 
+            FROM detalles_ordenes_compras doc
+            LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+            WHERE doc.kid_orden_compras = :idOrdenCompra AND doc.kid_estatus != 3";
+  $stmt = $conexion->prepare($query);
+  $stmt->bindParam(':idOrdenCompra', $idOrdenCompra, PDO::PARAM_INT);
+  $stmt->execute();
+  $insumos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+    ?>
 
     <style>
     @font-face {
@@ -143,26 +156,35 @@
       </div>
       <div class="row mt-4 justify-content-center">'; // Nueva fila para los inputs y selects
           echo '<div class="col-6">'; // Reduced from col-md-4
-              echo CreateInput([ 
-                  'type' => 'text',
-                  'id' => 'num_pedido',
-                  'etiqueta' => 'Número de Pedido',
-                  'readonly' => 'readonly',
-                  'value' => '001',
-                  'class' => 'form-control form-control-sm'
-              ]);
-        
-          echo CreateSelect([
-            'type' => 'text',
-            'id' => 'insumo_peso',
-            'etiqueta' => 'Insumo pesado',
-            'required' => 'true',
-            'class' => 'form-control form-control-sm'
-        ], [
-            ['valor' => 'POLIPROPILENO NEGRO', 'texto' => 'POLIPROPILENO NEGRO', 'pordefecto' => 0],
-            ['valor' => 'POLIPROPILENO BLANCO', 'texto' => 'POLIPROPILENO BLANCO', 'pordefecto' => 0],
-            ['valor' => 'POLIPROPILENO MULTICOLOR', 'texto' => 'POLIPROPILENO MULTICOLOR', 'pordefecto' => 0]
-          ]);
+             // Crear el input y el select
+echo CreateInput([
+  'type' => 'text',
+  'id' => 'num_pedido',
+  'etiqueta' => 'Número de Pedido',
+  'readonly' => 'readonly',
+  'value' => $idOrdenCompra ?? '',
+  'class' => 'form-control form-control-sm'
+]);
+
+$insumoOptions = [];
+if (!empty($insumos)) {
+  foreach ($insumos as $insumo) {
+      $insumoOptions[] = [
+          'valor' => $insumo['insumo'],
+          'texto' => $insumo['insumo'],
+          'pordefecto' => 0
+      ];
+  }
+}
+
+echo CreateSelect([
+  'type' => 'text',
+  'id' => 'insumo_peso',
+  'etiqueta' => 'Insumo pesado',
+  'required' => 'true',
+  'class' => 'form-control form-control-sm'
+], $insumoOptions);
+
           echo '</div>
      <div class="col-6">';  // Primera columna con dos elementos
           echo CreateSelect([

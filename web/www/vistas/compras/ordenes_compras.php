@@ -52,17 +52,17 @@
 
   $id='detalles_ordenes_compras';
   $ButtonAddLabel = "Nuevo Detalle";
-  $titulos = ['ID', 'Orden de Compra','Materia Prima','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+  $titulos = ['ID', 'Orden de Compra','Materia Prima','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
 
   ob_start();
-  CreateTable($id, $ButtonAddLabel, $titulos, [],true,[],'',$atributos = ['data-select-column'=>2]);
+  CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', ['data-select-column'=>'[1]']);
   $detailsTableOutput = ob_get_clean();
 
-  CreateModal( [
+  CreateModal([
     'id'=> $id.'-View', 
-    'Title'=>'Contenido de Ordenes de Compras',
-    'Title2'=>'Editar Lista',
-    'Title3'=>'Ver Lista',
+    'Title'=>'Detalles de Orden de Compra',
+    'Title2'=>'',
+    'Title3'=>'',
     'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
     'method'=>'POST',
     'action'=>'bd/crudSummit.php',

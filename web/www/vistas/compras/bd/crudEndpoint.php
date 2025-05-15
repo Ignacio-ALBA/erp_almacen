@@ -346,57 +346,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         doc.costo_unitario_neto,
                         doc.monto_total,
                         doc.monto_neto,
-                        doc.fecha_creacion,
-                        doc.grupo_cotizacion
+                        doc.fecha_creacion
                     FROM detalles_ordenes_compras doc
-                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                     LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                    WHERE doc.kid_estatus !=3 AND doc.kid_orden_compras = :id";
-                    
+                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+                    WHERE doc.kid_estatus != 3 AND doc.kid_orden_compras = :id";
                     $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':id', $elementID);
+                    $resultado->bindParam(':id', $_POST['firstColumnValue']);
                     $resultado->execute();
-                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                    
-                    // Fetch available articles for this order
-                    $consultaselect = "SELECT a.id_articulo, a.articulo
-                        FROM articulos a
-                        WHERE a.kid_estatus != 3
-                        ORDER BY a.articulo ASC";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->execute();
-                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    $data = $resultado->fetchAll(PDO::FETCH_NUM);
 
-                    $data['options']['kid_articulo'] = array_map(fn($item) => [
-                        'valor'=> $item['id_articulo'],
-                        'texto'=> $item['articulo'],
-                        'pordefecto' => 0,
-                    ], $select);
-                }
-                else {
-                    $consultaselect = "SELECT doc.id_detalle_orden_compra,
+                    // Verifica si se encontraron datos y envía la respuesta una sola vez
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                    return;
+                } else {
+                    $consultaselect = "SELECT doc.id_detalle_orden_compra,  
                         oc.orden_compras AS kid_orden_compras,
-                        oc.id_orden_compras,
-                        a.articulo AS kid_articulo,
+                        a.articulo as kid_articulo,
                         a.id_articulo,
                         doc.cantidad,
                         doc.costo_unitario_total,
                         doc.costo_unitario_neto,
                         doc.monto_total,
                         doc.monto_neto,
-                        doc.grupo_cotizacion,
                         doc.fecha_creacion
                     FROM detalles_ordenes_compras doc
-                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                     LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                    WHERE doc.kid_estatus !=3 AND doc.id_detalle_orden_compra = :id";
-                    
+                    LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
+                    WHERE doc.kid_estatus != 3 AND doc.id_detalle_orden_compra = :id";
                     $resultado = $conexion->prepare($consultaselect);
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    
-                    // If we have data, prepare the options for the article select
                     if ($data) {
                         $data['options'] = [
                             'kid_articulo' => [
@@ -405,23 +386,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     'texto' => $data['kid_articulo'],
                                     'pordefecto' => 1
                                 ]
-                            ],
-                            'kid_orden_compras' => [
-                                [
-                                    'valor' => $data['id_orden_compras'],
-                                    'texto' => $data['kid_orden_compras'],
-                                    'pordefecto' => 1
-                                ]
                             ]
                         ];
-                        // Keep the original ID for kid_articulo
+                        // Mantener el valor original para el campo kid_articulo
                         $data['kid_articulo'] = $data['id_articulo'];
-                        
-                        // Keep the original ID for kid_orden_compras
-                        $data['kid_orden_compras'] = $data['id_orden_compras'];
                     }
+                    $data['id_detalle_orden_compras'] = null;
                 }
-
+            
                 // Verifica si se encontraron datos
                 if ($data) {
                     print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
@@ -429,7 +401,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
-
+            case 'getColaboradorAlmacen':
+                session_start(); // Asegurarse de que la sesión está iniciada
+                $idColaborador = $_SESSION['s_id']; // Obtener el ID del colaborador de la sesión
+            
+                $query = "SELECT kid_almacen FROM colaboradores WHERE id_colaborador = :idColaborador LIMIT 1";
+                $stmt = $conexion->prepare($query);
+                $stmt->bindParam(':idColaborador', $idColaborador, PDO::PARAM_INT);
+                $stmt->execute();
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontró información del colaborador.'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
             case 'recepciones_compras':
                 $consultaselect = "SELECT rc.recepcion_compras,
                     rc.codigo_externo,

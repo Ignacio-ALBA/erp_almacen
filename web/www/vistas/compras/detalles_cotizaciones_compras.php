@@ -23,7 +23,7 @@
 <?php 
   $id = 'detalles_cotizaciones_compras';
   $ButtonAddLabel = "Nuevo Detalle de Cotización";
-  $titulos = ['ID', 'Cotización','Insumos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+  $titulos = ['ID', 'Cotización','Materia Prima','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, $AllowADDButton); 
   CreateModalForm(
     [

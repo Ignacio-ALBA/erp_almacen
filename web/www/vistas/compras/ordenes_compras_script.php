@@ -122,41 +122,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Manejar el clic en el botón "Ver Detalles"
+    // Handle Ver Detalles button click
     $(document).on('click', '.ModalNewAdd3', function(e) {
-        // Prevenir comportamientos por defecto y propagación del evento
         e.preventDefault();
         e.stopImmediatePropagation();
         
         const modalCRUD = $(this).attr('modalCRUD');
         const rowData = $(this).closest('tr').find('td');
         const ordenId = rowData.eq(0).text().trim();
-        const ordenName = rowData.eq(2).text().trim();  // La columna 3 contiene el nombre de la orden
-        
-        // Almacenar esta información para usarla más tarde
-        currentOrdenId = ordenId;
-        currentOrdenName = ordenName;
+        const ordenName = rowData.eq(2).text().trim();
         
         console.log("Botón Ver Detalles clickeado");
         console.log("Valor del ID de orden:", ordenId);
         console.log("Nombre de orden:", ordenName);
         
-        // Guardar en sessionStorage inmediatamente
+        // Store for later use
         sessionStorage.setItem('currentOrdenId', ordenId);
         sessionStorage.setItem('currentOrdenName', ordenName);
         
-        // Actualizar el título del modal antes de mostrarlo
+        // Update modal title
         updateModalTitle(ordenName);
         
-        // Mostrar el modal de pantalla completa
+        // Show fullscreen modal
         $(`#modalCRUD${modalCRUD}-View`).modal('show');
         
-        // Limpiar datos previos y mostrar mensaje de carga
+        // Clear previous data and show loading
         const table = $(`#modalCRUD${modalCRUD}-View table tbody`);
         table.empty();
-        table.append('<tr><td colspan="10" class="text-center"><i class="bi bi-hourglass-split"></i> Cargando detalles...</td></tr>');
+        table.append('<tr><td colspan="9" class="text-center"><i class="bi bi-hourglass-split"></i> Cargando detalles...</td></tr>');
         
-        // Obtener y cargar todos los detalles relacionados con esta orden
+        // Fetch details
         $.ajax({
             type: "POST",
             url: "../../../vistas/compras/bd/crudEndpoint.php",
@@ -167,56 +162,48 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             dataType: "json",
             success: function(response) {
-                table.empty(); // Limpiar mensaje de carga
-                
-                console.log("Response:", response);
+                table.empty();
                 
                 try {
-                    // Verificar si tenemos datos en el formato correcto
-                    if(response.status === "success" && response.data && response.data.data) {
-                        console.log("Datos de detalles recibidos:", response.data.data.length);
-                        
-                        // Verificar si data.data es un array y tiene elementos
-                        if(Array.isArray(response.data.data) && response.data.data.length > 0) {
-                            // Poblar tabla con todos los detalles
-                            response.data.data.forEach(function(row) {
+                    if(response.status === "success" && response.data) {
+                        if(Array.isArray(response.data) && response.data.length > 0) {
+                            response.data.forEach(function(row) {
                                 let newRow = $("<tr></tr>");
                                 if(Array.isArray(row)) {
                                     row.forEach(function(cell) {
                                         newRow.append($("<td></td>").text(cell));
                                     });
-                                } else {
-                                    // Si no es un array, mostrar mensaje de error
-                                    newRow.append($("<td colspan='10'></td>").text("Formato de datos inesperado"));
                                 }
-                                
                                 table.append(newRow);
                             });
                         } else {
-                            // No se encontraron detalles
-                            table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta orden de compra</td></tr>');
+                            table.append('<tr><td colspan="9" class="text-center">No se encontraron detalles para esta orden de compra</td></tr>');
                         }
                     } else {
-                        // No se encontraron detalles o el formato es inesperado
-                        table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta orden de compra</td></tr>');
+                        table.append('<tr><td colspan="9" class="text-center">No se encontraron detalles para esta orden de compra</td></tr>');
                     }
                 } catch(err) {
                     console.error("Error procesando respuesta:", err);
-                    table.append('<tr><td colspan="10" class="text-center text-danger">Error al procesar los datos: ' + err.message + '</td></tr>');
+                    table.append('<tr><td colspan="9" class="text-center text-danger">Error al procesar los datos</td></tr>');
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Error obteniendo detalles:", error);
-                console.error("Código de estado:", xhr.status);
-                
-                // Limpiar carga y mostrar mensaje de error
                 table.empty();
-                table.append('<tr><td colspan="10" class="text-center text-danger">Error al cargar los detalles. Por favor intente de nuevo.</td></tr>');
+                table.append('<tr><td colspan="9" class="text-center text-danger">Error al cargar los detalles</td></tr>');
             }
         });
-        
-        // Evitar que el evento se procese más de una vez
-        return false;
+    });
+
+    // Handle new detail button click
+    $(document).on('click', '#modalCRUDdetalles_ordenes_compras-View .btn-primary', function(e) {
+        // Get current orden name from sessionStorage
+        const ordenName = sessionStorage.getItem('currentOrdenName');
+        if (ordenName) {
+            setTimeout(() => {
+                $('#kid_orden_compras').val(ordenName);
+            }, 300);
+        }
     });
 
     // Manejar el clic en el botón "Nuevo Detalle" dentro del modal de detalles
@@ -237,36 +224,19 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Abriendo modal para nuevo detalle");
         
         // Recuperar los valores guardados en el sessionStorage
-        const savedOrdenId = sessionStorage.getItem('currentOrdenId');
+        const savedOrdenName = sessionStorage.getItem('currentOrdenName');
         
-        console.log("ID de orden recuperado de sessionStorage:", savedOrdenId);
+        console.log("Orden recuperada de sessionStorage:", savedOrdenName);
         
-        if (savedOrdenId) {
+        if (savedOrdenName) {
             // Asignar el valor al campo después de un breve retraso para asegurar que el DOM esté listo
             setTimeout(function() {
-                const selectOrden = document.getElementById('kid_orden_compras');
-                if (selectOrden) {
-                    // Primero intentamos buscar una opción con el valor exacto
-                    const option = Array.from(selectOrden.options).find(opt => opt.value === savedOrdenId);
-                    if (option) {
-                        selectOrden.value = savedOrdenId;
-                        console.log("Valor ID establecido en kid_orden_compras:", savedOrdenId);
-                    } else {
-                        // Si no se encuentra, intentamos buscar por el texto visible
-                        const savedOrdenName = sessionStorage.getItem('currentOrdenName');
-                        const optionByText = Array.from(selectOrden.options).find(opt => opt.text === savedOrdenName);
-                        if (optionByText) {
-                            selectOrden.value = optionByText.value;
-                            console.log("Valor establecido en kid_orden_compras por texto:", optionByText.value);
-                        } else {
-                            console.warn("No se encontró ninguna opción para la orden con ID", savedOrdenId, "o nombre", savedOrdenName);
-                        }
-                    }
-                    
-                    // Disparar evento de cambio para notificar a otros controladores
-                    const event = new Event('change', { bubbles: true });
-                    selectOrden.dispatchEvent(event);
-                }
+                $('#kid_orden_compras').val(savedOrdenName);
+                console.log("Valor establecido en kid_orden_compras:", savedOrdenName);
+                
+                // Disparar evento de cambio para notificar a otros controladores
+                const event = new Event('change', { bubbles: true });
+                document.getElementById('kid_orden_compras').dispatchEvent(event);
             }, 300);
         }
     });
@@ -276,113 +246,36 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Modal para nuevo detalle completamente visible");
         
         // Recuperar los valores guardados en el sessionStorage
-        const savedOrdenId = sessionStorage.getItem('currentOrdenId');
+        const savedOrdenName = sessionStorage.getItem('currentOrdenName');
         
-        console.log("ID de orden recuperado de sessionStorage (en shown):", savedOrdenId);
+        console.log("Orden recuperada de sessionStorage (en shown):", savedOrdenName);
         
-        if (savedOrdenId) {
-            const selectOrden = document.getElementById('kid_orden_compras');
-            if (selectOrden) {
-                // Primero intentamos buscar una opción con el valor exacto
-                const option = Array.from(selectOrden.options).find(opt => opt.value === savedOrdenId);
-                if (option) {
-                    selectOrden.value = savedOrdenId;
-                    console.log("Valor ID establecido en kid_orden_compras (en shown):", savedOrdenId);
-                } else {
-                    // Si no se encuentra, intentamos buscar por el texto visible
-                    const savedOrdenName = sessionStorage.getItem('currentOrdenName');
-                    const optionByText = Array.from(selectOrden.options).find(opt => opt.text === savedOrdenName);
-                    if (optionByText) {
-                        selectOrden.value = optionByText.value;
-                        console.log("Valor establecido en kid_orden_compras por texto (en shown):", optionByText.value);
-                    } else {
-                        console.warn("No se encontró ninguna opción para la orden con ID", savedOrdenId, "o nombre", savedOrdenName);
-                    }
-                }
-                
-                // Disparar evento de cambio para notificar a otros controladores
-                const event = new Event('change', { bubbles: true });
-                selectOrden.dispatchEvent(event);
-            }
+        if (savedOrdenName) {
+            $('#kid_orden_compras').val(savedOrdenName);
+            console.log("Valor establecido en kid_orden_compras (en shown):", savedOrdenName);
+            
+            // Disparar evento de cambio para notificar a otros controladores
+            const event = new Event('change', { bubbles: true });
+            document.getElementById('kid_orden_compras').dispatchEvent(event);
         }
     });
 
     // Capturar el valor actual de la orden cuando se abra el modal de ver detalles
     $(document).on('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras-View', function(e) {
         // Almacenar el nombre de la orden actual en una variable global
-        const ordenSelect = document.getElementById('kid_orden_compras');
-        if (ordenSelect) {
-            const selectedOption = ordenSelect.options[ordenSelect.selectedIndex];
-            if (selectedOption) {
-                currentOrdenId = selectedOption.value;
-                currentOrdenName = selectedOption.text;
-            }
+        if ($('#kid_orden_compras').length > 0 && $('#kid_orden_compras').val()) {
+            currentOrdenName = $('#kid_orden_compras').val();
         } else {
             // Si no está en el DOM, intentar recuperarlo del sessionStorage
-            currentOrdenId = sessionStorage.getItem('currentOrdenId') || '';
             currentOrdenName = sessionStorage.getItem('currentOrdenName') || '';
         }
         
         // También almacenarlo en sessionStorage para mayor seguridad
-        if (currentOrdenId) {
-            sessionStorage.setItem('currentOrdenId', currentOrdenId);
-        }
         if (currentOrdenName) {
             sessionStorage.setItem('currentOrdenName', currentOrdenName);
         }
         
-        console.log("Modal de detalles abierto, orden actual ID:", currentOrdenId, "Nombre:", currentOrdenName);
-    });
-    
-    // Detectar cuando se abre el modal de editar un detalle de orden
-    $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras-Edit', function(e) {
-        console.log("Abriendo modal de edición");
-        
-        // Verificar si el sistema ya ha configurado el select
-        setTimeout(function() {
-            const ordenSelect = document.getElementById('kid_orden_compras');
-            if (ordenSelect) {
-                const selectedValue = ordenSelect.value;
-                console.log("En modal de edición, valor actual del select de orden:", selectedValue);
-                
-                // Si no hay un valor seleccionado, verificar si hay datos de opciones disponibles
-                if (!selectedValue || selectedValue === "") {
-                    // Verificar si hay datos en el dataJson
-                    try {
-                        const dataJsonElem = document.querySelector('form input[name="dataJson"]');
-                        if (dataJsonElem) {
-                            const dataJson = JSON.parse(dataJsonElem.value || "{}");
-                            console.log("Datos JSON disponibles:", dataJson);
-                            
-                            // Verificar si tenemos opciones para kid_orden_compras
-                            if (dataJson.options && dataJson.options.kid_orden_compras && 
-                                dataJson.options.kid_orden_compras.length > 0) {
-                                
-                                const ordenData = dataJson.options.kid_orden_compras[0];
-                                console.log("Datos de orden encontrados:", ordenData);
-                                
-                                // Intentar configurar el select
-                                if (ordenData.valor) {
-                                    const option = Array.from(ordenSelect.options).find(opt => 
-                                        opt.value === ordenData.valor || opt.text === ordenData.texto);
-                                    
-                                    if (option) {
-                                        ordenSelect.value = option.value;
-                                        console.log("Valor establecido en el select:", option.value);
-                                        
-                                        // Disparar evento de cambio
-                                        const event = new Event('change', { bubbles: true });
-                                        ordenSelect.dispatchEvent(event);
-                                    }
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.error("Error procesando datos JSON:", error);
-                    }
-                }
-            }
-        }, 500);
+        console.log("Modal de detalles abierto, orden actual:", currentOrdenName);
     });
 });
 </script>

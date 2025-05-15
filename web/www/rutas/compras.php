@@ -351,7 +351,7 @@ if($resultado){
                 $botones_acciones = $data_script['botones_acciones'];
 
                 $nuevo_boton_detalles = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="detalles_ordenes_compras"><i class="bi bi-eye"></i> Ver Detalles</button>';
-                $nuevo_boton_pesaje = '<button class="ModalNewAddPesaje btn btn-success" modalCRUD="recepciones_compras"><i class="bi bi-balance-scale"></i> Iniciar Pesaje</button>';
+                $nuevo_boton_pesaje = '<button class="ModalNewAddPesaje btn btn-success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>';
 
                 if (!in_array($nuevo_boton_detalles, $botones_acciones)) {
                     array_push($botones_acciones, $nuevo_boton_detalles);
@@ -422,28 +422,20 @@ if($resultado){
                 FROM detalles_ordenes_compras doc
                 LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                 LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                WHERE doc.kid_estatus !=3 AND doc.kid_orden_compras = $id";
+                WHERE doc.kid_estatus != 3 AND doc.kid_orden_compras = :id";
 
-
-                $resultado = $conexion->prepare("SELECT orden_compras FROM ordenes_compras WHERE id_orden_compras = $id");
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $id);
                 $resultado->execute();
-                $breadcrumb_data = $resultado->fetch(PDO::FETCH_ASSOC);
 
-                $breadcrumb = '
-                <li class="breadcrumb-item"><a href="/rutas/compras.php/ordenes_compras">Orden de Compra</a></li>
-                <li class="breadcrumb-item">'.$breadcrumb_data['orden_compras'].'</li>
-                <li class="breadcrumb-item active">Contenido</li>
-                ';
-                $data['data_show']['breadcrumb'] = $breadcrumb;
-                $data['data_show']['valor_id'] = $id;
+                $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
                 $data['data_show']['articulos'] = GetArticulosListForSelect();
-                // Always allow Add button when viewing details for a specific order
+                $data['data_show']['ordenes'] = GetOrdenesComprasListForSelect();
                 $data['data_show']['AllowADDButton'] = true;
-
             } else {
                 $consultaselect = "SELECT doc.id_detalle_orden_compra,
                     oc.orden_compras AS kid_orden_compras,
-                    a.articulo AS kid_articulo,
+                    a.articulo AS kid_articulo, 
                     doc.cantidad,
                     doc.costo_unitario_total,
                     doc.costo_unitario_neto,
@@ -453,20 +445,17 @@ if($resultado){
                 FROM detalles_ordenes_compras doc
                 LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
                 LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
-                WHERE doc.kid_estatus  !=3";
-                // Don't show Add button when viewing all order details
+                WHERE doc.kid_estatus != 3";
+
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->execute();
+                
+                $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                $data['data_show']['articulos'] = GetArticulosListForSelect();
+                $data['data_show']['ordenes'] = GetOrdenesComprasListForSelect();
                 $data['data_show']['AllowADDButton'] = false;
             }
-            
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->execute();
-
-            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-            $data['data_show']['articulos'] = GetArticulosListForSelect();
-            $data['data_show']['ordenes'] = GetOrdenesComprasListForSelect();
-            
-            // Add the script for detalles_ordenes_compras
-            $data['list_js_scripts']['../vistas/compras/detalles_ordenes_script'] = ['data' => $data_script];
+            $data['list_js_scripts']['../vistas/compras/detalles_ordenes_compras_script'] = ['data' => $data_script];
             break;
         case 'recepcion_orden':
             $perms = [

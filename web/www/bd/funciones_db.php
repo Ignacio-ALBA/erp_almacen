@@ -151,7 +151,7 @@ function GetIDCotizacionComprasByName($valor){
 
 function GetIDOrdenComprasByName($valor){
     global $conexion;
-    $consult = "SELECT id_orden_compras FROM ordenes_compras WHERE kid_estatus != 3 AND orden_compras =:valor";
+    $consult = "SELECT id_orden_compras FROM ordenes_compras WHERE kid_estatus != 3 AND orden_compras = :valor";
     $resultado = $conexion->prepare($consult);
     $resultado->bindParam(':valor', $valor);
     $resultado->execute();
