@@ -32,29 +32,40 @@ if($resultado){
 
     switch ($pathResult) {
        
-        
         case 'recepciones_produccion':
             $perms = [
                 "crear_recepciones_compras",
                 "editar_recepciones_compras",
                 "ver_recepciones_compras",
                 "eliminar_recepciones_compras"
-                   ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
-                        }
-                    }
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+
             $vista = 'recepciones_produccion';
+
+            // Extract id_orden_compra from the URL path
+            $pathParts = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+            $idOrdenCompra = end($pathParts);
+            if (is_numeric($idOrdenCompra)) {
+                $data['data_show']['id_orden_compra'] = $idOrdenCompra;
+            } else {
+                $idOrdenCompra = null;
+            }
+
             $estatus = GetEstatusLabels();
             $caseEstatus = "CASE \n";
             foreach ($estatus as $key => $value) {
                 $caseEstatus .= "    WHEN rc.kid_estatus = $key THEN '$value'\n";
             }
             $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
+
             $consultaselect = "SELECT rc.id_recepcion_compras,
                 rc.recepcion_compras,
                 rc.codigo_externo,
@@ -66,24 +77,29 @@ if($resultado){
                 fecha_creacion
             FROM recepciones_compras rc
             WHERE rc.kid_estatus !=3";
+
+            if ($idOrdenCompra) {
+                $consultaselect .= " AND rc.kid_orden_compras = :idOrdenCompra";
+            }
+
             $resultado = $conexion->prepare($consultaselect);
+            if ($idOrdenCompra) {
+                $resultado->bindParam(':idOrdenCompra', $idOrdenCompra, PDO::PARAM_INT);
+            }
             $resultado->execute();
 
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
             $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
-            
+
             $modalCRUD = 'detalles_recepciones_compras';
             $nuevo_boton = '
                 <button class="ModalNewAdd3 btn btn-info info" modalCRUD="'.$modalCRUD.'"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
-            //array_splice($data_script['botones_acciones'], 0, 0, $nuevo_boton);
             array_push($data_script['botones_acciones'], $nuevo_boton);
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             $optionkey = 'NewAdd3';
-            $data_script[$optionkey] =['data_list_column'=>[]];
+            $data_script[$optionkey] = ['data_list_column' => []];
 
-            $data_script[$optionkey] =['data_list_column'=>[]];
-            $data['list_js_scripts']['../vistas/compras/recepciones_compras_script'] =['data'=> $data_script];
             break;
             case 'recepciones_pedidos':
                 $perms = [

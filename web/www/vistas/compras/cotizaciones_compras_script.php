@@ -155,42 +155,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 dataType: "json",
                 success: function(response) {
                     table.empty(); // Clear loading message
-                    
                     console.log("Response:", response); // Debug log
                     
                     try {
-                        // Check if we have data in the correct format
-                        if(response.status === "success" && response.data && response.data.data) {
-                            console.log("tabla" + modalCRUD);
-                            console.log(response.data.data.length);
-                            console.log(response);
-                            
-                            // Verificar si data.data es un array y tiene elementos
-                            if(Array.isArray(response.data.data) && response.data.data.length > 0) {
-                                // Populate table with all details
-                                response.data.data.forEach(function(row) {
+                        if(response.status === "success" && response.data) {
+                            if(Array.isArray(response.data) && response.data.length > 0) {
+                                response.data.forEach(function(row) {
                                     let newRow = $("<tr></tr>");
                                     if(Array.isArray(row)) {
                                         row.forEach(function(cell) {
                                             newRow.append($("<td></td>").text(cell));
                                         });
-                                    } else {
-                                        // Si no es un array, mostrar mensaje de error
-                                        newRow.append($("<td colspan='10'></td>").text("Formato de datos inesperado"));
+                                        table.append(newRow);
                                     }
-                                    
-                                    table.append(newRow);
                                 });
                             } else {
-                                // No details found
                                 table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta cotización</td></tr>');
                             }
                         } else {
-                            // No details found or format is unexpected
                             table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta cotización</td></tr>');
                         }
                     } catch(err) {
-                        console.error("Error processing response:", err);
+                        console.error("Error procesando respuesta:", err);
                         table.append('<tr><td colspan="10" class="text-center text-danger">Error al procesar los datos: ' + err.message + '</td></tr>');
                     }
                 },
@@ -464,6 +450,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
+    });
+
+    // Cuando el DOM esté listo
+    // Capturar el evento de clic en el botón de ver detalles
+    document.querySelectorAll(".ModalNewAdd3").forEach(function(button) {
+        button.addEventListener("click", function(e) {
+            // Obtener el nombre de la cotización de la fila actual
+            const row = this.closest("tr");
+            if (row) {
+                const cells = row.querySelectorAll("td");
+                if (cells.length >= 2) {
+                    const cotizacionName = cells[1].textContent.trim();
+                    
+                    // Actualizar el título inmediatamente
+                    const headerSpan = document.getElementById("cotizacion-nombre-header");
+                    if (headerSpan) {
+                        headerSpan.textContent = cotizacionName;
+                    }
+                    
+                    // También actualizar cuando el modal se muestre completamente
+                    $("#modalCRUDdetalles_cotizaciones_compras-View").on("shown.bs.modal", function() {
+                        const headerSpan = document.getElementById("cotizacion-nombre-header");
+                     
+                        
+                        // También actualizar directamente el título del modal
+                        const modalTitle = $(this).find(".modal-title");
+                        if (modalTitle.length && !modalTitle.text().includes(cotizacionName)) {
+                            modalTitle.html("Detalle de Cotización: <strong>" + cotizacionName + "</strong>");
+                        }
+                    });
+                }
+            }
+        });
     });
 });
 </script>

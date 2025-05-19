@@ -71,7 +71,7 @@
         $titulos = ['ID', 'Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
       
         ob_start();
-        CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = [
+        CreateTable($id, $ButtonAddLabel, $titulos, [], false, [], '', $atributos = [
             'data-select-column'=>'1',
             'data-input-fill'=>'[kid_cotizacion_compra]'
         ]);
@@ -85,9 +85,7 @@
           'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
           'method'=>'POST',
           'action'=>'bd/crudSummit.php',
-          'bloque'=>'compras',
-          'data-select-column'=>'1',
-          'data-input-fill'=>'[kid_cotizacion_compra]'
+          'bloque'=>'compras'
         ],
         [
           $detailsTableOutput

@@ -117,21 +117,21 @@ function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $Ale
 
 $data = []; // Inicializa la variable $data
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['opcion']) && $_POST['opcion'] === 'codificarId') {
+    if (isset($_POST['id'])) {
+        require_once '../../../helpers/helper.php';
+        $id = $_POST['id'];
+        $encodedId = codificar($id);
+        echo json_encode(['status' => 'success', 'encodedId' => $encodedId]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'ID no proporcionado']);
+    }
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = null;
     $checkdata = null;
-    if (isset($_POST['modalCRUD']) && isset($_POST['opcion']) && isset($_POST['formDataJson'])) {
-        $modalCRUD = $_POST['modalCRUD'];
-        $opcion = $_POST['opcion'];
-        $formDataJson = $_POST['formDataJson'];
-        if (!is_array($formDataJson)) {
-            $formDataJson = json_decode($formDataJson, true);
-        }
-        foreach ($formDataJson as $key => $value) {
-            if ($value === '' || $value === null) {
-                $formDataJson[$key] = null;
-            }
-        }
         $AlertDataSimilar = isset($_POST['AlertDataSimilar']) ? filter_var($_POST['AlertDataSimilar'], FILTER_VALIDATE_BOOLEAN) : null;
 
         $tabla = null;

@@ -351,7 +351,7 @@ if($resultado){
                 $botones_acciones = $data_script['botones_acciones'];
 
                 $nuevo_boton_detalles = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="detalles_ordenes_compras"><i class="bi bi-eye"></i> Ver Detalles</button>';
-                $nuevo_boton_pesaje = '<button class="ModalNewAddPesaje btn btn-success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>';
+                $nuevo_boton_pesaje = '<button class="IniciarPesaje btn btn-success"><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>';
 
                 if (!in_array($nuevo_boton_detalles, $botones_acciones)) {
                     array_push($botones_acciones, $nuevo_boton_detalles);

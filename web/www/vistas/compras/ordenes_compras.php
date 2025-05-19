@@ -20,13 +20,13 @@
   $ButtonAddLabel = "Nueva Orden de Compra";
   $titulos = ['ID', 'Código Externo', 'Orden de Compra', 'Proveedor', 'Monto Total', 'Monto Neto', 'Fecha de Creación'];
   
-  // Define custom buttons for the table
+  // Definir los botones de acción
   $botones_acciones = [
-    '<button type="button" class="ModalDataView btn btn-primary primary" modalCRUD=${modalCRUD}><i class="bi bi-eye"></i> Ver</button>',
-    '<button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=${modalCRUD}><i class="bi bi-pencil"></i> Editar</button>',
-    '<button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD=${modalCRUD}><i class="bi bi-trash"></i> Eliminar</button>',
-    '<button type="button" class="ModalNewAdd3 btn btn-info info" modalCRUD=${modalCRUD}><i class="bi bi-list-check"></i> Ver Detalles</button>',
-    '<button type="button" class="IniciarPesaje btn btn-success success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>'
+    '<button type="button" class="ModalDataView btn btn-primary" modalCRUD="'.$id.'"><i class="bi bi-eye"></i> Ver</button>',
+    '<button type="button" class="ModalDataEdit btn btn-warning" modalCRUD="'.$id.'"><i class="bi bi-pencil"></i> Editar</button>',
+    '<button type="button" class="ModalDataDelete btn btn-danger" modalCRUD="'.$id.'"><i class="bi bi-trash"></i> Eliminar</button>',
+    '<button type="button" class="ModalNewAdd3 btn btn-info" modalCRUD="'.$id.'"><i class="bi bi-list-check"></i> Ver Detalles</button>',
+    '<button type="button" class="IniciarPesaje btn btn-success" modalCRUD="'.$id.'"><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>'
   ];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true,'ButtonsInRow');
   CreateModalForm(
@@ -55,7 +55,7 @@
   $titulos = ['ID', 'Orden de Compra','Materia Prima','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
 
   ob_start();
-  CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', ['data-select-column'=>'[1]']);
+  CreateTable($id, null, $titulos, [], false, [], '', ['data-select-column'=>'[1]']);
   $detailsTableOutput = ob_get_clean();
 
   CreateModal([

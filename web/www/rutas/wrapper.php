@@ -550,6 +550,7 @@ echo '
 <!-- Template Main JS File -->
 <script  nonce="<?php echo $nonce; ?>" src="<?php echo $SERVERURL ?>/assets/js/main.js"></script>
 <script  nonce="<?php echo $nonce; ?>" src="<?php echo $SERVERURL ?>/assets/js/fullcalendar/index.global.min.js"></script>
+
 <!--<script src="<?php //echo $SERVERURL ?>/vistas/formularios.js"></script>-->
 <?php 
   if(!empty($params['list_js_scripts'])) {

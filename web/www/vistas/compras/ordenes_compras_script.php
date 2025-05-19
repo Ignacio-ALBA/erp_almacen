@@ -75,40 +75,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calcularMontos();
     }
+     // Evento para el botón "Iniciar Pesaje"
+     $(document).on('click', '.IniciarPesaje', function(e) {
+        e.preventDefault();
+        console.log('Botón Iniciar Pesaje clickeado');
 
-    // Inicializar cálculos en todos los modales
-    function initializeModal() {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            const forms = modal.querySelectorAll('form');
-            forms.forEach(setupCalculations);
-        });
-    }
+        // Obtener el ID de la orden de compras seleccionada
+        const row = $(this).closest('tr');
+        const idOrdenCompra = row.find('td').eq(0).text().trim();
+        
+        console.log('ID de Orden de Compra:', idOrdenCompra);
+        
+        
+        
+        
+        // Codificar el ID de la orden de compra
+        const hashedIdOrdenCompra = codificar(idOrdenCompra);
 
-    // Observer para detectar nuevos modales
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1 && node.classList.contains('modal')) {
-                    setupCalculations(node.querySelector('form'));
+        // Solicitar el tipo de almacén del colaborador
+        $.ajax({
+            type: "POST",
+            url: "<?php echo $SERVERURL; ?>/vistas/compras/bd/crudEndpoint.php",
+            data: { 
+                opcion: "getColaboradorAlmacen"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                
+                if (response.status === "success") {
+                    const kidAlmacen = response.data.kid_almacen;
+                    console.log('Tipo de almacén:', kidAlmacen);
+                    
+                    // Determinar la ruta de redirección
+                    let targetUrl = "";
+                    const serverUrl = "<?php echo rtrim($SERVERURL, '/'); ?>/";
+                    if (kidAlmacen === 1) {
+                        targetUrl = serverUrl + "rutas/almacen_mp.php/recepciones_materia_prima?id=" + hashedIdOrdenCompra;
+                    } else if (kidAlmacen == 2) {
+                        targetUrl = serverUrl + "rutas/almacen_produccion.php/recepciones_produccion?id=" + hashedIdOrdenCompra;
+                    }
+
+                    // Redirigir al usuario
+                    if (targetUrl) {
+                        console.log('Redirigiendo a:', targetUrl);
+                        window.location.href = targetUrl;
+                        alert("redirigiendo a: " + targetUrl);
+                    } else {
+                        console.error('No se pudo determinar la ruta de redirección');
+                        alert("No se pudo determinar la ruta de redirección.");
+                    }
+                } else {
+                    console.error('Error en la respuesta:', response.message);
+                    alert("Error al obtener la información del colaborador: " + (response.message || "Error desconocido"));
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la solicitud AJAX');
+                console.error('Estado:', status);
+                console.error('Error:', error);
+                console.error('Respuesta:', xhr.responseText);
+                alert("Ocurrió un error al procesar la solicitud.");
+            }
         });
     });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-
-    // Aplicar cálculos cuando se muestra un modal
-    document.body.addEventListener('shown.bs.modal', function(event) {
-        const modal = event.target;
-        const forms = modal.querySelectorAll('form');
-        forms.forEach(setupCalculations);
-    });
-
-    initializeModal();
 
     // Variables para rastrear la orden actual
     let currentOrdenId = '';
