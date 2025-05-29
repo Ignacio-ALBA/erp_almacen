@@ -18,7 +18,7 @@ $password = trim($password);
 
 $data=null;
 $pass = $password;   #AGREGAR SEED
-// Uso de consultas preparadas
+// Uso de consultas preparadas 
 $consulta = "SELECT * FROM colaboradores WHERE email = :email AND kid_tipo_usuario = :id_tipoUsuario AND login = 1 AND kid_estatus  = 1";
 $resultado = $conexion->prepare($consulta);
 $resultado->bindParam(':email', $usuario);
@@ -40,8 +40,9 @@ if($resultado->rowCount() >= 1){
 	    $_SESSION["s_id"] = $data[0]['id_colaborador'];
 	    $_SESSION["s_usuario"] = $data[0]['email'];
 	    $_SESSION["s_id_tipoUsuario"] = $data[0]['kid_tipo_usuario'];
-		$_SESSION["s_usuario"] = $data[0]['email'];
 	    $_SESSION["s_tipo_usuario"] = $tipo_usuario["tipo_usuario"];
+		$_SESSION["s_id_almacen"] = $data[0]['kid_almacen'];
+
 		
 		$_SESSION["permisos"] =  $_SESSION["s_id_tipoUsuario"] == 1 ? ["all"] : GetAllowPermsList($_SESSION["s_id_tipoUsuario"]) ;
 		$nombre = $data[0]['nombre'];
@@ -62,6 +63,7 @@ if($resultado->rowCount() >= 1){
 	    $_SESSION["s_id_tipoUsuario"] = null;
 		$_SESSION["s_tipo_usuario"] = null;
 		$_SESSION["s_nombre"] = null;
+		$_SESSION["s_id_almacen"] = null;
 		$_SESSION["permisos"] = [];
 	    $data=null;
 
@@ -79,6 +81,7 @@ if($resultado->rowCount() >= 1){
     $_SESSION["s_id_tipoUsuario"] = null;
 	$_SESSION["s_tipo_usuario"] = null;
 	$_SESSION["s_nombre"] = null;
+	$_SESSION["s_id_almacen"] = null;
 	$_SESSION["permisos"] = [];
 	$data=null;
 	/*

@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'comentarios_proveedores':
-                if(isset($_POST['opcion'])) {
+                if (isset($_POST['opcion'])) {
                     $consultaselect = "SELECT cp.id_comentario_proveedor, 
                         p.proveedor AS kid_proveedor, 
                         cp.comentario_proveedor,
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resultado->bindParam(':id', $elementID);
                     $resultado->execute();
                     $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                
+
                     $consultaselect = "SELECT a.articulo
                         FROM ordenes_compras oc
                         LEFT JOIN detalles_ordenes_compras doc ON oc.id_orden_compras = doc.kid_orden_compras
@@ -66,11 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
                     $data['options']['kid_articulo'] = array_map(fn($item) => [
-                        'valor'=> $item['articulo'],
+                        'valor' => $item['articulo'],
                         'pordefecto' => 0,
                     ], $select);
-
-                }else{
+                } else {
                     $consultaselect = "SELECT p.proveedor AS kid_proveedor, 
                         cp.comentario_proveedor,
                         tc.tipo_comentario AS kid_tipo_comentario
@@ -95,29 +94,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
-                case 'clientes':
-                    $consultaselect = "SELECT c.*,
+            case 'clientes':
+                $consultaselect = "SELECT c.*,
                         e.estado AS kid_estado
                     FROM clientes c
                     LEFT JOIN estados e ON c.kid_estado = e.id_estados 
                     WHERE id_cliente = :idCliente";
-    
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idCliente', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_cliente']=null;
-    
-                    // Verifica si se encontraron datos
-                    if ($data) {
-                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                    } else {
-                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                    }
-                    break;
-                    case 'mermas':
-                        if (isset($_POST['opcion'])) {
-                            $consultaselect = "SELECT m.id_merma,
+
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idCliente', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_cliente'] = null;
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+            case 'mermas':
+                if (isset($_POST['opcion'])) {
+                    $consultaselect = "SELECT m.id_merma,
                                 p.produccion AS kid_produccion,
                                 a.articulo AS kid_articulo,
                                 m.tipo_merma,
@@ -131,25 +130,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             LEFT JOIN articulos a ON m.kid_articulo = a.id_articulo
                             LEFT JOIN usuarios u ON m.kid_creacion = u.id_colaborador
                             WHERE m.kid_estatus != 3 AND m.kid_produccion = :id";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->bindParam(':id', $elementID);
-                            $resultado->execute();
-                            $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                    
-                            $consultaselect = "SELECT a.articulo
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+
+                    $consultaselect = "SELECT a.articulo
                                 FROM articulos a
                                 WHERE a.kid_estatus != 3
                                 ORDER BY a.articulo ASC;";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->execute();
-                            $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                    
-                            $data['options']['kid_articulo'] = array_map(fn($item) => [
-                                'valor' => $item['articulo'],
-                                'pordefecto' => 0,
-                            ], $select);
-                        } else {
-                            $consultaselect = "SELECT m.id_merma,
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->execute();
+                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $data['options']['kid_articulo'] = array_map(fn($item) => [
+                        'valor' => $item['articulo'],
+                        'pordefecto' => 0,
+                    ], $select);
+                } else {
+                    $consultaselect = "SELECT m.id_merma,
                                 p.produccion AS kid_produccion,
                                 a.articulo AS kid_articulo,
                                 m.tipo_merma,
@@ -163,21 +162,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             LEFT JOIN articulos a ON m.kid_articulo = a.id_articulo
                             LEFT JOIN usuarios u ON m.kid_creacion = u.id_colaborador
                             WHERE m.kid_estatus != 3 AND m.id_merma = :id";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->bindParam(':id', $elementID);
-                            $resultado->execute();
-                            $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                        }
-                    
-                        if ($data) {
-                            print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                        } else {
-                            print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                        }
-                        break;
-                        case 'ubicacion_almacen':
-                            if (isset($_POST['opcion'])) {
-                                $consultaselect = "SELECT u.id_ubicacion,
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                }
+
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+            case 'ubicacion_almacen':
+                if (isset($_POST['opcion'])) {
+                    $consultaselect = "SELECT u.id_ubicacion,
                                     a.almacen AS kid_almacen,
                                     u.codigo_localizacion,
                                     u.descripcion,
@@ -187,25 +186,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
                                 LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
                                 WHERE u.kid_estatus != 3 AND u.kid_almacen = :id";
-                                $resultado = $conexion->prepare($consultaselect);
-                                $resultado->bindParam(':id', $elementID);
-                                $resultado->execute();
-                                $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                        
-                                $consultaselect = "SELECT a.almacen
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+
+                    $consultaselect = "SELECT a.almacen
                                     FROM almacenes a
                                     WHERE a.kid_estatus != 3
                                     ORDER BY a.almacen ASC;";
-                                $resultado = $conexion->prepare($consultaselect);
-                                $resultado->execute();
-                                $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                        
-                                $data['options']['kid_almacen'] = array_map(fn($item) => [
-                                    'valor' => $item['almacen'],
-                                    'pordefecto' => 0,
-                                ], $select);
-                            } else {
-                                $consultaselect = "SELECT u.id_ubicacion,
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->execute();
+                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $data['options']['kid_almacen'] = array_map(fn($item) => [
+                        'valor' => $item['almacen'],
+                        'pordefecto' => 0,
+                    ], $select);
+                } else {
+                    $consultaselect = "SELECT u.id_ubicacion,
                                     a.almacen AS kid_almacen,
                                     u.codigo_localizacion,
                                     u.descripcion,
@@ -215,21 +214,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
                                 LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
                                 WHERE u.kid_estatus != 3 AND u.id_ubicacion = :id";
-                                $resultado = $conexion->prepare($consultaselect);
-                                $resultado->bindParam(':id', $elementID);
-                                $resultado->execute();
-                                $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                            }
-                        
-                            if ($data) {
-                                print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                            } else {
-                                print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                            }
-                            break;
-                    case 'comentarios_clientes':
-                        if(isset($_POST['opcion'])) {
-                            $consultaselect = "SELECT cc.id_comentario_cliente, 
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                }
+
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+            case 'comentarios_clientes':
+                if (isset($_POST['opcion'])) {
+                    $consultaselect = "SELECT cc.id_comentario_cliente, 
                                 c.nombre AS kid_cliente, 
                                 cc.comentario_cliente,
                                 tc.tipo_comentario AS kid_tipo_comentario,
@@ -241,12 +240,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             LEFT JOIN 
                                 tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
                             WHERE cc.kid_estatus !=3 AND cc.kid_cliente  = :id";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->bindParam(':id', $elementID);
-                            $resultado->execute();
-                            $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
-                        
-                            $consultaselect = "SELECT a.articulo
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+
+                    $consultaselect = "SELECT a.articulo
                                 FROM ordenes_compras oc
                                 LEFT JOIN detalles_ordenes_compras doc ON oc.id_orden_compras = doc.kid_orden_compras
                                 LEFT JOIN articulos a ON doc.kid_articulo = a.id_articulo
@@ -257,18 +256,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     WHERE doc.kid_orden_compras = :id
                                 ) 
                                 ORDER BY a.articulo ASC;";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->bindParam(':id', $elementID);
-                            $resultado->execute();
-                            $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
-        
-                            $data['options']['kid_articulo'] = array_map(fn($item) => [
-                                'valor'=> $item['articulo'],
-                                'pordefecto' => 0,
-                            ], $select);
-        
-                        }else{
-                            $consultaselect = "SELECT c.nombre AS kid_cliente, 
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $select = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $data['options']['kid_articulo'] = array_map(fn($item) => [
+                        'valor' => $item['articulo'],
+                        'pordefecto' => 0,
+                    ], $select);
+                } else {
+                    $consultaselect = "SELECT c.nombre AS kid_cliente, 
                                 cc.comentario_cliente,
                                 tc.tipo_comentario AS kid_tipo_comentario
                             FROM 
@@ -278,20 +276,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             LEFT JOIN 
                                 tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
                             WHERE cc.kid_estatus !=3 AND cc.id_comentario_cliente  = :id";
-                            $resultado = $conexion->prepare($consultaselect);
-                            $resultado->bindParam(':id', $elementID);
-                            $resultado->execute();
-                            $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                            $data['id_detalle_cotizacion_compras'] = null;
-                        }
-        
-                        // Verifica si se encontraron datos
-                        if ($data) {
-                            print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                        } else {
-                            print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                        }
-                        break;
+                    $resultado = $conexion->prepare($consultaselect);
+                    $resultado->bindParam(':id', $elementID);
+                    $resultado->execute();
+                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $data['id_detalle_cotizacion_compras'] = null;
+                }
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
             case 'colaboradores':
                 $consultaselect = "SELECT u.*,
                     tu.tipo_usuario AS kid_tipo_usuario,
@@ -304,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $resultado->bindParam(':idUsuario', $elementID);
                 $resultado->execute();
                 $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                $data['id_colaborador']=null;
+                $data['id_colaborador'] = null;
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -313,7 +311,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
-            
+
             case 'marcas':
                 $consultaselect = "SELECT id_marca, orden, marca,pordefecto, fecha_creacion FROM marcas WHERE id_marca = :id_marca";
                 $resultado = $conexion->prepare($consultaselect);
@@ -364,7 +362,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
                 break;
-            
+
             case 'dimensiones':
                 $consultaselect = "SELECT id_dimension , orden, dimension, simbolo, pordefecto,fecha_creacion FROM dimensiones WHERE id_dimension = :id_dimension";
                 $resultado = $conexion->prepare($consultaselect);
@@ -636,10 +634,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         LEFT JOIN
                             estados e ON s.kid_estado = e.id_estados 
                         WHERE s.kid_estatus = 1 AND s.id_sucursal   = :idSucursal ";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idSucursal', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idSucursal', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -660,11 +658,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         LEFT JOIN 
                             colaboradores u ON a.kid_encargado = u.id_colaborador
                         WHERE a.kid_estatus = 1 AND a.id_almacen   = :idAlmacen ";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idAlmacen', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_almacen'] = null;
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idAlmacen', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_almacen'] = null;
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -685,11 +683,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         LEFT JOIN 
                             almacenes a ON ad.kid_almacen = a.id_almacen
                         WHERE ad.kid_estatus = 1 AND ad.id_detalle_almacen   = :idDetalleAlmacen ";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idDetalleAlmacen', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_detalle_almacen'] = null;
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idDetalleAlmacen', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_detalle_almacen'] = null;
+
+                // Verifica si se encontraron datos
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
+
+            case 'tipo_almacenes':
+                $consultaselect = "SELECT tipo_almacen, 
+                        apodo FROM tipo_almacenes      
+                        WHERE kid_estatus = 1 AND id_tipo_almacen   = :id ";
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_tipo_almacen'] = null;
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -715,11 +731,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         LEFT JOIN 
                             tipos_comentarios tc ON ca.kid_tipo_comentario = tc.id_tipo_comentario 
                         WHERE ca.kid_estatus = 1 AND ca.id_comentario_almacen   = :idComentarioAlmacen ";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idComentarioAlmacen', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_comentario_almacen'] = null;
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idComentarioAlmacen', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_comentario_almacen'] = null;
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -738,11 +754,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     FROM 
                                         tipos_comentarios
                                     WHERE kid_estatus = 1 AND id_tipo_comentario   = :idTipoComentario ";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':idTipoComentario', $elementID);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                    $data['id_tipo_comentario'] = null;
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':idTipoComentario', $elementID);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data['id_tipo_comentario'] = null;
 
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -797,7 +813,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
                 $data = array_map(fn($item) => [
-                    'valor'=> $item['municipio'],
+                    'valor' => $item['municipio'],
                     'text' => trim(implode('-', array_filter([$item['municipio'], $item['simbolo']]))),
                     'pordefecto' => $item['pordefecto'],
                 ], $data);
@@ -816,7 +832,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $resultado->bindParam(':CP', $elementID);
                 $resultado->execute();
                 $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                
+
                 //$data = $item['cp'];
                 // Verifica si se encontraron datos
                 if ($data) {
@@ -831,7 +847,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default:
                 print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
                 break;
-                
         }
     } else {
         print json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos'], JSON_UNESCAPED_UNICODE);
@@ -839,4 +854,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     print json_encode(['status' => 'error', 'message' => 'Método no permitido'], JSON_UNESCAPED_UNICODE);
 }
-?>

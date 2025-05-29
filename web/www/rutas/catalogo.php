@@ -3,7 +3,7 @@
 // Sanitizar la entrada del pathResult
 $resultado = processRequest();
 
-if($resultado){
+if ($resultado) {
     $pathResult = $resultado['pathResult'];
     $queryParams = $resultado['queryParams'];
 
@@ -28,18 +28,18 @@ if($resultado){
         case 'proveedores':
             $perms = [
                 "crear_proveedores",
-                    "editar_proveedores",
-                    "ver_proveedores",
-                    "eliminar_proveedores"
-                    ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
-                        }
-                    }
+                "editar_proveedores",
+                "ver_proveedores",
+                "eliminar_proveedores"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
             $vista = 'proveedores';
             $consultaselect = "SELECT id_proveedor,
                 orden,
@@ -61,14 +61,14 @@ if($resultado){
             $resultado->execute();
             $modalCRUD = 'comentarios_proveedores';
             $nuevo_boton = '
-                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
+                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="' . $modalCRUD . '"><i class="bi bi-chat-left-text"></i> Comentario</button>
             ';
             array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-            
-            $data_script['NewAdd1'] =['data_list_column'=>[
-                'kid_proveedor'=>5,
-                
+
+            $data_script['NewAdd1'] = ['data_list_column' => [
+                'kid_proveedor' => 5,
+
             ]];
 
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
@@ -86,15 +86,15 @@ if($resultado){
                 "editar_comentarios_proveedores",
                 "ver_comentarios_proveedores",
                 "eliminar_comentarios_proveedores"
-                ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'comentarios_proveedores';
             $consultaselect = "SELECT cp.id_comentario_proveedor, 
                 p.proveedor AS kid_proveedor, 
@@ -119,9 +119,9 @@ if($resultado){
         case 'clientes':
             $perms = [
                 "crear_clientes",
-            "editar_clientes",
-            "ver_clientes",
-            "eliminar_clientes"
+                "editar_clientes",
+                "ver_clientes",
+                "eliminar_clientes"
             ];
 
             checkPerms($perms);
@@ -149,14 +149,14 @@ if($resultado){
 
             $modalCRUD = 'comentarios_clientes';
             $nuevo_boton = '
-                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="'.$modalCRUD.'"><i class="bi bi-chat-left-text"></i> Comentario</button>
+                <button class="ModalNewAdd1 btn btn-secondary secondary" modalCRUD="' . $modalCRUD . '"><i class="bi bi-chat-left-text"></i> Comentario</button>
             ';
             array_splice($data_script['botones_acciones'], 1, 0, $nuevo_boton);
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-            
-            $data_script['NewAdd1'] =['data_list_column'=>[
-                'kid_cliente'=>5,
-                
+
+            $data_script['NewAdd1'] = ['data_list_column' => [
+                'kid_cliente' => 5,
+
             ]];
 
             $clientes = $resultado->fetchAll(PDO::FETCH_ASSOC);
@@ -165,10 +165,10 @@ if($resultado){
                 global $data_script, $estatus;
                 $botones_acciones = $data_script['botones_acciones'];
                 $hashed_id = codificar($row['id_cliente']);
-               // array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
+                // array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
                 //array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
-              //  array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
-              //  array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
+                //  array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
+                //  array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
                 $row['botones'] = GenerateCustomsButtons($botones_acciones, 'clientes');
                 return $row;
             }, $clientes);
@@ -183,23 +183,23 @@ if($resultado){
             $data['data_show']['bolsas_proyectos'] = GetBolsaProyectosListForSelect();
             break;
 
-            case 'comentarios_clientes':
-                $perms = [
-                    "crear_comentarios_clientes",
-                    "editar_comentarios_clientes",
-                    "ver_comentarios_clientes",
-                    "eliminar_comentarios_clientes"
-                    ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
-                        }
-                    }
-                $vista = 'comentarios_clientes';
-                $consultaselect = "SELECT cc.id_comentario_cliente , 
+        case 'comentarios_clientes':
+            $perms = [
+                "crear_comentarios_clientes",
+                "editar_comentarios_clientes",
+                "ver_comentarios_clientes",
+                "eliminar_comentarios_clientes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'comentarios_clientes';
+            $consultaselect = "SELECT cc.id_comentario_cliente , 
                     c.nombre AS kid_cliente, 
                     cc.comentario_cliente,
                     tc.tipo_comentario AS kid_tipo_comentario,
@@ -211,28 +211,28 @@ if($resultado){
                 LEFT JOIN 
                     tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
                 WHERE cc.kid_estatus !=3";
-                $resultado = $conexion->prepare($consultaselect);
-                $resultado->execute();
-    
-                $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
-                $data['data_show']['clientes'] = GetClientesListForSelect();
-                break;
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
+            $data['data_show']['clientes'] = GetClientesListForSelect();
+            break;
         case 'marcas':
             $perms = [
                 "crear_marcas",
-                    "editar_marcas",
-                    "ver_marcas",
-                    "eliminar_marcas"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_marcas",
+                "ver_marcas",
+                "eliminar_marcas"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'marcas';
             break;
         case 'categorias':
@@ -241,83 +241,83 @@ if($resultado){
                 "editar_categorias",
                 "ver_categorias",
                 "eliminar_categorias"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'categorias';
             break;
         case 'subcategorias':
             $perms = [
                 "crear_subcategorias",
-                    "editar_subcategorias",
-                    "ver_subcategorias",
-                    "eliminar_subcategorias"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_subcategorias",
+                "ver_subcategorias",
+                "eliminar_subcategorias"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'subcategorias';
             break;
         case 'dimensiones':
             $perms = [
                 "crear_dimensiones",
-                    "editar_dimensiones",
-                    "ver_dimensiones",
-                    "eliminar_dimensiones"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_dimensiones",
+                "ver_dimensiones",
+                "eliminar_dimensiones"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'dimensiones';
             break;
         case 'presentaciones':
             $perms = [
                 "crear_presentaciones",
-                    "editar_presentaciones",
-                    "ver_presentaciones",
-                    "eliminar_presentaciones"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_presentaciones",
+                "ver_presentaciones",
+                "eliminar_presentaciones"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'presentaciones';
             break;
         case 'formatos':
             $perms = [
                 "crear_formatos",
-                    "editar_formatos",
-                    "ver_formatos",
-                    "eliminar_formatos"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_formatos",
+                "ver_formatos",
+                "eliminar_formatos"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'formatos';
             break;
         case 'roles':
@@ -327,136 +327,136 @@ if($resultado){
         case 'unidades':
             $perms = [
                 "crear_unidades",
-                    "editar_unidades",
-                    "ver_unidades",
-                    "eliminar_unidades"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_unidades",
+                "ver_unidades",
+                "eliminar_unidades"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'unidades';
             break;
         case 'articulos':
             $perms = [
                 "crear_articulos",
-                    "editar_articulos",
-                    "ver_articulos",
-                    "eliminar_articulos"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_articulos",
+                "ver_articulos",
+                "eliminar_articulos"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'articulos';
             break;
         case 'estados':
             $perms = [
                 "crear_estados",
-                    "editar_estados",
-                    "ver_estados",
-                    "eliminar_estados"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_estados",
+                "ver_estados",
+                "eliminar_estados"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'estados';
             break;
         case 'municipios':
             $perms = [
                 "crear_municipios",
-                    "editar_municipios",
-                    "ver_municipios",
-                    "eliminar_municipios"
-                ];
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_municipios",
+                "ver_municipios",
+                "eliminar_municipios"
+            ];
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'municipios';
             break;
         case 'empresas':
             $perms = [
                 "crear_empresas",
-                    "editar_empresas",
-                    "ver_empresas",
-                    "eliminar_empresas"
-                ];
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_empresas",
+                "ver_empresas",
+                "eliminar_empresas"
+            ];
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'empresas';
             break;
         case 'sucursales':
             $perms = [
                 "crear_sucursales",
-                    "editar_sucursales",
-                    "ver_sucursales",
-                    "eliminar_sucursales"
-                ];
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_sucursales",
+                "ver_sucursales",
+                "eliminar_sucursales"
+            ];
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'sucursales';
             break;
         case 'almacenes':
             $perms = [
                 "crear_almacenes",
-                    "editar_almacenes",
-                    "ver_almacenes",
-                    "eliminar_almacenes"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_almacenes",
+                "ver_almacenes",
+                "eliminar_almacenes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'almacenes';
             break;
-                case 'locaciones':
-                    $perms = [
-                        "crear_locaciones_almacen",
-                            "editar_locaciones_almacen",
-                            "ver_locaciones_almacen",
-                            "eliminar_locaciones_almacen"
-                       ];
-            
-                        checkPerms($perms);
-                        $acciones = ['ver_', 'editar_', 'eliminar_'];
-                        foreach ($acciones as $index => $accion) {
-                            if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                                unset($data_script['botones_acciones'][$index]);
-                            }
-                        }
-                    $vista = 'locaciones';
-                    $consultaselect = "SELECT u.id_ubicacion,
+        case 'locaciones':
+            $perms = [
+                "crear_locaciones_almacen",
+                "editar_locaciones_almacen",
+                "ver_locaciones_almacen",
+                "eliminar_locaciones_almacen"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'locaciones';
+            $consultaselect = "SELECT u.id_ubicacion,
                         a.almacen AS kid_almacen,
                         u.codigo_localizacion,
                         u.descripcion,
@@ -466,46 +466,66 @@ if($resultado){
                     LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
                     LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
                     WHERE u.kid_estatus != 3";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->execute();
-                
-                    $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                    $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
-                    $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
-                    break;
-      
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['almacenes'] = GetAlmacenesListForSelect();
+            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+            break;
+
+        case 'tipo_almacenes':
+            $perms = [
+                "crear_tipo_almacenes",
+                "editar_tipo_almacenes",
+                "ver_tipo_almacenes",
+                "eliminar_tipo_almacenes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'tipo_almacenes';
+            break;
+
+
+
         case 'comentarios_almacenes':
             $perms = [
                 "crear_comentarios_almacenes",
-                    "editar_comentarios_almacenes",
-                    "ver_comentarios_almacenes",
-                    "eliminar_comentarios_almacenes"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_comentarios_almacenes",
+                "ver_comentarios_almacenes",
+                "eliminar_comentarios_almacenes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'comentarios_almacenes';
             break;
         case 'tipos_comentarios':
             $perms = [
                 "crear_tipos_comentarios",
-                    "editar_tipos_comentarios",
-                    "ver_tipos_comentarios",
-                    "eliminar_tipos_comentarios"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+                "editar_tipos_comentarios",
+                "ver_tipos_comentarios",
+                "eliminar_tipos_comentarios"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'tipos_comentarios';
             break;
         case 'tipos_estados':
@@ -514,15 +534,15 @@ if($resultado){
                 "editar_estatus",
                 "ver_estatus",
                 "eliminar_estatus"
-               ];
-    
-                checkPerms($perms);
-                $acciones = ['ver_', 'editar_', 'eliminar_'];
-                foreach ($acciones as $index => $accion) {
-                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                        unset($data_script['botones_acciones'][$index]);
-                    }
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                 }
+            }
             $vista = 'tipos_estados';
             $consultaselect = "SELECT id_estatus,
                 estatus,
@@ -536,7 +556,7 @@ if($resultado){
             foreach ($consulta_data as &$fila) { // Usar referencia para modificar el array original
                 $fila['estatus_color'] = CreateBadge([
                     'etiqueta' => $fila['estatus_color'] ? $fila['estatus_color'] : 'Sin Color',
-                    'style' => $fila['estatus_color'] ? ('background-color:' . $fila['estatus_color'].';') : 'color:black;' // Cambiar $data a $fila
+                    'style' => $fila['estatus_color'] ? ('background-color:' . $fila['estatus_color'] . ';') : 'color:black;' // Cambiar $data a $fila
                 ]);
             }
             $data['data_show']['data'] = $consulta_data;
@@ -549,12 +569,9 @@ if($resultado){
             break;
     }
 
-    $data['list_js_scripts']['formularios_script'] =$data_script;
+    $data['list_js_scripts']['formularios_script'] = $data_script;
 
     renderView($vista, $data);
-}else{
+} else {
     header("Location: /index.php");
 }
-
-
-?>

@@ -2,7 +2,8 @@
 $objeto = new Conexion();
 $conexion = $objeto->Conectar();
 
-function insertarDespuesDeClave($array, $clave, $nuevoElemento) {
+function insertarDespuesDeClave($array, $clave, $nuevoElemento)
+{
     // Obtener las claves del array
     $claves = array_keys($array);
 
@@ -22,7 +23,8 @@ function insertarDespuesDeClave($array, $clave, $nuevoElemento) {
     return $array;
 }
 
-function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $AlertDataSimilar,$edit=false) {
+function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $AlertDataSimilar, $edit = false)
+{
     $resultados = [];
     $checkdata = false; // Variable para indicar si se encontró algún dato
 
@@ -38,7 +40,7 @@ function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $Ale
             $stmt = $conexion->prepare($consulta);
             $stmt->execute([':valor' => $valor]);
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($data['existe'] > 0 && $edit == false) {
                 $checkdata = true;
                 if (!isset($resultados['DataExist'])) {
@@ -60,12 +62,11 @@ function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $Ale
                             $resultados['DataSimilar'] = [];
                         }
                         $resultados['DataSimilar'][$column] = $DataSimilar; // Almacena los valores similares
-                    } 
+                    }
                 }
-                if($AlertDataSimilar === true) {
+                if ($AlertDataSimilar === true) {
                     $checkdata = false;
                 }
-                
             }
         }
     }
@@ -101,20 +102,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         switch ($modalCRUD) {
             case 'proveedores':
                 $tabla = 'proveedores';
-                $idcolumn= "id_proveedor";
+                $idcolumn = "id_proveedor";
 
-               /*-------------------- Obtener Tablas Foráneas --------------------*/
-               $estados = GetEstadosListById();
-               /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                $estados = GetEstadosListById();
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
-               if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
-                   $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
-               }
+                if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
+                    $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
+                }
                 $editformDataJson = CleanJson($formDataJson);
                 $editformDataJson = $formDataJson;
 
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT id_proveedor,
@@ -131,29 +132,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     END AS pordefecto,
                     fecha_creacion
                 FROM proveedores
-                WHERE kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
+                WHERE kid_estatus != 3 and " . $idcolumn . " = :" . $idcolumn;
 
                 $ColumnsCheck = [
-                    ['column'=>"razon_social","check_similar"=>false],
-                    ['column'=>"rfc","check_similar"=>false]
+                    ['column' => "razon_social", "check_similar" => false],
+                    ['column' => "rfc", "check_similar" => false]
                 ];
                 break;
 
             case 'comentarios_proveedores':
                 $tabla = 'comentarios_proveedores';
-                $idcolumn= "id_comentario_proveedor";
-                                             
+                $idcolumn = "id_comentario_proveedor";
+
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
                 $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-                $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;  
+                $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
 
                 $editformDataJson = CleanJson($formDataJson);
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
 
@@ -172,77 +173,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $ColumnsCheck = [];
                 break;
-                case 'clientes':
-                    $tabla = 'clientes';
-                    $idcolumn= "id_cliente";
-    
-                    /*-------------------- Obtener Tablas Foráneas --------------------*/
-                    $estados = GetEstadosListById();
-                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-    
-                    if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
-                        $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
-                    }
-    
-                    $editformDataJson = $formDataJson;
-                    //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                    $consultaselect = "SELECT id_marca, orden, marca, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
-                        FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
-    
-                    $consultaselect = "SELECT id_cliente , 
+            case 'clientes':
+                $tabla = 'clientes';
+                $idcolumn = "id_cliente";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                $estados = GetEstadosListById();
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+                if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
+                    $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
+                }
+
+                $editformDataJson = $formDataJson;
+                //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+                $consultaselect = "SELECT id_marca, orden, marca, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
+                        FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
+
+                $consultaselect = "SELECT id_cliente , 
                                             codigo, 
                                             nombre,
                                             razon_social,
                                             rfc,
                                             email,
                                             fecha_creacion
-                                        FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
-    
-                    $fuc_mapping = function ($row) {
-                        global $data_script, $estatus;
-                        $botones_acciones = $data_script['botones_acciones'];
-                        $hashed_id = codificar($row['id_cliente']);
-                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
-                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
-                        array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
-                        array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
-                        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'clientes');
-                        return $row;
-                    };
-    
-    
-                    $ColumnsCheck = [
-                        ['column'=>"codigo","check_similar"=>false],
-                        ['column'=>"razon_social","check_similar"=>false],
-                        ['column'=>"rfc","check_similar"=>false]
-                    ];
-                    $text_colums_edit = [];
-    
-                    
-                    break;
-                    case 'comentarios_clientes':
-                        $tabla = 'comentarios_clientes';
-                        $idcolumn= "id_comentario_cliente";
-        
-                        /*-------------------- Obtener Tablas Foráneas --------------------*/
-                        //$colaboradores = GetUsuariosListById();
-                        $formDataJson['kid_cliente'] = isset($formDataJson['kid_cliente']) ? GetIDClienteByName($formDataJson['kid_cliente']) : null;
-                        $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;  
-                        /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-        
-        
-                        $editformDataJson = CleanJson($formDataJson);
-                        //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
-                        $newformDataJson = $formDataJson;
-                        $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                        $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                        $newformDataJson['kid_estatus'] = 1;
-        
-                        $consultaselect = "SELECT cc.id_comentario_cliente, 
+                                        FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
+
+                $fuc_mapping = function ($row) {
+                    global $data_script, $estatus;
+                    $botones_acciones = $data_script['botones_acciones'];
+                    $hashed_id = codificar($row['id_cliente']);
+                    array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_actividades?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Actividades</a>');
+                    array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_recursos_humanos?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> TH</a>');
+                    array_push($botones_acciones, '<a href="/rutas/planeacion.php/planeaciones_compras?id=' . $hashed_id . '" class="btn btn-info "><i class="bi bi-file-spreadsheet"></i> Compras</a>');
+                    array_push($botones_acciones, '<a href="/rutas/contabilidad.php/facturas_clientes?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-receipt"></i> Facturas</a>');
+                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'clientes');
+                    return $row;
+                };
+
+
+                $ColumnsCheck = [
+                    ['column' => "codigo", "check_similar" => false],
+                    ['column' => "razon_social", "check_similar" => false],
+                    ['column' => "rfc", "check_similar" => false]
+                ];
+                $text_colums_edit = [];
+
+
+                break;
+            case 'comentarios_clientes':
+                $tabla = 'comentarios_clientes';
+                $idcolumn = "id_comentario_cliente";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                //$colaboradores = GetUsuariosListById();
+                $formDataJson['kid_cliente'] = isset($formDataJson['kid_cliente']) ? GetIDClienteByName($formDataJson['kid_cliente']) : null;
+                $formDataJson['kid_tipo_comentario'] = isset($formDataJson['kid_tipo_comentario']) ? GetIDTipoComentarioByName($formDataJson['kid_tipo_comentario']) : null;
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+
+                $editformDataJson = CleanJson($formDataJson);
+                //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+
+                $consultaselect = "SELECT cc.id_comentario_cliente, 
                             c.nombre AS kid_cliente, 
                             cc.comentario_cliente,
                             tc.tipo_comentario AS kid_tipo_comentario,
@@ -254,64 +255,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         LEFT JOIN 
                             tipos_comentarios tc ON cc.kid_tipo_comentario = tc.id_tipo_comentario
                         WHERE cc.kid_estatus !=3 AND $idcolumn = :$idcolumn";
-        
-                        $ColumnsCheck = [];
-                        break;
+
+                $ColumnsCheck = [];
+                break;
             case 'marcas':
                 $tabla = 'marcas';
-                $idcolumn= "id_marca";
+                $idcolumn = "id_marca";
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT id_marca, orden, marca, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
-                    FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
+                    FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
                 /*$ColumnsCheck = [
                     ['column'=>"codigo_interno","check_similar"=>false],
                     ['column'=>"codigo_externo","check_similar"=>false],
                     ['column'=>"articulo","check_similar"=>true]
                 ];*/
                 $ColumnsCheck = [
-                    ['column'=>"marca","check_similar"=>true]
+                    ['column' => "marca", "check_similar" => true]
                 ];
 
-                
+
                 break;
             case 'categorias':
                 $tabla = 'categorias';
-                $idcolumn= "id_categoria";
+                $idcolumn = "id_categoria";
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT id_categoria , orden, categoria, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
-                    FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
+                    FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
 
                 $ColumnsCheck = [
-                    ['column'=>"categoria","check_similar"=>true]
+                    ['column' => "categoria", "check_similar" => true]
                 ];
 
                 break;
 
             case 'subcategorias':
                 $tabla = 'subcategorias';
-                $idcolumn= "id_subcategoria";
+                $idcolumn = "id_subcategoria";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $categorias = GetCategoriasListById();
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_categoria']) && isset($categorias[$formDataJson['kid_categoria']])) {
-                $formDataJson['kid_categoria'] = $categorias[$formDataJson['kid_categoria']];
+                    $formDataJson['kid_categoria'] = $categorias[$formDataJson['kid_categoria']];
                 }
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT 
@@ -329,32 +330,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"subcategoria","check_similar"=>true]
+                    ['column' => "subcategoria", "check_similar" => true]
                 ];
 
                 break;
             case 'dimensiones':
                 $tabla = 'dimensiones';
-                $idcolumn= "id_dimension";
+                $idcolumn = "id_dimension";
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT id_dimension , orden, dimension, simbolo, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion
-                    FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
-                
+                    FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
+
                 $ColumnsCheck = [
-                    ['column'=>"dimension","check_similar"=>true]
+                    ['column' => "dimension", "check_similar" => true]
                 ];
 
                 break;
 
             case 'presentaciones':
                 $tabla = 'presentaciones';
-                $idcolumn= "id_presentacion";
-                
+                $idcolumn = "id_presentacion";
+
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $dimensiones = GetDimensionesListById();
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
@@ -364,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
 
@@ -380,34 +381,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             FROM $tabla s
                                             JOIN dimensiones c ON s.kid_dimension = c.id_dimension 
                                             WHERE $idcolumn = :$idcolumn";
-                
+
                 $ColumnsCheck = [
-                    ['column'=>"presentacion","check_similar"=>true]
+                    ['column' => "presentacion", "check_similar" => true]
                 ];
 
                 break;
 
             case 'unidades':
                 $tabla = 'unidades';
-                $idcolumn= "id_unidad";
+                $idcolumn = "id_unidad";
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT id_unidad , orden, unidad, simbolo, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion
-                    FROM ".$tabla." WHERE ".$idcolumn." = :".$idcolumn;
+                    FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
 
                 $ColumnsCheck = [
-                    ['column'=>"unidad","check_similar"=>true]
+                    ['column' => "unidad", "check_similar" => true]
                 ];
-                
+
                 break;
 
             case 'formatos':
                 $tabla = 'formatos';
-                $idcolumn= "id_formato";
+                $idcolumn = "id_formato";
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $presentaciones = GetPresentacionesListById();
                 $unidad = GetUnidadListById();
@@ -429,7 +430,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT f.id_formato, 
@@ -459,15 +460,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"formato","check_similar"=>true]
+                    ['column' => "formato", "check_similar" => true]
                 ];
 
                 break;
 
             case 'articulos':
                 $tabla = 'articulos';
-                $idcolumn= "id_articulo";
-                
+                $idcolumn = "id_articulo";
+
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $marcas = GetMarcasListById();
                 $categorias = GetCategoriasListById();
@@ -495,7 +496,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($formDataJson['kid_dimension']) && isset($dimensiones[$formDataJson['kid_dimension']])) {
                     $formDataJson['kid_dimension'] = $dimensiones[$formDataJson['kid_dimension']];
                 }
-                
+
                 // Asegurarse de que el campo costo esté presente y tenga un valor por defecto si no se proporciona
                 if (!isset($formDataJson['costo']) || $formDataJson['costo'] === null || $formDataJson['costo'] === '') {
                     $formDataJson['costo'] = 0; // Establecer un valor predeterminado para el campo costo
@@ -504,11 +505,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
 
-                
+
                 $consultaselect = "SELECT a.id_articulo  , 
                             a.codigo_interno, 
                             a.codigo_externo,
@@ -532,26 +533,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"codigo_interno","check_similar"=>false],
-                    ['column'=>"articulo","check_similar"=>true]
+                    ['column' => "codigo_interno", "check_similar" => false],
+                    ['column' => "articulo", "check_similar" => true]
                 ];
 
                 break;
             case 'estados':
                 $tabla = 'estados';
-                $idcolumn= "id_estados";
+                $idcolumn = "id_estados";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $paises = GetPaisesListById();
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_pais']) && isset($paises[$formDataJson['kid_pais']])) {
-                $formDataJson['kid_pais'] = $paises[$formDataJson['kid_pais']];
+                    $formDataJson['kid_pais'] = $paises[$formDataJson['kid_pais']];
                 }
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT e.id_estados  , 
@@ -567,27 +568,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     FROM $tabla e
                                     JOIN paises p ON e.kid_pais = p.id_pais 
                                     WHERE $idcolumn = :$idcolumn";
-                                    
+
 
                 $ColumnsCheck = [
-                    ['column'=>"estado","check_similar"=>true]
+                    ['column' => "estado", "check_similar" => true]
                 ];
                 break;
-                case 'ubicacion_almacen':
-                    $tabla = 'ubicacion_almacen';
-                    $idcolumn = "id_ubicacion";
-                
-                    /*-------------------- Obtener Tablas Foráneas --------------------*/
-                    $formDataJson['kid_almacen'] = isset($formDataJson['kid_almacen']) ? GetIDAlmacenByName($formDataJson['kid_almacen']) : null;
-                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-                
-                    $editformDataJson = CleanJson($formDataJson);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                
-                    $consultaselect = "SELECT u.id_ubicacion,
+            case 'ubicacion_almacen':
+                $tabla = 'ubicacion_almacen';
+                $idcolumn = "id_ubicacion";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                $formDataJson['kid_almacen'] = isset($formDataJson['kid_almacen']) ? GetIDAlmacenByName($formDataJson['kid_almacen']) : null;
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+                $editformDataJson = CleanJson($formDataJson);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+
+                $consultaselect = "SELECT u.id_ubicacion,
                         a.almacen AS kid_almacen,
                         u.codigo_localizacion,
                         u.descripcion,
@@ -597,28 +598,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     LEFT JOIN almacenes a ON u.kid_almacen = a.id_almacen
                     LEFT JOIN colaboradores c ON u.kid_creacion = c.id_colaborador
                     WHERE u.kid_estatus != 3 AND $idcolumn = :$idcolumn";
-                
-                    $ColumnsCheck = [
-                        ['column' => "codigo_localizacion", "check_similar" => true],
-                        ['column' => "descripcion", "check_similar" => false],
-                    ];
-                    break;
-                case 'mermas':
-                    $tabla = 'mermas';
-                    $idcolumn = "id_merma";
-                
-                    /*-------------------- Obtener Tablas Foráneas --------------------*/
-                    $formDataJson['kid_produccion'] = isset($formDataJson['kid_produccion']) ? GetIDProduccionByName($formDataJson['kid_produccion']) : null;
-                    $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
-                    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-                
-                    $editformDataJson = CleanJson($formDataJson);
-                    $newformDataJson = $formDataJson;
-                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
-                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                    $newformDataJson['kid_estatus'] = 1;
-                
-                    $consultaselect = "SELECT m.id_merma,
+
+                $ColumnsCheck = [
+                    ['column' => "codigo_localizacion", "check_similar" => true],
+                    ['column' => "descripcion", "check_similar" => false],
+                ];
+                break;
+            case 'mermas':
+                $tabla = 'mermas';
+                $idcolumn = "id_merma";
+
+                /*-------------------- Obtener Tablas Foráneas --------------------*/
+                $formDataJson['kid_produccion'] = isset($formDataJson['kid_produccion']) ? GetIDProduccionByName($formDataJson['kid_produccion']) : null;
+                $formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ? GetIDArticuloByName($formDataJson['kid_articulo']) : null;
+                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+                $editformDataJson = CleanJson($formDataJson);
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                $newformDataJson['kid_estatus'] = 1;
+
+                $consultaselect = "SELECT m.id_merma,
                         p.produccion AS kid_produccion,
                         a.articulo AS kid_articulo,
                         m.tipo_merma,
@@ -632,27 +633,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     LEFT JOIN articulos a ON m.kid_articulo = a.id_articulo
                     LEFT JOIN usuarios u ON m.kid_creacion = u.id_colaborador
                     WHERE m.kid_estatus != 3 AND $idcolumn = :$idcolumn";
-                
-                    $ColumnsCheck = [
-                        ['column' => "titulo", "check_similar" => true],
-                        ['column' => "descripcion", "check_similar" => false],
-                    ];
-                    break;
+
+                $ColumnsCheck = [
+                    ['column' => "titulo", "check_similar" => true],
+                    ['column' => "descripcion", "check_similar" => false],
+                ];
+                break;
             case 'municipios':
                 $tabla = 'municipios';
-                $idcolumn= "id_municipio";
+                $idcolumn = "id_municipio";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $estados = GetEstadosListById();
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
-                $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
+                    $formDataJson['kid_estado'] = $estados[$formDataJson['kid_estado']];
                 }
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT m.id_municipio   , 
@@ -671,13 +672,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"municipio","check_similar"=>true]
+                    ['column' => "municipio", "check_similar" => true]
                 ];
                 break;
 
             case 'empresas':
                 $tabla = 'empresas';
-                $idcolumn= "id_empresa";
+                $idcolumn = "id_empresa";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $colaboradores =  GetUsuariosListById();
@@ -701,7 +702,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT e.id_empresa, 
@@ -726,15 +727,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"empresa","check_similar"=>true],
-                    ['column'=>"razon_social","check_similar"=>true],
-                    ['column'=>"rfc","check_similar"=>false]
+                    ['column' => "empresa", "check_similar" => true],
+                    ['column' => "razon_social", "check_similar" => true],
+                    ['column' => "rfc", "check_similar" => false]
                 ];
                 break;
 
             case 'sucursales':
                 $tabla = 'sucursales';
-                $idcolumn= "id_sucursal";
+                $idcolumn = "id_sucursal";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $colaboradores = GetUsuariosListById();
@@ -759,11 +760,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 //debug($formDataJson);
 
-                
+
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT s.id_sucursal , 
@@ -788,15 +789,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"sucursal","check_similar"=>true],
-                    ['column'=>"razon_social","check_similar"=>true],
-                    ['column'=>"rfc","check_similar"=>false]
+                    ['column' => "sucursal", "check_similar" => true],
+                    ['column' => "razon_social", "check_similar" => true],
+                    ['column' => "rfc", "check_similar" => false]
                 ];
                 break;
 
             case 'almacenes':
                 $tabla = 'almacenes';
-                $idcolumn= "id_almacen";
+                $idcolumn = "id_almacen";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $colaboradores = GetUsuariosListById();
@@ -809,7 +810,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
                 $consultaselect = "SELECT a.id_almacen, 
@@ -829,13 +830,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"almacen","check_similar"=>true]
+                    ['column' => "almacen", "check_similar" => true]
                 ];
                 break;
 
             case 'detalles_almacenes':
                 $tabla = 'detalles_almacenes';
-                $idcolumn= "id_detalle_almacen";
+                $idcolumn = "id_detalle_almacen";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
@@ -849,16 +850,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
 
-                $lo_lo = CreateBadgeIcon('danger',['etiqueta'=>'Muy Baja', 'class'=>'danger']);
-                $hi_hi = CreateBadgeIcon('danger',['etiqueta'=>'Muy Alta', 'class'=>'danger']);
-                $lo = CreateBadgeIcon('warning',['etiqueta'=>'Baja', 'class'=>'warning']);
-                $hi = CreateBadgeIcon('warning',['etiqueta'=>'Alta', 'class'=>'warning']);
-                $alarmasok = CreateBadgeIcon('success',['etiqueta'=>'Normal', 'class'=>'success']);
-                
+                $lo_lo = CreateBadgeIcon('danger', ['etiqueta' => 'Muy Baja', 'class' => 'danger']);
+                $hi_hi = CreateBadgeIcon('danger', ['etiqueta' => 'Muy Alta', 'class' => 'danger']);
+                $lo = CreateBadgeIcon('warning', ['etiqueta' => 'Baja', 'class' => 'warning']);
+                $hi = CreateBadgeIcon('warning', ['etiqueta' => 'Alta', 'class' => 'warning']);
+                $alarmasok = CreateBadgeIcon('success', ['etiqueta' => 'Normal', 'class' => 'success']);
+
                 $consultaselect = "SELECT ad.id_detalle_almacen, 
                             a.almacen AS kid_almacen, 
                             ar.articulo AS kid_articulo,
@@ -880,13 +881,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"kid_articulo","check_similar"=>false]
+                    ['column' => "kid_articulo", "check_similar" => false]
                 ];
                 break;
 
+            case 'tipo_almacenes':
+                $tabla = 'tipo_almacenes';
+                $idcolumn = 'id_tipo_almacen';
+
+                // Validar que $formDataJson exista (solo en crudEndpoint si hace falta)
+                if (!isset($formDataJson)) {
+                    $formDataJson = json_decode($_POST['formDataJson'] ?? '{}', true);
+                }
+
+                // Formatear datos para inserción
+                $newformDataJson = $formDataJson;
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                $newformDataJson['kid_creacion'] = $_SESSION["s_id"] ?? 1;
+                $newformDataJson['kid_estatus'] = 1;
+
+                // Datos para edición
+                $editformDataJson = $formDataJson;
+
+                // Consulta SELECT para ver/editar
+                $consultaselect = "SELECT 
+                        id_tipo_almacen, 
+                        tipo_almacen, 
+                        apodo, 
+                        fecha_creacion 
+                    FROM 
+                        $tabla 
+                    WHERE 
+                        $idcolumn = :$idcolumn";
+
+                // Validación de duplicados
+                $ColumnsCheck = [
+                    ['column' => "tipo_almacen", "check_similar" => true]
+                ];
+
+                $AlertDataSimilar = true;
+                break;
+
+
+
             case 'comentarios_almacenes':
                 $tabla = 'comentarios_almacenes';
-                $idcolumn= "id_comentario_almacen";
+                $idcolumn = "id_comentario_almacen";
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
@@ -898,18 +938,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 //$formDataJson['kid_almacen'] = !empty($formDataJson['kid_almacen']) && isset($almacenes[$formDataJson['kid_almacen']]) ? $almacenes[$formDataJson['kid_almacen']] : -1;
                 //$formDataJson['kid_articulo'] = !empty($formDataJson['kid_articulo']) && isset($articulos[$formDataJson['kid_articulo']]) ? $articulos[$formDataJson['kid_articulo']] : -1;
 
-                if(isset($formDataJson['almacen']) && $formDataJson['almacen']){
+                if (isset($formDataJson['almacen']) && $formDataJson['almacen']) {
                     $formDataJson['kid_almacen'] = !empty($formDataJson['almacen']) && isset($almacenes[$formDataJson['almacen']]) ? $almacenes[$formDataJson['almacen']] : -1;
                     unset($formDataJson['almacen']);
-                }else{
+                } else {
                     $formDataJson['kid_almacen'] = !empty($formDataJson['kid_almacen']) && isset($almacenes[$formDataJson['kid_almacen']]) ? $almacenes[$formDataJson['kid_almacen']] : -1;
                 }
-                
+
 
                 $editformDataJson = $formDataJson;
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
 
@@ -931,21 +971,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             tipos_comentarios tc ON ca.kid_tipo_comentario = tc.id_tipo_comentario
                         WHERE ca.$idcolumn = :$idcolumn";
 
-                $ColumnsCheck = [
-                    
-                ];
+                $ColumnsCheck = [];
                 break;
 
             case 'tipos_comentarios':
                 $tabla = 'tipos_comentarios';
-                $idcolumn= "id_tipo_comentario";
+                $idcolumn = "id_tipo_comentario";
 
                 $editformDataJson = $formDataJson;
                 $newformDataJson = $formDataJson;
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
+                $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
-                
+
                 $consultaselect = "SELECT id_tipo_comentario, 
                             orden, 
                             tipo_comentario, 
@@ -958,7 +996,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
-                    ['column'=>"tipo_comentario","check_similar"=>true]
+                    ['column' => "tipo_comentario", "check_similar" => true]
                 ];
                 break;
 
@@ -970,7 +1008,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
-            
+
                 $consultaselect = "
                     SELECT 
                         id_estatus,
@@ -982,42 +1020,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE 
                         kid_estatus = 1 AND $idcolumn = :$idcolumn
                 ";
-            
+
                 $ColumnsCheck = [
                     ['column' => "estatus", "check_similar" => true]
                 ];
                 break;
-                
 
-            
+
+
             default:
                 print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
                 break;
         }
 
-        if($tabla != null &&  $idcolumn != null){
+        if ($tabla != null &&  $idcolumn != null) {
             switch ($opcion) {
                 case 1:
                     $resultados = [];
 
-                    list($resultados, $checkdata) = verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson,$AlertDataSimilar);
+                    list($resultados, $checkdata) = verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $AlertDataSimilar);
 
-                    
 
-                    if(!$checkdata){
+
+                    if (!$checkdata) {
                         $columnas = [];
                         $columnas2 = [];
                         foreach ($newformDataJson as $key => $value) {
                             $columnas[] = $key;
-                            $columnas2[] = ':'.$key;
+                            $columnas2[] = ':' . $key;
                         }
-                        $consulta = "INSERT INTO ".$tabla." (".implode(',', $columnas).") VALUES (".implode(',', $columnas2).")";
+                        $consulta = "INSERT INTO " . $tabla . " (" . implode(',', $columnas) . ") VALUES (" . implode(',', $columnas2) . ")";
                         $resultado = $conexion->prepare($consulta);
                         foreach ($newformDataJson as $key => $value) {
-                            $resultado->bindParam(':'.$key, $newformDataJson[$key]);
+                            $resultado->bindParam(':' . $key, $newformDataJson[$key]);
                         }
                         if ($resultado->execute()) {
-                            $columnas =[];
+                            $columnas = [];
                             $lastId = $conexion->lastInsertId();
                             foreach ($formDataJson as $key => $value) {
                                 $columnas[] = $key;
@@ -1026,11 +1064,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $resultado = $conexion->prepare($consultaselect);
                             $resultado->bindParam(":$idcolumn", $lastId, PDO::PARAM_INT);
                             $resultado->execute();
-                            $data_resultado=$resultado->fetch(PDO::FETCH_ASSOC);
+                            $data_resultado = $resultado->fetch(PDO::FETCH_ASSOC);
 
                             $data = $data_resultado;
                         }
-                    }else{
+                    } else {
                         $data =  $resultados;
                     }
                     break;
@@ -1038,49 +1076,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 2:
                     $resultados = [];
 
-                    list($resultados, $checkdata) = verificarDatos($conexion, $tabla, $ColumnsCheck, $editformDataJson,$AlertDataSimilar,true);
-                    
-                    if(!$checkdata){
+                    list($resultados, $checkdata) = verificarDatos($conexion, $tabla, $ColumnsCheck, $editformDataJson, $AlertDataSimilar, true);
+
+                    if (!$checkdata) {
                         if (isset($_POST['firstColumnValue']) && is_numeric($_POST['firstColumnValue'])) {
                             $id = $_POST['firstColumnValue'];
                             $columnas = [];
                             foreach ($editformDataJson as $key => $value) {
                                 $columnas[] = $key;
                             }
-                    
+
                             $setPart = [];
                             foreach ($columnas as $key) {
                                 $setPart[] = "$key = :$key";
                             }
-                            
+
                             $consulta = "UPDATE " . $tabla . " SET " . implode(', ', $setPart) . " WHERE " . $idcolumn . " = :id";
-                            
+
                             $resultado = $conexion->prepare($consulta);
-                            
+
                             foreach ($editformDataJson as $key => $value) {
                                 $resultado->bindValue(":$key", $value);
                             }
-                            
+
                             $resultado->bindValue(":id", $id);
-                            
+
                             if ($resultado->execute()) {
                                 $columnas = [];
                                 $lastId = $id; // Usa el ID que ya tienes
                                 foreach ($formDataJson as $key => $value) {
                                     $columnas[] = $key;
                                 }
-                    
+
                                 $resultado = $conexion->prepare($consultaselect);
                                 $resultado->bindParam(":$idcolumn", $lastId, PDO::PARAM_INT);
                                 $resultado->execute();
                                 $data_resultado = $resultado->fetch(PDO::FETCH_ASSOC);
-                    
+
                                 $data = $data_resultado;
                             }
                         } else {
                             print json_encode(['status' => 'error', 'message' => 'Elemento no valido.'], JSON_UNESCAPED_UNICODE);
                         }
-                    }else{
+                    } else {
                         $data =  $resultados;
                     }
                     break;
@@ -1090,27 +1128,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $id = $_POST['firstColumnValue'];
 
                         // Verificar si el registro existe antes de intentar actualizarlo
-                        $consulta_check = "SELECT * FROM ".$tabla." WHERE " . $idcolumn . " = :id";
+                        $consulta_check = "SELECT * FROM " . $tabla . " WHERE " . $idcolumn . " = :id";
                         $resultado_check = $conexion->prepare($consulta_check);
                         $resultado_check->bindParam(':id', $id);
                         $resultado_check->execute();
-                        
-                        if($resultado_check->rowCount() > 0) {
+
+                        if ($resultado_check->rowCount() > 0) {
                             // El registro existe, proceder con la actualización
-                            $consulta = "UPDATE ".$tabla." SET kid_estatus = :kid_estatus WHERE " . $idcolumn . " = :id";
+                            $consulta = "UPDATE " . $tabla . " SET kid_estatus = :kid_estatus WHERE " . $idcolumn . " = :id";
                             $resultado = $conexion->prepare($consulta);
                             $kid_estatus = 3; // Asignar el estatus de eliminado
                             $resultado->bindParam(':kid_estatus', $kid_estatus);
                             $resultado->bindParam(':id', $id);
-                            
+
                             if ($resultado->execute()) {
                                 // Verificar que se haya actualizado correctamente
                                 $consulta_verify = "SELECT * FROM " . $tabla . " WHERE " . $idcolumn . " = :id AND kid_estatus = 3";
                                 $resultado_verify = $conexion->prepare($consulta_verify);
                                 $resultado_verify->bindParam(':id', $id);
                                 $resultado_verify->execute();
-                                
-                                if($resultado_verify->rowCount() > 0) {
+
+                                if ($resultado_verify->rowCount() > 0) {
                                     // La actualización del estatus fue exitosa
                                     $data = true;
                                 } else {
@@ -1135,25 +1173,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
 
-    
+
                 default:
                     print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
                     break;
             }
             if ($data && !$checkdata) {
                 print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-            } else if($checkdata){
+            } else if ($checkdata) {
                 print json_encode(['status' => 'error', 'checkdata' => $data], JSON_UNESCAPED_UNICODE);
-            }else{
+            } else {
                 print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
             }
         }
-
-    }else{
+    } else {
         print json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos'], JSON_UNESCAPED_UNICODE);
-    } 
-
+    }
 } else {
     print json_encode(['status' => 'error', 'message' => 'Método no permitido'], JSON_UNESCAPED_UNICODE);
 }
-?>

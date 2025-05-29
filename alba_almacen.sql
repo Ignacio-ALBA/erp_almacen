@@ -151038,3 +151038,23 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- Creación de tabla `Tipo almacenes`--
+CREATE TABLE tipo_almacenes (
+    id_tipo_almacen INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_almacen VARCHAR(47) NOT NULL,
+    apodo VARCHAR(20),
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO permisos (permiso, descripcion, kid_estatus, kid_creacion)
+VALUES
+('crear_tipo_almacenes', 'Crear Tipo de Almacenes', 1, 1),
+('editar_tipo_almacenes', 'Editar Tipo de Almacenes', 1, 1),
+('ver_tipo_almacenes', 'Ver Tipo de Almacenes', 1, 1),
+('eliminar_tipo_almacenes', 'Eliminar Tipo de Almacenes', 1, 1);
+
+ALTER TABLE tipo_almacenes
+ADD kid_estatus INT DEFAULT 1,
+ADD kid_creacion INT DEFAULT 1;
