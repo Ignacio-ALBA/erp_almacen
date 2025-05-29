@@ -1406,7 +1406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }else{
                 print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
             }
-        }
+        
 
     }else{
         print json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos'], JSON_UNESCAPED_UNICODE);
@@ -1416,4 +1416,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     print json_encode(['status' => 'error', 'message' => 'Método no permitido'], JSON_UNESCAPED_UNICODE);
     echo 'Esta página solo admite solicitudes POST.';
 }
-?>
+?>¿
