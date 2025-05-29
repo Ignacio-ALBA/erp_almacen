@@ -802,37 +802,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $colaboradores = GetUsuariosListById();
                 $sucursales = GetSucursalesListById();
+                $tiposAlmacen = GetTiposAlmacenListById(); // ✅ NECESARIO
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $formDataJson['kid_sucursal'] = !empty($formDataJson['kid_sucursal']) && isset($sucursales[$formDataJson['kid_sucursal']]) ? $sucursales[$formDataJson['kid_sucursal']] : -1;
                 $formDataJson['kid_encargado'] = !empty($formDataJson['kid_encargado']) && isset($colaboradores[$formDataJson['kid_encargado']]) ? $colaboradores[$formDataJson['kid_encargado']] : -1;
+                $formDataJson['id_tipo_almacen'] = !empty($formDataJson['id_tipo_almacen']) && isset($tiposAlmacen[$formDataJson['id_tipo_almacen']]) ? $tiposAlmacen[$formDataJson['id_tipo_almacen']] : -1;
 
                 $editformDataJson = $formDataJson;
-                //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
+
                 $newformDataJson = $formDataJson;
+                if ($opcion == 1) {
+                    $newformDataJson['id_tipo_almacen'] = $formDataJson['id_tipo_almacen']; // ✅ solo en inserción
+                }
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
+
                 $consultaselect = "SELECT a.id_almacen, 
-                            a.orden, 
-                            a.almacen, 
-                            a.ubicacion, 
-                            s.sucursal AS kid_sucursal,
-                            CASE 
-                                WHEN a.pordefecto = 1 THEN 'SÍ' 
-                                ELSE 'NO' 
-                            END AS pordefecto,
-                            s.fecha_creacion
-                        FROM 
-                            $tabla a
-                        LEFT JOIN 
-                            sucursales s ON a.kid_sucursal = s.id_sucursal
-                        WHERE $idcolumn = :$idcolumn";
+                a.orden, 
+                a.almacen, 
+                a.ubicacion, 
+                s.sucursal AS kid_sucursal,
+                CASE 
+                    WHEN a.pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS pordefecto,
+                s.fecha_creacion
+                    FROM 
+                        $tabla a
+                    LEFT JOIN 
+                        sucursales s ON a.kid_sucursal = s.id_sucursal
+                    WHERE $idcolumn = :$idcolumn";
 
                 $ColumnsCheck = [
                     ['column' => "almacen", "check_similar" => true]
                 ];
+
+                function GetTiposAlmacenListById()
+                {
+                    global $conexion;
+                    $consulta = "SELECT id_tipo_almacen FROM tipo_almacenes WHERE kid_estatus = 1";
+                    $resultado = $conexion->prepare($consulta);
+                    $resultado->execute();
+                    $datos = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    return array_column($datos, 'id_tipo_almacen', 'id_tipo_almacen');
+                }
+
                 break;
+
 
             case 'detalles_almacenes':
                 $tabla = 'detalles_almacenes';

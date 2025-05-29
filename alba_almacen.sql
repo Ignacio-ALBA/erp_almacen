@@ -151058,3 +151058,20 @@ VALUES
 ALTER TABLE tipo_almacenes
 ADD kid_estatus INT DEFAULT 1,
 ADD kid_creacion INT DEFAULT 1;
+
+
+-- Agrega la columna sin restricción y sin NOT NULL --
+ALTER TABLE almacenes ADD COLUMN id_tipo_almacen INT;
+
+--Asigna manualmente el tipo a cada almacén existente --
+--(Ejemplo: asignar tipo 1 para MP, o 2 para P)--
+UPDATE almacenes SET id_tipo_almacen = 1 WHERE id_almacen = 1;
+UPDATE almacenes SET id_tipo_almacen = 2 WHERE id_almacen = 2;
+
+-- Ahora sí, modifica la columna para que sea NOT NULL y agrega la FOREIGN KEY--
+
+ALTER TABLE almacenes 
+MODIFY COLUMN id_tipo_almacen INT NOT NULL,
+ADD CONSTRAINT fk_almacenes_tipo FOREIGN KEY (id_tipo_almacen) REFERENCES tipo_almacenes(id_tipo_almacen);
+
+
