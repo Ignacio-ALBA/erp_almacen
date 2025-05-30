@@ -298,7 +298,7 @@ $navItems = [
             ]
         ], */
       [
-        "label" => "Listas de Compras",
+        "label" => "Programa de Compras", //jess
         "href" => "/listas_compras",
         "permiso" => [
           "crear_listas_compras",

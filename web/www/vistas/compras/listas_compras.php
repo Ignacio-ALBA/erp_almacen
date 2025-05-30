@@ -1,6 +1,6 @@
 <?php
     ob_start(); // Inicia la captura del buffer de salida
-    $PageSection = "Listas de Compras";
+    $PageSection = "Programa de Compras";
 ?>
 
   <div class="pagetitle">
@@ -16,22 +16,22 @@
 <?php 
 
   $id = 'listas_compras';
-  $ButtonAddLabel = "Nueva Lista";
-  $titulos = ['ID', 'Orden','Lista','Estado','La Creo','La Autorizo','Fecha de creación'];
+  $ButtonAddLabel = "Nuevo Programa";
+  $titulos = ['ID', 'Orden','Programa','Estado','La Creo','La Autorizo','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
     [
       'id'=> $id, 
       'Title'=>$ButtonAddLabel,
-      'Title2'=>'Editar Lista',
-      'Title3'=>'Ver Lista',
+      'Title2'=>'Editar Programa',
+      'Title3'=>'Ver Programa',
       'ModalType'=>'modal-dialog-scrollable', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
       'bloque'=>'compras'
     ],
     [
-      CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Lista de Compra','required' => '']),
+      CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Programa de Compra','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
       /*CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$cuentas_bancarias),
       CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
