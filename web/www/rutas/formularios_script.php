@@ -1,62 +1,19 @@
 <?php
-//$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
-//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-//$dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
-//$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
-//$imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
-//$imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
-//$dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
-
-// 1. Definir rutas base y rutas de imágenes 
-if (!defined('SERVERURL')) {
-    define('SERVERURL', 'http://' . $_SERVER['HTTP_HOST']);
+$path = $SERVERURL.'/assets/img/logot2.JPG'; // Ruta de la imagen
+if (file_exists($path)) {
+    $imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+    $imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+    $dataUrl2 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+} else {
+    $dataUrl2 = null;
 }
-
-// Intentar obtener las imágenes desde URL primero
-try {
-    // Procesar logo superior (logot2.JPG)
-    $path = SERVERURL.'/assets/img/logot2.JPG';
-    $imageData = @file_get_contents($path);
-    if ($imageData !== false) {
-        $imageType = pathinfo($path, PATHINFO_EXTENSION);
-        $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-    } else {
-        // Si falla la URL, intentar con ruta del sistema de archivos
-        $logo_top_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logot2.JPG';
-        if (file_exists($logo_top_path)) {
-            $imageData = file_get_contents($logo_top_path);
-            $imageType = pathinfo($logo_top_path, PATHINFO_EXTENSION);
-            $dataUrl2 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-        } else {
-            error_log("No se pudo cargar logot2.JPG ni por URL ni por sistema de archivos");
-            $dataUrl2 = ''; // O asignar una imagen por defecto en base64
-        }
-    }
-
-    // Procesar logo izquierdo (logoi.JPG)
-    $path = SERVERURL.'/assets/img/logoi.JPG';
-    $imageData = @file_get_contents($path);
-    if ($imageData !== false) {
-        $imageType = pathinfo($path, PATHINFO_EXTENSION);
-        $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-    } else {
-        // Si falla la URL, intentar con ruta del sistema de archivos
-        $logo_izq_path = $_SERVER['DOCUMENT_ROOT'] . '/assets/img/logoi.JPG';
-        if (file_exists($logo_izq_path)) {
-            $imageData = file_get_contents($logo_izq_path);
-            $imageType = pathinfo($logo_izq_path, PATHINFO_EXTENSION);
-            $dataUrl1 = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-        } else {
-            error_log("No se pudo cargar logoi.JPG ni por URL ni por sistema de archivos");
-            $dataUrl1 = ''; // O asignar una imagen por defecto en base64
-        }
-    }
-} catch (Exception $e) {
-    error_log("Error al procesar las imágenes: " . $e->getMessage());
-    // Imágenes por defecto en caso de error
-    $dataUrl1 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
-    $dataUrl2 = 'data:image/jpeg;base64,/9j/4AAQSkZJRg...';
+$path = $SERVERURL.'/assets/img/logoi.JPG'; // Ruta de la imagen
+if (file_exists($path)) {
+    $imageData = base64_encode(file_get_contents($path)); // Leer la imagen y codificarla en base64
+    $imageType = pathinfo($path, PATHINFO_EXTENSION); // Obtener el tipo de imagen
+    $dataUrl1 = 'data:image/' . $imageType . ';base64,' . $imageData; // Crear el Data URL
+} else {
+    $dataUrl1 = null;
 }
 ?>
 <script nonce="<?php echo $nonce; ?>">
@@ -547,17 +504,21 @@ $(document).ready(function() {
                         // Crear un contenedor para la fila
                         const row = {
                             columns: [
+                                <?php if (!empty($dataUrl1)): ?>
                                 {
                                     image: "<?php echo $dataUrl1 ?>", // Ruta de la primera imagen
                                     width: secondImageHeight, // Ancho de la primera imagen
                                     //height: 20, // Altura de la primera imagen
                                     margin: [0, 0, 10, 0] // Margen derecho para espacio entre imágenes y fecha
                                 },
+                                <?php endif; ?>
+                                <?php if (!empty($dataUrl2)): ?>
                                 {
                                     image: "<?php echo $dataUrl2 ?>", // Ruta de la segunda imagen
                                     width: secondImageWidth, // Ancho de la segunda imagen
                                     height: secondImageHeight, // Altura proporcional de la segunda imagen
                                 },
+                                <?php endif; ?>
                                 {
                                     text: 'Elaborado: '+formattedDate, // Texto de la fecha
                                     italics: true,
@@ -803,7 +764,7 @@ $(document).ready(function() {
             console.log(`#modal${title}`);
             $(`#modalTitle1${modalCRUD}`).hide();
             $(`#modalTitle2${modalCRUD}`).hide();
-            $(`#modalTitle3${modalCRUD}`).hide();
+            $(`#modalTitle3${modalCRUD}`).show();
             $(`#modal${title + modalCRUD}`).show();
         }else{
             $(`#modalTitle1${modalCRUD}`).show();
@@ -847,9 +808,9 @@ $(document).ready(function() {
                 var id = $(this).attr('id');
                 var value;
 
-                // Quitar "-SetData" del ID si existe
+                // Quitar "-NewAdd1" del ID si existe
                 if (id && id.includes("-SetData")) {
-                    id = id.replace("-SetData", ""); // Elimina "-SetData" del ID
+                    id = id.replace("-SetData", ""); // Elimina "-NewAdd1" del ID
                 }
 
             
@@ -861,7 +822,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -870,9 +831,7 @@ $(document).ready(function() {
                         //$(this).removeClass('is-invalid');
                         if ($(this).is(':checkbox')) {
                             formDataJson[id] = $(this).is(':checked') ? 1 : 0; // Almacena 1 si está activado, 0 si no
-                            //formDataJson.append(id, $(this).is(':checked') ? 1 : 0);
                         } else {
-                            //formDataJson.append(id, value);
                             formDataJson[id] = value; // Almacena el valor de otros inputs
                         }
                     }
@@ -936,6 +895,7 @@ $(document).ready(function() {
                                     console.log($(`#${id+subfix}`));
                                     
                                     valor = $(`#${id+subfix}`).val();
+                                    $(`#${id+subfix}`).val("");
                                     $(`#error_${id+subfix}`).text(`El valor "${valor}" ya existe.`);
                                     $(`#form${modalCRUD}`).removeAttr('alertdatasimilar');
                                 }
@@ -1033,7 +993,7 @@ $(document).ready(function() {
                     }
                 }else{
                     if(response.data != 'NoChanges'){
-                        data = Object.values(response.data || {});    
+                        data = Object.values(response.data);    
                         UpdateRow(tablemodalCRUD,row,data)
                     }
                     
@@ -1305,7 +1265,13 @@ $(document).ready(function() {
                         }
                     }
                     $(`#form${modalCRUD} .OnEditReadOnly`).prop('readonly', true);
-                    $(`#form${modalCRUD} .OnEditReadOnly`).prop('readonly', false);
+                    //$(`#form${modalCRUD} .OnEditReadOnly`).prop('readonly', false);
+                    // Si es un select, también deshabilitarlo
+                    $(`#form${modalCRUD} .OnEditReadOnly`).each(function() {
+                        if ($(this).is('select')) {
+                            $(this).prop('disabled', true);
+                        }
+                    });
                     //$(`#form${modalCRUD} .OnEditReadOnly`).addClass('readonly-input');
                     $(`#modalCRUD${modalCRUD}`).modal('show');
                 }
@@ -1332,7 +1298,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1397,12 +1363,6 @@ $(document).ready(function() {
                                     valor = $(`#${id}`).val();
                                     //$(`#${id}`).val("");
                                     $(`#validate_${id}`).text(`Elementos similares: ${data.join(", ")}`);
-                                    $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
-                                        return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
-                                    });
-                                    var tipoalerta = 'warning';
-                                    $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
-                                    $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
                                     $(`#alertmsg_${modalCRUD}`).text(`Ya existen elementos similares registrados, si deseas agregar el elemento actual vuelve a guardarlo.`);
                                     $(`#alert_${modalCRUD}`).show();
                                     $(`#form${modalCRUD}`).attr('alertdatasimilar',true);
@@ -1433,7 +1393,7 @@ $(document).ready(function() {
                     }else{
                         console.log('Respuesta 1 del servidor:', response);
                         if(response.data != 'NoChanges'){
-                            data = Object.values(response.data || {});
+                            data = Object.values(response.data);
                             UpdateRow(modalCRUD.split('-')[0],row,data)
                         }
                         
@@ -1472,6 +1432,7 @@ $(document).ready(function() {
         $(`#form${modalCRUD} input[type="checkbox"]`).prop('disabled', false);
 
         $(`#form${modalCRUD} .OnEditReadOnly`).prop('disabled', false);
+        $(`#form${modalCRUD} .OnEditReadOnly`).prop('readonly', false);
         $(`#form${modalCRUD} .OnEditReadOnly`).prop('required', true);
         $(`#form${modalCRUD} .OnAddReadOnly`).prop('disabled', true);
         $(`#form${modalCRUD} .OnAddReadOnly`).prop('required', false);
@@ -1542,7 +1503,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1641,14 +1602,8 @@ $(document).ready(function() {
                             $(`#alert_${modalCRUD}`).show();
                         }
                     }else{
-                        data = Object.values(response.data || {});
-                        try {
-                            AddRow(modalCRUD, data);
-                        } catch (e) {
-                            console.error('Error en AddRow:', e);
-                            // Cerrar el modal aunque AddRow falle
-                            $(`#modalCRUD${modalCRUD}`).modal('hide');
-                        }
+                        data = Object.values(response.data);
+                        AddRow(modalCRUD,data)
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
                 },
@@ -1689,6 +1644,7 @@ $(document).ready(function() {
         $(`#form${modalCRUD} input[type="checkbox"]`).prop('disabled', false);
 
         $(`#form${modalCRUD} .OnEditReadOnly`).prop('disabled', false);
+        $(`#form${modalCRUD} .OnEditReadOnly`).prop('readonly', false);
         $(`#form${modalCRUD} .OnEditReadOnly`).prop('required', true);
         $(`#form${modalCRUD} .OnAddReadOnly`).prop('disabled', true);
         $(`#form${modalCRUD} .OnAddReadOnly`).prop('required', false);
@@ -1731,7 +1687,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1794,7 +1750,6 @@ $(document).ready(function() {
                                     valor = $(`#${id}`).val();
                                     //$(`#${id}`).val("");
                                     $(`#validate_${id}`).text(`Elementos similares: ${data.join(", ")}`);
-                                    $(`#alertmsg_${modalCRUD}`).text(`Ya existen elementos similares registrados, si deseas agregar el elemento actual vuelve a guardarlo.`);
                                     $(`#alert_${modalCRUD}`).show();
                                     $(`#form${modalCRUD}`).attr('alertdatasimilar',true);
                                 }
@@ -1854,7 +1809,7 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: data,
-            success: function(response){  
+            success: function(response) {  
                 console.log(response);
                 if(response.data){
                     for (var key in response.data) {
@@ -1868,7 +1823,16 @@ $(document).ready(function() {
                                     // Establece el estado del checkbox basado en el valor de la respuesta
                                     inputElement.prop('checked', response.data[key] === 1);
                                 } else if (inputElement.is('select')) {
-                                    if (inputElement.find('option').length === 1) {
+                                    if (Array.isArray(response.data[key])) {
+                                        // Si el valor es un arreglo, agregar opciones al select
+                                        inputElement.empty(); // Limpia las opciones existentes
+                                        response.data[key].forEach(option => {
+                                            console.log(option);
+                                            
+                                            inputElement.append(new Option(option.text, option.valor));
+                                        });
+                                    } else if (inputElement.find('option').length / inputElement.length === 1) {
+                                        inputElement.find('option').remove();
                                         // Si no hay opciones, crea una nueva opción
                                         inputElement.append($('<option>', {
                                             value: response.data[key], // No tiene valor seleccionable
@@ -1881,7 +1845,15 @@ $(document).ready(function() {
                                         inputElement.find('option:selected').prop('selected', false);
                                         inputElement.val(response.data[key]);
                                     }
-                                } else {
+                                } else if (inputElement.is('input[type="date"]')) {
+                                    // Si el input es de tipo date, convierte el valor a un formato aceptable
+                                    if (response.data[key] != null){
+                                        const dateValue = new Date(response.data[key]);
+                                        const formattedDate = dateValue.toISOString().split('T')[0];
+                                        inputElement.val(formattedDate);
+                                    }
+                                    
+                                }else {
                                     console.log("entro al else");
                                     console.log(inputElement);
                                     
@@ -1893,7 +1865,6 @@ $(document).ready(function() {
                         }
                     }
                     $(`#form${modalCRUD} .OnEditReadOnly`).prop('disabled', true);
-                    $(`#form${modalCRUD} .OnEditReadOnly`).prop('required', false);
                     $(`#form${modalCRUD} .OnAddReadOnly`).prop('disabled', true);
         $(`#form${modalCRUD} .OnAddReadOnly`).prop('required', false);
                     //$(`#form${modalCRUD} .OnEditReadOnly`).addClass('readonly-input');
@@ -1927,7 +1898,7 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && !$(this).is(':disabled') && (value === "" || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
@@ -1966,6 +1937,7 @@ $(document).ready(function() {
                 data: additionalData,
                 success: function(response) {
                     if(response.status == "error"){
+                        console.log('Respuesta error 1 del servidor:', response);
                         if(response.checkdata){
                             checkdata = response.checkdata;
                             console.log(checkdata);
@@ -1990,16 +1962,42 @@ $(document).ready(function() {
                                     valor = $(`#${id}`).val();
                                     //$(`#${id}`).val("");
                                     $(`#validate_${id}`).text(`Elementos similares: ${data.join(", ")}`);
+                                    $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
+                                        return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
+                                    });
+                                    var tipoalerta = 'warning';
+                                    $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
+                                    $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
                                     $(`#alertmsg_${modalCRUD}`).text(`Ya existen elementos similares registrados, si deseas agregar el elemento actual vuelve a guardarlo.`);
                                     $(`#alert_${modalCRUD}`).show();
                                     $(`#form${modalCRUD}`).attr('alertdatasimilar',true);
                                 }
                             }
                         
+                        }else{
+                            $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
+                                return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
+                            });
+                            var tipoalerta = 'danger';
+                            $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
+                            $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
+                            $(`#alertmsg_${modalCRUD}`).text(response.message);
+                            $(`#alert_${modalCRUD}`).show();
                         }
+                        return;
+                    }if(response.status == "nocambios"){
+                        $(`#alert_${modalCRUD}`).removeClass(function(index, className) {
+                            return (className.match(/(bg-\S+|alert-(?!dismissible)\S+)/g) || []).join(' ');
+                        });
+                        var tipoalerta = 'info';
+                        $(`#alert_${modalCRUD}`).addClass(`alert-${tipoalerta}`);
+                        $(`#alert_${modalCRUD}`).addClass(`bg-${tipoalerta}`);
+                        $(`#alertmsg_${modalCRUD}`).text(response.message);
+                        $(`#alert_${modalCRUD}`).show();
+                        return;
                     }else{
                         console.log('Respuesta 1 del servidor:', response);
-                        data = Object.values(response.data || {});
+                        data = Object.values(response.data);
                         UpdateRow(modalCRUD,row,data)
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                     }
@@ -2160,11 +2158,10 @@ $(document).ready(function() {
                 }
             
                 if (id) { 
-                    if ($(this).is(':required') && !$(this).is(':disabled') && $(this).is(':visible') && (value.trim() === "" || ( $(this).is(':checkbox') && !$(this).is(':checked')))) { 
+                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
                         // Manejo de inputs de texto, selects y checkboxes
                         form_error = true;
                         $(`#error_${id}`).text("Campo Obligatorio");
-                        //$(this).addClass('is-invalid');
                     } else {
                         $(`#error_${id}`).text("");
                         //$(this).removeClass('is-invalid');
@@ -2196,7 +2193,7 @@ $(document).ready(function() {
                 dataType: "json",
                 success: function(response) {
                     
-                    data = Object.values(response.data || {});
+                    data = Object.values(response.data);
                     AddRow(modalCRUD,data)
                     $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
                 },
@@ -2210,54 +2207,47 @@ $(document).ready(function() {
 
 
     // Función para manejar el clic en el botón "Eliminar"
-    $(document).on('click', '.ModalDataDelete', function() {
+    $(document).on('click', '.ModalDataDelete', function()  {
         var modalCRUD = $(this).attr('modalCRUD');
+
         var formbloque = ($(`#form${modalCRUD}`).attr('bloque') || "") + "/";
         var row = $(this).closest('tr');
         var firstColumnValue = row.find('td:first').text();
         console.log('Eliminar botón clickeado con ID:', modalCRUD);
         console.log('Valor de la primera columna:', firstColumnValue);
+        var additionalData = { opcion: 3, formDataJson: [1,1], modalCRUD: modalCRUD,firstColumnValue:firstColumnValue, AlertDataSimilar:false};
         
+        console.log('Formulario enviado para el modal:', modalCRUD);
+        console.log('Datos adicionales:', additionalData);
+
         if (!row) {
             console.error('Fila no válida.');
             return;
         }
+
 
         const confirmar = confirm('¿Estás seguro de que deseas eliminar esta fila?');
         if (!confirmar) {
             return;
         }
         
-        // Lógica unificada para todos los módulos
+
         $.ajax({
             url: `/vistas/${formbloque}bd/crudSummit.php`, 
             type: "POST",
-            dataType: "json", 
-            data: {
-                opcion: 3, 
-                formDataJson: [1,1], 
-                modalCRUD: modalCRUD, 
-                firstColumnValue: firstColumnValue, 
-                AlertDataSimilar: false
-            },
+            dataType: "json",
+            data: additionalData,
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
-                // Elimina la fila visualmente si aplica
-                if(response.data) {
-                    DeleteRow(modalCRUD, row);
+                if(response.data){
+                    DeleteRow(modalCRUD,row)
                 }
-                // Recarga la página tras eliminar (para todos los módulos)
-                setTimeout(function() {
-                    window.location.reload(true);
-                }, 300);
             },
             error: function(xhr, status, error) {
                 console.error('Error en la solicitud:', error);
-                alert(`Error al eliminar. Por favor, inténtelo de nuevo.`);
             }
         });
     });
-
 
     /************************************** Validaciones de inputs **************************************/
     //Validar Correo
@@ -2880,11 +2870,7 @@ function actualizarResultadosPorClases(clases) {
 
     });
     
-    // Recargar la página al cerrar cualquier modal de formulario que empiece con 'modalCRUD'
-    $("[id^='modalCRUD']").on('hidden.bs.modal', function () {
-        location.reload();
-    });
-
+    
 
     });
 
@@ -2900,5 +2886,8 @@ function actualizarResultadosPorClases(clases) {
             console.log($(this).val());
         });
     });
+    
+    
+
     
 </script>
