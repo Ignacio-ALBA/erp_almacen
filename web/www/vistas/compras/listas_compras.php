@@ -33,9 +33,9 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'200','id'=>'lista_compra','etiqueta'=>'Lista de Compra','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
-      CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$cuentas_bancarias),
+      /*CreateSelect(['id'=>'kid_cuenta_bancaria','etiqueta'=>'Cuenta Bancaria','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$cuentas_bancarias),
       CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
-      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus)
+      CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus)*/
     ]);
 
     $id='detalles_listas_compras';

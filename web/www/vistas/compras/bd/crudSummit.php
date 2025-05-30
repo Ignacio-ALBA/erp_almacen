@@ -1429,4 +1429,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     print json_encode(['status' => 'error', 'message' => 'Método no permitido'], JSON_UNESCAPED_UNICODE);
     echo 'Esta página solo admite solicitudes POST.';
 }
-?>¿
+?>
