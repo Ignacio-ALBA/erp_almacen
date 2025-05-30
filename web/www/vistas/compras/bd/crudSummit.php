@@ -129,9 +129,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['opcion']) && $_POST['
     exit;
 }
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = null;
     $checkdata = null;
+    if (isset($_POST['modalCRUD']) && isset($_POST['opcion']) && isset($_POST['formDataJson'])) {
+        $modalCRUD = $_POST['modalCRUD'];
+        $opcion = $_POST['opcion'];
+        $formDataJson = $_POST['formDataJson'];
+        if (!is_array($formDataJson)) {
+            $formDataJson = json_decode($formDataJson, true);
+        }
+        foreach ($formDataJson as $key => $value) {
+            if ($value === '' || $value === null) {
+                $formDataJson[$key] = null;
+            }
+        }
         $AlertDataSimilar = isset($_POST['AlertDataSimilar']) ? filter_var($_POST['AlertDataSimilar'], FILTER_VALIDATE_BOOLEAN) : null;
 
         $tabla = null;
@@ -146,14 +159,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $estatus = GetEstatusLabels();
 
         switch ($modalCRUD) {
-           /* case 'proveedores':
+            /* case 'proveedores':
                 $tabla = 'proveedores';
                 $idcolumn= "id_proveedor";
-*/
+                */
                 /*-------------------- Obtener Tablas Foráneas --------------------
                 $formDataJson['kid_estado'] = GetIDEstatusByName($formDataJson['kid_estado']);
                 ------------------- Fin Obtener Tablas Foráneas ------------------*/
-/*
+                /*
                 $editformDataJson = CleanJson($formDataJson);
                 
 
@@ -186,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'comentarios_proveedores':
                 $tabla = 'comentarios_proveedores';
                 $idcolumn= "id_comentario_proveedor";
-*/
+                */
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 //$colaboradores = GetUsuariosListById();
              /*    $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
@@ -194,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                */
                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
-/*
+                /*
                 $editformDataJson = CleanJson($formDataJson);
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
@@ -1406,7 +1419,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }else{
                 print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
             }
-        
+        }
 
     }else{
         print json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos'], JSON_UNESCAPED_UNICODE);
