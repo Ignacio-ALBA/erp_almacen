@@ -1,26 +1,4 @@
 <?php
-// Asegura que la sesión esté activa
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
-
-// DEBUG opcional (elimina después de verificar)
-echo "<pre>TIPO USUARIO: " . ($_SESSION['tipo_usuario'] ?? 'SIN SESIÓN') . "</pre>";
-
-$visibilidadPorTipoUsuario = [
-  'Superadmin' => ['*'],
-  'admin' => ['Compras', 'Almacén MP', 'Almacén Producción', 'Catálogos', 'Configuraciones'],
-  'gerente' => ['Compras', 'Catálogos', 'Configuraciones'],
-  'MP' => ['*'],
-  'p' => ['Almacén Producción']
-];
-
-// Normaliza el tipo de usuario (asegura coincidencia con las claves del arreglo)
-//$tipoUsuarioActual = strtolower($_SESSION['s_tipo_usuario'] ?? '');
-$tipoUsuarioActual = $_SESSION['s_tipo_usuario'] ?? '';
-
-
-$permisosVisibles = $visibilidadPorTipoUsuario[$tipoUsuarioActual];
 
 $navItems = [
   /* Módulo de Administración comentado
@@ -1084,10 +1062,3 @@ $navItems = [
   ]
 ];
 
-// Solo después de definir todo, aplica el filtro
-$navItems = array_filter($navItems, function ($item) use ($permisosVisibles) {
-  return in_array('*', $permisosVisibles) || in_array($item['label'], $permisosVisibles);
-});
-
-// Si deseas reindexar (opcional):
-$navItems = array_values($navItems);
