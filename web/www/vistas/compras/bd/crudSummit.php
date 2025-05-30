@@ -258,16 +258,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $caseEstatus .= "    WHEN lc.kid_estatus = $key THEN '$value'\n";
                 }
                 $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
-                $consultaselect = "SELECT lc.id_lista_compra,
+                 $consultaselect = "SELECT 
+                    lc.id_lista_compra,
                     lc.orden,
                     lc.lista_compra,
-                    p.proyecto AS kid_proyecto,
-                    cb.cuenta_bancaria AS kid_cuenta_bancaria,
                     $caseEstatus,
-                    u.email AS kid_creacion,
-                    COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                    (SELECT email FROM colaboradores u WHERE u.id_colaborador = lc.kid_creacion LIMIT 1) AS kid_creacion,
+                    COALESCE((SELECT email FROM colaboradores u2 WHERE u2.id_colaborador = lc.kid_autorizo LIMIT 1), 'Sin Autorizar') AS kid_autorizo,
                     lc.fecha_creacion
-                FROM listas_compras lc
+            FROM listas_compras lc
                 LEFT JOIN cuentas_bancarias cb ON lc.kid_cuenta_bancaria = cb.id_cuenta_bancaria
                 LEFT JOIN proyectos p ON lc.kid_proyecto = p.id_proyecto
                 LEFT JOIN colaboradores u ON lc.kid_creacion = u.id_colaborador
