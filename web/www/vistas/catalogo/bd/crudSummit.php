@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $estados = GetEstadosListById();
+                
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
@@ -179,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 $estados = GetEstadosListById();
+                $almacenes = GetAlmacenesListById();
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_estado']) && isset($estados[$formDataJson['kid_estado']])) {
@@ -186,6 +188,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $editformDataJson = $formDataJson;
+
+                
+
+                if ($opcion == 1) {
+                    $esSuperadmin = isset($_SESSION['tipo_usuario']) && strtolower($_SESSION['tipo_usuario']) === 'superadmin';
+
+                    if ($esSuperadmin && !empty($formDataJson['id_almacen']) && isset($almacenes[$formDataJson['id_almacen']])) {
+                        $formDataJson['id_almacen'] = $almacenes[$formDataJson['id_almacen']];
+                    } else {
+                        $formDataJson['id_almacen'] = $_SESSION['id_almacen'] ?? null;
+                    }
+                }
+
                 //$formDataJson = insertarDespuesDeClave($formDataJson, 'marca', ['fecha_creacion'=>date('Y-m-d H:i:s')]);
                 $newformDataJson = $formDataJson;
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
@@ -222,7 +237,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ['column' => "rfc", "check_similar" => false]
                 ];
                 $text_colums_edit = [];
-
 
                 break;
             case 'comentarios_clientes':
@@ -815,6 +829,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($opcion == 1) {
                     $newformDataJson['id_tipo_almacen'] = $formDataJson['id_tipo_almacen']; // ✅ solo en inserción
                 }
+
+                if ($opcion == 2) {
+                    unset($formDataJson['id_tipo_almacen']); // ← evitar que lo manden por truco de JS
+                }
+
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
                 $newformDataJson['kid_estatus'] = 1;
@@ -838,16 +857,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ColumnsCheck = [
                     ['column' => "almacen", "check_similar" => true]
                 ];
-
-                function GetTiposAlmacenListById()
-                {
-                    global $conexion;
-                    $consulta = "SELECT id_tipo_almacen FROM tipo_almacenes WHERE kid_estatus = 1";
-                    $resultado = $conexion->prepare($consulta);
-                    $resultado->execute();
-                    $datos = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                    return array_column($datos, 'id_tipo_almacen', 'id_tipo_almacen');
-                }
 
                 break;
 

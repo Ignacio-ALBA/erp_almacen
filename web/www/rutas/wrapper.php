@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'navmenulist.php';
 // Configuración de cabeceras de seguridad
 header("X-Content-Type-Options: nosniff");

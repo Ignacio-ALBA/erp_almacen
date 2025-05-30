@@ -99,7 +99,6 @@ CreateModalForm(
   ],
   [
     CreateInput(['type' => 'text', 'id' => 'almacen', 'etiqueta' => 'Almacén', 'required' => '']),
-    CreateInput(['type'=>'text','id'=>'almacen','etiqueta'=>'Almacén','required'=>'']),
     CreateSelect(['id'=>'id_tipo_almacen', 'etiqueta'=>'Tipo de Almacén', 'required'=>true, 'visible'=>true, 'editable'=>false, 'soloCrear' => true], $tipos_almacen),
     CreateInput(['type' => 'text', 'id' => 'ubicacion', 'etiqueta' => 'Ubicación']),
     CreateSelect(['id' => 'kid_sucursal', 'etiqueta' => 'Sucursal'], $sucursales),

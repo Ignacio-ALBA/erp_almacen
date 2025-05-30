@@ -663,6 +663,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $resultado->execute();
                 $data = $resultado->fetch(PDO::FETCH_ASSOC);
                 $data['id_almacen'] = null;
+                unset($data['id_tipo_almacen']); // ✅ Quitar tipo para que no se edite
 
                 // Verifica si se encontraron datos
                 if ($data) {

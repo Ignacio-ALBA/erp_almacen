@@ -1,17 +1,10 @@
 <?php
 ob_start(); // Inicia la captura del buffer de salida
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+ // ← Asegura que la sesión esté disponible
 $PageSection = "Colaboradores ";
-
-$consulta = "SELECT id_almacen, almacen FROM almacenes WHERE kid_estatus = 1";
-$resultado = $conexion->prepare($consulta);
-$resultado->execute();
-$almacenes = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-$almacenes = array_map(fn($item) => [
-  'valor' => $item['id_almacen'],
-  'text' => $item['almacen'],
-  'pordefecto' => 0
-], $almacenes);
 ?>
 
 
@@ -31,6 +24,21 @@ $id = 'colaboradores';
 $ButtonAddLabel = "Nuevo Colaborador";
 $titulos = ['ID', 'Nombre', 'Modalidad', 'Email', 'Tipo de Colaborador', 'Inicio de Sesión', 'Fecha de creación'];
 CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones, 'StaticButtons');
+
+$consultaAlmacenes = "SELECT id_almacen, almacen FROM almacenes WHERE kid_estatus = 1";
+$resultado = $conexion->prepare($consultaAlmacenes);
+$resultado->execute();
+$almacenes = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+$almacenes = array_map(fn($item) => [
+  'valor' => $item['id_almacen'],
+  'text' => $item['almacen'],
+  'pordefecto' => 0
+], $almacenes);
+
+$tipoUsuario = isset($_SESSION['s_tipo_usuario']) ? strtolower($_SESSION['s_tipo_usuario']) : null;
+$esSuperadmin = $tipoUsuario === 'superadmin';
+
 CreateModalForm(
   [
     'id' => $id,
@@ -50,15 +58,7 @@ CreateModalForm(
     CreateInput(['type' => 'text', 'maxlength' => '27', 'id' => 'apellido_materno', 'etiqueta' => 'Apellido Materno', 'required' => '']),
     CreatSwitchCheck(['id' => 'login', 'etiqueta' => 'Colaborador del sistema', 'class' => 'VerificarCambioMostrar']),
     CreateSelect(['id' => 'kid_tipo_usuario', 'etiqueta' => 'Tipo de Colaborador', 'required' => ''], $tipos_usuario),
-    // CreateSelect(['id' => 'kid_almacen', 'etiqueta' => 'Zona de Trabajo', 'required' => ''], $almacenes),
-    CreateSelect([
-      'id' => 'id_almacen',
-      'etiqueta' => 'Zona de Trabajo',
-      'opciones' => $almacenes,
-      'required' => true,
-      'visible' => ($_SESSION['tipo_usuario'] == 'Superadmin'),
-      'editable' => true
-    ]),
+    CreateSelect(['id' => 'kid_almacen', 'etiqueta' => 'Zona de Trabajo', 'required' => ''], $almacenes),
     CreateSelect(['id' => 'kid_internos_externos', 'etiqueta' => 'Modalidad de Trabajo', 'required' => ''], $internos_externos),
     CreateSelect(['id' => 'kid_tipo_cantidad', 'etiqueta' => 'Tipo de Costo', 'required' => ''], $tipo_cantidad),
     CreateInput(['type' => 'number', 'id' => 'cantidad_periodo', 'etiqueta' => 'Cantidad', 'required' => '']),
@@ -95,6 +95,16 @@ CreateModalForm(
     CreateInput(['type' => 'text', 'maxlength' => '60', 'id' => 'puesto', 'etiqueta' => 'Puesto']),
     //CreateSelect(['id'=>'pais','etiqueta'=>'País','readonly' => '','disabled' => ''],$paises),
     //CreatSwitchCheck(['id'=>'pordefecto','etiqueta'=>'Por defecto'])
+
+    // 👇 Agrega este campo solo si el usuario es superadmin
+    ...($esSuperadmin ? [
+      CreateSelect(
+        ['id' => 'id_almacen', 'etiqueta' => 'Almacén Asignado', 'required' => true],
+        $almacenes
+      )
+    ] : []),
+
+
 
   ]
 );

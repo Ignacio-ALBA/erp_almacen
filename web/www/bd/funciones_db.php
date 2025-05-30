@@ -590,6 +590,16 @@ function GetProveedoresListById(){
     $data = array_column($data, 'id_proveedor', 'proveedor');
     return $data;
 }
+
+function GetTiposAlmacenListById()
+                {
+                    global $conexion;
+                    $consulta = "SELECT id_tipo_almacen FROM tipo_almacenes WHERE kid_estatus = 1";
+                    $resultado = $conexion->prepare($consulta);
+                    $resultado->execute();
+                    $datos = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    return array_column($datos, 'id_tipo_almacen', 'id_tipo_almacen');
+                }
 /************************************** Fin Funciones BackEnd **************************************/
 
 /************************************** Funciones FrontEnd **************************************/

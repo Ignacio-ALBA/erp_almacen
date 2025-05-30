@@ -156,13 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $formDataJson['kid_internos_externos'] = isset($formDataJson['kid_internos_externos']) ? GetIDInternosExternosByName($formDataJson['kid_internos_externos']): null;
                 $formDataJson['kid_tipo_cantidad'] = isset($formDataJson['kid_tipo_cantidad']) ? GetIDTiposCostosByName($formDataJson['kid_tipo_cantidad']): null;
                 $almacenes = GetAlmacenesListById();
-
-                    if ($_SESSION['tipo_usuario'] == 'Superadmin') {
-                        $formDataJson['id_almacen'] = !empty($formDataJson['id_almacen']) && isset($almacenes[$formDataJson['id_almacen']]) ? $almacenes[$formDataJson['id_almacen']] : null;
-                    } else {
-                        $formDataJson['id_almacen'] = $_SESSION['id_almacen']; // Se asigna automáticamente
-}
-
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 if (!empty($formDataJson['kid_tipo_usuario']) && isset($tipos_usuarios[$formDataJson['kid_tipo_usuario']])) {
@@ -181,6 +174,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $editformDataJson = CleanJson($formDataJson);
+
+
+                if ($opcion == 1) {
+                    $esSuperadmin = isset($_SESSION['tipo_usuario']) && strtolower($_SESSION['tipo_usuario']) === 'superadmin';
+
+                    if ($esSuperadmin) {
+                        $formDataJson['id_almacen'] = !empty($formDataJson['id_almacen']) && isset($almacenes[$formDataJson['id_almacen']])
+                            ? $almacenes[$formDataJson['id_almacen']]
+                            : null;
+                    } else {
+                        $formDataJson['id_almacen'] = $_SESSION['id_almacen'] ?? null; // También protegido
+                    }
+                }
 
                 
                 $newformDataJson = $formDataJson;
@@ -204,15 +210,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $ColumnsCheck = isset($newformDataJson['email']) ? [['column' => "email", "check_similar" => true]] : [];
                     $text_colums_edit = [];
-
-                    function GetAlmacenesListById() {
-                        global $conexion;
-                        $consulta = "SELECT id_almacen FROM almacenes WHERE kid_estatus = 1";
-                        $resultado = $conexion->prepare($consulta);
-                        $resultado->execute();
-                        $datos = $resultado->fetchAll(PDO::FETCH_ASSOC);
-                        return array_column($datos, 'id_almacen', 'id_almacen');
-                    }
 
 
                 break;
