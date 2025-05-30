@@ -17,22 +17,22 @@
 <?php 
 
   $id = 'tipos_usuario';
-  $ButtonAddLabel = "Nuevo Tipo de Colaborador";
+  $ButtonAddLabel = "Nuevo Tipo de Rol";
   $titulos = ['ID', 'Tipo','Descripción','Por Defecto','En Login','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true,$botones_acciones);
   CreateModalForm(
     [
       'id'=> $id, 
       'Title'=>$ButtonAddLabel,
-      'Title2'=>'Editar Tipo de Adicional',
-      'Title3'=>'Ver Tipo de Adicional',
+      'Title2'=>'Editar Tipo de Rol',
+      'Title3'=>'Ver Tipo de Rol',
       'ModalType'=>'modal-dialog-centered', 
       'method'=>'POST',
       'action'=>'bd/crudSummit.php',
       'bloque'=>'talento_humano'
     ],
     [
-      CreateInput(['type'=>'text','id'=>'tipo_usuario','etiqueta'=>'Tipo de Colaborador','required' => '']),
+      CreateInput(['type'=>'text','id'=>'tipo_usuario','etiqueta'=>'Tipo de Rol','required' => '']),
       CreateInput(['type'=>'text','id'=>'descripcion','etiqueta'=>'Descripción','required' => '']),
       CreatSwitchCheck(['id'=>'login','etiqueta'=>'Permitido en el Inicio de Sesión']),
       CreatSwitchCheck(['id'=>'pordefecto','etiqueta'=>'Por defecto'])
@@ -51,7 +51,6 @@
           ],
           $tabla['permisos']
         )];
-        //debug($tabla);
       }
       
 
