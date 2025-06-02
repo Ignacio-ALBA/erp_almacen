@@ -56,8 +56,10 @@ if ($resultado) {
                 fecha_creacion
             FROM proveedores
             WHERE kid_estatus != 3 
+            AND id_almacen = :kid_almacen
             ORDER BY calificacion DESC";
             $resultado = $conexion->prepare($consultaselect);
+             $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
             $resultado->execute();
             $modalCRUD = 'comentarios_proveedores';
             $nuevo_boton = '
@@ -142,9 +144,10 @@ if ($resultado) {
                     FROM 
                         clientes c
                     WHERE 
-                        c.kid_estatus != 3";
-
+                        c.kid_estatus != 3
+                    AND c.id_almacen = :kid_almacen";
             $resultado = $conexion->prepare($consultaselect);
+            $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
             $resultado->execute();
 
             $modalCRUD = 'comentarios_clientes';
