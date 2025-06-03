@@ -40,8 +40,12 @@ if ($resultado) {
                     unset($data_script['botones_acciones'][$index]);
                 }
             }
-            $vista = 'proveedores';
-            $consultaselect = "SELECT id_proveedor,
+            $vista = 'proveedores';// Consulta para obtener los proveedores   
+
+                $esSuperadmin = isset($_SESSION['s_tipo_usuario']) && strtolower($_SESSION['s_tipo_usuario']) === 'superadmin';
+
+                if ($esSuperadmin) {
+                $consultaselect = "SELECT id_proveedor,
                 orden,
                 codigo,
                 proveedor,
@@ -52,14 +56,33 @@ if ($resultado) {
                 CASE 
                     WHEN pordefecto = 1 THEN 'SÍ' 
                     ELSE 'NO' 
-                END AS pordefecto,  -- Se añadió un alias aquí
+                END AS pordefecto,
+                fecha_creacion
+            FROM proveedores
+            WHERE kid_estatus != 3
+            ORDER BY calificacion DESC";
+        $resultado = $conexion->prepare($consultaselect);
+                 } else {
+              $consultaselect = "SELECT id_proveedor,
+                orden,
+                codigo,
+                proveedor,
+                CONCAT(calificacion,' <i class=\"bi bi-star-fill\"></i>') AS calificacion,
+                razon_social,
+                rfc,
+                email1,
+                CASE 
+                    WHEN pordefecto = 1 THEN 'SÍ' 
+                    ELSE 'NO' 
+                END AS pordefecto,
                 fecha_creacion
             FROM proveedores
             WHERE kid_estatus != 3 
-            AND id_almacen = :kid_almacen
+            AND kid_almacen = :kid_almacen
             ORDER BY calificacion DESC";
-            $resultado = $conexion->prepare($consultaselect);
-             $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
+        }
             $resultado->execute();
             $modalCRUD = 'comentarios_proveedores';
             $nuevo_boton = '
@@ -134,21 +157,36 @@ if ($resultado) {
                 }
             }
             $vista = 'clientes';
+            $esSuperadmin = isset($_SESSION['s_tipo_usuario']) && strtolower($_SESSION['s_tipo_usuario']) === 'superadmin';
+    
+            if ($esSuperadmin) {
             $consultaselect = "SELECT c.id_cliente, 
-                        c.codigo, 
-                        c.nombre,
-                        c.razon_social,
-                        c.rfc,
-                        c.email,
-                        c.fecha_creacion
-                    FROM 
-                        clientes c
-                    WHERE 
-                        c.kid_estatus != 3
-                    AND c.id_almacen = :kid_almacen";
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
-            $resultado->execute();
+                    c.codigo, 
+                    c.nombre,
+                    c.razon_social,
+                    c.rfc,
+                    c.email,
+                    c.fecha_creacion
+                FROM clientes c
+                WHERE c.kid_estatus != 3
+                ORDER BY c.nombre";
+        $resultado = $conexion->prepare($consultaselect);
+    } else {
+        $consultaselect = "SELECT c.id_cliente, 
+                    c.codigo, 
+                    c.nombre,
+                    c.razon_social,
+                    c.rfc,
+                    c.email,
+                    c.fecha_creacion
+                FROM clientes c
+                WHERE c.kid_estatus != 3
+                AND c.kid_almacen = :kid_almacen
+                ORDER BY c.nombre";
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
+    }
+    $resultado->execute();
 
             $modalCRUD = 'comentarios_clientes';
             $nuevo_boton = '

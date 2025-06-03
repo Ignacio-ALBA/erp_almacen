@@ -209,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $consultaselect = "SELECT id_marca, orden, marca, CASE WHEN pordefecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS pordefecto, fecha_creacion 
                         FROM " . $tabla . " WHERE " . $idcolumn . " = :" . $idcolumn;
 
-                $consultaselect = "SELECT id_cliente , 
+                $consultaselect = "SELECT id_cliente, 
                                             codigo, 
                                             nombre,
                                             razon_social,
