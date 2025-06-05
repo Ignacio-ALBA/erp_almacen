@@ -101,6 +101,7 @@ if($resultado){
             $optionkey = 'NewAdd3';
             $data_script[$optionkey] = ['data_list_column' => []];
 
+            $data['list_js_scripts']['../vistas/almacen_mp/recepciones_mp_script'] =['data'=> $data_script];
             break;
         case 'detalles_recepciones_mp':
             $perms = [
@@ -151,6 +152,73 @@ if($resultado){
                 
             ]];
             break;
+
+            case 'reportes':
+    $perms = [
+       "crear_detalles_recepciones_compras",
+          "editar_detalles_recepciones_compras",
+          "ver_detalles_recepciones_compras",
+          "eliminar_detalles_recepciones_compras"
+    ];
+    checkPerms($perms);
+
+    $vista = 'reportes';
+
+  
+    // Si el usuario no envía fechas, usar el día actual
+    $fecha_inicio = isset($queryParams['fecha_inicio']) ? $queryParams['fecha_inicio'] : date('Y-m-d 00:00:00');
+    $fecha_fin = isset($queryParams['fecha_fin']) ? $queryParams['fecha_fin'] : date('Y-m-d 23:59:59');
+
+    // Consulta de resumen
+    $consultaselect = "SELECT 
+            COUNT(*) AS total_detalles,
+            SUM(`cantidad tarimas`) AS total_tarimas,
+            SUM(`cantidad parets`) AS total_parets,
+            SUM(peso_real) AS total_peso_real,
+            SUM(peso_estimado) AS total_peso_estimado,
+            SUM(diferencia_peso) AS total_diferencia_peso
+        FROM detalles_recepciones_mp
+        WHERE kid_estatus != 3
+          AND fecha_creacion BETWEEN :fecha_inicio AND :fecha_fin";
+
+    $resultado = $conexion->prepare($consultaselect);
+    $resultado->bindParam(':fecha_inicio', $fecha_inicio);
+    $resultado->bindParam(':fecha_fin', $fecha_fin);
+    $resultado->execute();
+    $data['data_show']['reporte'] = $resultado->fetch(PDO::FETCH_ASSOC);
+
+    // Consulta de detalles para la tabla
+    $consultadetalles = "SELECT 
+            drmp.id_detalle_recepcion_mp,
+            a.articulo AS kid_articulo,
+            drmp.`cantidad tarimas`,
+            drmp.`cantidad parets`,
+            drmp.peso_real,
+            drmp.peso_estimado,
+            drmp.diferencia_peso,
+            drmp.costo_unitario_total,
+            drmp.costo_unitario_neto,
+            drmp.monto_total,
+            drmp.monto_neto,
+            drmp.fecha_creacion
+        FROM detalles_recepciones_mp drmp
+        LEFT JOIN articulos a ON drmp.kid_articulo = a.id_articulo
+        WHERE drmp.kid_estatus != 3
+          AND drmp.fecha_creacion BETWEEN :fecha_inicio AND :fecha_fin";
+
+    $resultadodetalles = $conexion->prepare($consultadetalles);
+    $resultadodetalles->bindParam(':fecha_inicio', $fecha_inicio);
+    $resultadodetalles->bindParam(':fecha_fin', $fecha_fin);
+    $resultadodetalles->execute();
+    $data['data_show']['data'] = $resultadodetalles->fetchAll(PDO::FETCH_ASSOC);
+
+    // Para mantener los valores seleccionados en la vista
+    $data['data_show']['fecha_inicio'] = $fecha_inicio;
+    $data['data_show']['fecha_fin'] = $fecha_fin;
+
+    $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+    break;
+
         case 'comentarios_recepciones_mp':
             $perms = [
                 "crear_comentarios_recepciones",
@@ -228,6 +296,10 @@ if($resultado){
                 $data['data_show']['producciones'] = GetProduccionesListForSelect();
                 $data['data_show']['articulos'] = GetArticulosListForSelect();
                 $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+                $optionkey = 'NewAdd3';
+                $data_script[$optionkey] = ['data_list_column' => []];
+                $data['list_js_scripts']['../vistas/almacen_mp/mermas_script'] =['data'=> $data_script];
+                
                 break;
 
 

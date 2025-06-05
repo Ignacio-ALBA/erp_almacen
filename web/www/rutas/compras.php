@@ -589,7 +589,7 @@ if($resultado){
             array_push($data_script['botones_acciones'], $nuevo_boton);
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
             $optionkey = 'NewAdd3';
-            $data_script[$optionkey] =['data_list_column'=>[]];
+           
 
             $data_script[$optionkey] =['data_list_column'=>[]];
             $data['list_js_scripts']['../vistas/compras/recepciones_compras_script'] =['data'=> $data_script];

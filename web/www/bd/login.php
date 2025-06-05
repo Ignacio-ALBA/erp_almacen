@@ -44,6 +44,18 @@ if($resultado->rowCount() >= 1){
 		$_SESSION["s_id_almacen"] = $data[0]['kid_almacen'];
 
 		
+
+if ($data[0]['kid_almacen'] == 1) {
+    $_SESSION["s_tipo_almacen"] = 'materia_prima';
+} else if ($data[0]['kid_almacen'] == 2) {
+    $_SESSION["s_tipo_almacen"] = 'produccion';
+} else {
+    $_SESSION["s_tipo_almacen"] = 'otro';
+}
+
+
+
+
 		$_SESSION["permisos"] =  $_SESSION["s_id_tipoUsuario"] == 1 ? ["all"] : GetAllowPermsList($_SESSION["s_id_tipoUsuario"]) ;
 		$nombre = $data[0]['nombre'];
 		//debug ($_SESSION["permisos"]);

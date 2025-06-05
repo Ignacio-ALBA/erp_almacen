@@ -488,12 +488,12 @@ $navItems = [
       ],
       [
         "label" => "Reportes",
-        "href" => "/reportes_mp",
+        "href" => "/reportes",
         "permiso" => [
-          "crear_reportes_mp",
-          "editar_reportes_mp",
-          "ver_reportes_mp",
-          "eliminar_reportes_mp"
+          "crear_detalles_recepciones_compras",
+          "editar_detalles_recepciones_compras",
+          "ver_detalles_recepciones_compras",
+          "eliminar_detalles_recepciones_compras"
         ]
       ],
       [
@@ -519,30 +519,30 @@ $navItems = [
         "label" => "Recepción MP",
         "href" => "/recepciones_produccion",
         "permiso" => [
-          "crear_recepciones_compras",
-          "editar_recepciones_compras",
-          "ver_recepciones_compras",
-          "eliminar_recepciones_compras"
+          "crear_recepciones_prod",
+          "editar_recepciones_prod",
+          "ver_recepciones_prod",
+          "eliminar_recepciones_prod"
         ]
       ],
       [
         "label" => "Contenido de Recepciones",
-        "href" => "/detalles_recepciones_mp",
+        "href" => "/detalles_recepciones_prod",
         "permiso" => [
-          "crear_detalles_recepciones_compras",
-          "editar_detalles_recepciones_compras",
-          "ver_detalles_recepciones_compras",
-          "eliminar_detalles_recepciones_compras"
+          "crear_detalles_recepciones_prod",
+          "editar_detalles_recepciones_prod",
+          "ver_detalles_recepciones_prod",
+          "eliminar_detalles_recepciones_prod"
         ]
       ],
       [
         "label" => "Comentarios de Recepciones",
-        "href" => "/comentarios_recepciones_mp",
+        "href" => "/comentarios_recepciones_prod",
         "permiso" => [
-          "crear_comentarios_recepciones",
-          "editar_comentarios_recepciones",
-          "ver_comentarios_recepciones",
-          "eliminar_comentarios_recepciones"
+          "crear_comentarios_recepciones_prod",
+          "editar_comentarios_recepciones_prod",
+          "ver_comentarios_recepciones_prod",
+          "eliminar_comentarios_recepciones_prod"
         ]
       ],
       [
@@ -563,6 +563,17 @@ $navItems = [
           "editar_pesaje_produccion",
           "ver_pesaje_produccion",
           "eliminar_pesaje_produccion"
+        ]
+      ],
+           [
+        "label" => "Mermas",
+        "href" => "/mermas_prod",
+        "permiso" => [
+          "crear_mermas_prod",
+          "editar_mermas_prod",
+          "ver_mermas_prod",
+          "eliminar_mermas_prod"
+         
         ]
       ],
       [

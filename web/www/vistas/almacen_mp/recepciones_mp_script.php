@@ -35,7 +35,7 @@ if (file_exists($logo_path)) {
 
 
 <!-- Cargar el archivo JavaScript externo -->
-<script  type="module" src="/assets/js/recepciones_compras.js?v=<?php echo time(); ?>"></script>
+<script  type="module" src="/assets/js/recepciones_mp.js?v=<?php echo time(); ?>"></script>
 <!--<script src="/assets/js/codigoqr.js?v=<?php echo time(); ?>"></script>-->
 <?php 
 // Cierre del archivo PHP - esto evita errores de análisis en PHP

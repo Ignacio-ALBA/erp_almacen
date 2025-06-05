@@ -19,7 +19,7 @@
     </nav>
   </div><!-- End Page Title -->
 <?php 
-  $id = 'detalles_recepciones_compras';
+  $id = 'detalles_recepciones_prod';
   $ButtonAddLabel = "Nuevo Detalle";
   $titulos = ['ID','Artículos', 'Recepción','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,false,$botones_acciones);

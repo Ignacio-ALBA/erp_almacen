@@ -143,26 +143,35 @@
       </div>
       <div class="row mt-4 justify-content-center">'; // Nueva fila para los inputs y selects
           echo '<div class="col-6">'; // Reduced from col-md-4
-              echo CreateInput([ 
-                  'type' => 'text',
-                  'id' => 'num_pedido',
-                  'etiqueta' => 'Número de Pedido',
-                  'readonly' => 'readonly',
-                  'value' => '001',
-                  'class' => 'form-control form-control-sm'
-              ]);
-        
-          echo CreateSelect([
-            'type' => 'text',
-            'id' => 'insumo_peso',
-            'etiqueta' => 'Insumo pesado',
-            'required' => 'true',
-            'class' => 'form-control form-control-sm'
-        ], [
-            ['valor' => 'POLIPROPILENO NEGRO', 'texto' => 'POLIPROPILENO NEGRO', 'pordefecto' => 0],
-            ['valor' => 'POLIPROPILENO BLANCO', 'texto' => 'POLIPROPILENO BLANCO', 'pordefecto' => 0],
-            ['valor' => 'POLIPROPILENO MULTICOLOR', 'texto' => 'POLIPROPILENO MULTICOLOR', 'pordefecto' => 0]
-          ]);
+             // Crear el input y el select
+echo CreateInput([
+  'type' => 'text',
+  'id' => 'num_pedido',
+  'etiqueta' => 'Número de Pedido',
+  'readonly' => 'readonly',
+  'value' => $idOrdenCompra ?? '',
+  'class' => 'form-control form-control-sm'
+]);
+
+$insumoOptions = [];
+if (!empty($insumos)) {
+  foreach ($insumos as $insumo) {
+      $insumoOptions[] = [
+          'valor' => $insumo['insumo'],
+          'texto' => $insumo['insumo'],
+          'pordefecto' => 0
+      ];
+  }
+}
+
+echo CreateSelect([
+  'type' => 'text',
+  'id' => 'insumo_peso',
+  'etiqueta' => 'Insumo pesado',
+  'required' => 'true',
+  'class' => 'form-control form-control-sm'
+], $insumoOptions);
+
           echo '</div>
      <div class="col-6">';  // Primera columna con dos elementos
           echo CreateSelect([
@@ -191,13 +200,7 @@
       <div class="row mt-4">
           <div class="col-12 d-flex justify-content-center">';
               // Existing register weight button
-              echo CreateButtonP([
-                  'id' => 'btn_guardar_materia',
-                  'type' => 'button',
-                  'class' => 'btn btn-primary',
-                  'text' => '<i class="bi bi-save2-fill"></i> Registrar peso',
-                  'html' => true
-              ]);
+
                  // Botón para generar QR
                  echo CreateButtonP([
                   'id' => 'btn_generar_qr',
@@ -219,7 +222,6 @@
       </div>
   </div>
 </div>';
-
 
   $titulos = ['ID', 'Recepción','Código Externo','Proyecto','Proveedor','Almacén','Orden de Compra','Estado','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones);
