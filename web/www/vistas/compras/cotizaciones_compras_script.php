@@ -3,15 +3,7 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
 ?>
 
 <script nonce="<?php echo $nonce_value; ?>">
-    
-
 document.addEventListener('DOMContentLoaded', function() {
-    $('#modalCRUDdetalles_cotizaciones_compras-View').on('shown.bs.modal.setTitle', function() {
-    const modalTitle = $(this).find('.modal-title').first();
-    if (modalTitle.length) {
-        modalTitle.html('<span>Detalle de Cotización: </span><strong>' + (window.currentCotizacionName ?? '') + '</strong>');
-    }
-});
     // ---------- CÁLCULOS AUTOMÁTICOS EN FORMULARIOS -----------
     function setupCalculations(form) {
         const cantidad = form.querySelector('input[name="cantidad"], #cantidad');
@@ -96,15 +88,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCotizacionId = '';
     let currentCotizacionName = '';
 
-    // Handler ÚNICO para actualizar el título del modal
-    $('#modalCRUDdetalles_cotizaciones_compras-View').on('shown.bs.modal.setTitle', function() {
-        const modalTitle = $(this).find('.modal-title');
-        if (modalTitle.length) {
-            modalTitle.html('<span>Detalle de Cotización: </span><strong>' + (window.currentCotizacionName ?? '') + '</strong>');
+    // Función para actualizar el título del modal (SOLO UNA VEZ, FUERA DEL CLICK)
+    function updateCotizacionModalTitle(cotizacionName) {
+        // SOLO actualiza el primer .modal-title encontrado
+        const modalTitle = $('#modalCRUDdetalles_cotizaciones_compras-View .modal-title').first();
+        if (modalTitle.length && cotizacionName) {
+            modalTitle.html('<span>Detalle de Cotización: </span><strong>' + cotizacionName + '</strong>');
         }
-    });
+    }
 
-    // Al hacer click en "Ver Detalles", solo actualiza la variable global y abre el modal
+    // Handler para el botón "Ver Detalles"
     $(document).on('click', '.ModalNewAdd3', function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -116,10 +109,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         currentCotizacionId = cotizacionId;
         currentCotizacionName = cotizacionName;
-        window.currentCotizacionName = cotizacionName;
 
+        // Actualiza el título del modal ANTES de mostrarlo
+        updateCotizacionModalTitle(currentCotizacionName);
+
+        // Setea el campo hidden para el modal de nuevo detalle
         $('#kid_cotizacion_compra').val(cotizacionName);
 
+        // Abre el modal fullscreen
         $(`#modalCRUD${modalCRUD}-View`).modal('show');
         // Limpia y muestra cargando
         const table = $(`#modalCRUD${modalCRUD}-View table tbody`);
@@ -166,6 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         return false;
+    });
+
+    // (Opcional) Asegura que el título SIEMPRE se actualice al mostrarse el modal
+    $('#modalCRUDdetalles_cotizaciones_compras-View').on('shown.bs.modal', function() {
+        updateCotizacionModalTitle(currentCotizacionName);
     });
 
     // Botón "Nuevo Detalle de Cotización" dentro del modal de detalles
