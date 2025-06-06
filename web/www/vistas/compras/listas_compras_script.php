@@ -91,10 +91,44 @@ document.addEventListener('DOMContentLoaded', function() {
         forms.forEach(setupCalculations);
     });
 
+    // ===================== BLOQUE PARA LLENAR kid_lista_compras AUTOMÁTICAMENTE =====================
+
+    // Variable global para la lista seleccionada
+    let currentListaName = '';
+
+    // Cuando das clic en "Ver Detalles" guarda el nombre de la lista actual
+    $(document).on('click', '.ModalNewAdd3', function(e) {
+        const row = $(this).closest('tr');
+        currentListaName = row.find('td').eq(2).text().trim(); // Cambia el índice si tu columna nombre no es la 2
+        sessionStorage.setItem('currentListaName', currentListaName);
+    });
+
+    // Cuando das clic en "Nuevo Detalle" (dentro del modal de detalles)
+    $(document).on('click', '#modalCRUDdetalles_listas_compras-View .btn-primary', function(e) {
+        sessionStorage.setItem('currentListaName', currentListaName);
+        $(document).one('shown.bs.modal', '#modalCRUDdetalles_listas_compras', function() {
+            if (currentListaName) {
+                $('#kid_lista_compras').val(currentListaName);
+            }
+        });
+    });
+
+    // Cuando se abre el modal de "Nuevo Detalle" (seguro)
+    $(document).on('show.bs.modal', '#modalCRUDdetalles_listas_compras', function() {
+        const savedListaName = sessionStorage.getItem('currentListaName');
+        if (savedListaName) {
+            setTimeout(function() {
+                $('#kid_lista_compras').val(savedListaName);
+            }, 300);
+        }
+    });
+
+    // ================================================================================================
+
     // Variable para controlar si estamos en el modal de detalles
     let isViewingDetails = false;
 
-    // Setup click handler for Ver Detalles button
+    // Setup click handler for Ver Detalles button (ya incluido arriba)
     $(document).on('click', '.ModalNewAdd3', function(e) {
         e.preventDefault();
         isViewingDetails = true; // Indicar que estamos viendo detalles
@@ -102,23 +136,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const rowData = $(this).closest('tr').find('td');
         const listaId = rowData.eq(0).text().trim();
         const listaName = rowData.eq(2).text().trim();
-        
-        console.log("Ver Detalles clickeado con ID:", modalCRUD);
-        console.log("ID de lista:", listaId);
-        
+
         // Show the fullscreen modal
         $(`#modalCRUD${modalCRUD}-View`).modal('show');
-        
+
         // Clear previous data and show loading message
         const table = $(`#modalCRUD${modalCRUD}-View table tbody`);
         table.empty();
         table.append('<tr><td colspan="10" class="text-center"><i class="bi bi-hourglass-split"></i> Cargando detalles...</td></tr>');
-        
+
         // Fetch and load all details
         $.ajax({
             type: "POST",
             url: "../../../vistas/compras/bd/crudEndpoint.php",
-            data: { 
+            data: {
                 modalCRUD: modalCRUD,
                 firstColumnValue: listaId,
                 opcion: "getDetails"

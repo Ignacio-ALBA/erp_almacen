@@ -54,12 +54,15 @@
     'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
     'method'=>'POST',
     'action'=>'bd/crudSummit.php',
-    'bloque'=>'compras'
+    'bloque'=>'compras',
+     'data-select-column'=>'[1]',
+    'data-input-fill'=>'[kid_lista_compras]'
   ],
   [
     $detailsTableOutput
   ],
-  ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+  ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>'
+]);
 
   CreateModalForm(
   [
@@ -71,11 +74,11 @@
     'method'=>'POST',
     'action'=>'bd/crudSummit.php',
     'bloque'=>'compras',
-    'data-select-column'=>'[2]',
-    'data-input-fill'=>'[kid_lista_compras, orden]'
+    'data-select-column'=>'[1]',
+    'data-input-fill'=>'[kid_lista_compras]'
   ],
   [
-    CreateInput(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
+    CreateInput(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','readonly' => 'readonly','class'=>'OnEditReadOnly']),
     CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly','data-validation'=>'required'],$articulos),
     CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
     CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
