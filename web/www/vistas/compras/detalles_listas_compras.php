@@ -43,8 +43,8 @@
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad (Kg)','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Precio Por Kg (MXN)','required' => '','class'=>'MUL-1']),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Subtotal','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA) ','required' => '','class'=>'MUL-2']),
-      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Total','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA) ','required' => '','div_style'=>'display:none;','class'=>'MUL-2']),
+      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto IVA','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
       CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4']),
     ]);
 
