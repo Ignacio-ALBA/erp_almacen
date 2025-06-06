@@ -3,6 +3,9 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
 ?>
 
 <script nonce="<?php echo $nonce_value; ?>">
+    $(document).on('show.bs.modal', '#modalCRUDordenes_compras', function() {
+    $('#kid_proyecto').removeAttr('required');
+});
 document.addEventListener('DOMContentLoaded', function() {
     // Función para configurar cálculos automáticos en formularios
     function setupCalculations(form) {
@@ -75,6 +78,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calcularMontos();
     }
+
+    // Inicializar cálculos en todos los modales
+    function initializeModal() {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            const forms = modal.querySelectorAll('form');
+            forms.forEach(setupCalculations);
+        });
+    }
+
+    // Observer para detectar nuevos modales
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.classList.contains('modal')) {
+                    setupCalculations(node.querySelector('form'));
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    // Aplicar cálculos cuando se muestra un modal
+    document.body.addEventListener('shown.bs.modal', function(event) {
+        const modal = event.target;
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(setupCalculations);
+    });
+
+    initializeModal();
+
     // Variables para rastrear la orden actual
     let currentOrdenId = '';
     let currentOrdenName = '';

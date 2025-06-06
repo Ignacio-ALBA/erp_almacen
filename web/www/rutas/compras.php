@@ -331,7 +331,13 @@ if($resultado){
             }
 
             $vista = 'ordenes_compras';
-            $estatus = GetEstatusLabels();
+         $estatus = GetEstatusLabels();
+            $caseEstatus = "CASE \n";
+            foreach ($estatus as $key => $value) {
+                $caseEstatus .= "    WHEN oc.kid_estatus = $key THEN '$value'\n";
+            }
+            $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
+
             $estatus_name = GetEstatusList();
             $consultaselect = "SELECT oc.id_orden_compras,
                 oc.codigo_externo,
@@ -339,7 +345,8 @@ if($resultado){
                 (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = oc.kid_proveedor LIMIT 1) AS kid_proveedor,
                 oc.monto_total,
                 oc.monto_neto,
-                oc.fecha_creacion
+                oc.fecha_creacion,
+                 $caseEstatus
             FROM ordenes_compras oc
             WHERE oc.kid_estatus != 3";
 

@@ -117,18 +117,6 @@ function verificarDatos($conexion, $tabla, $ColumnsCheck, $newformDataJson, $Ale
 
 $data = []; // Inicializa la variable $data
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['opcion']) && $_POST['opcion'] === 'codificarId') {
-    if (isset($_POST['id'])) {
-        require_once '../../../helpers/helper.php';
-        $id = $_POST['id'];
-        $encodedId = codificar($id);
-        echo json_encode(['status' => 'success', 'encodedId' => $encodedId]);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'ID no proporcionado']);
-    }
-    exit;
-}
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = null;
@@ -356,6 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editformDataJson = CleanJson($formDataJson);
                 $newformDataJson = $formDataJson;
                 $newformDataJson['grupo'] = 1;
+                $newformDataJson['kid_estatus'] = 8;
 
                 if($opcion == 1){
                     $consultaselect = "SELECT MAX(grupo)
@@ -726,7 +715,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newformDataJson = $formDataJson;
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                $newformDataJson['kid_estatus'] = 1;
+                $newformDataJson['kid_estatus'] = 8;
                 
                 // Set default value for grupo_cotizacion if not present
                 $newformDataJson['grupo_cotizacion'] = isset($newformDataJson['grupo_cotizacion']) ? $newformDataJson['grupo_cotizacion'] : 1;

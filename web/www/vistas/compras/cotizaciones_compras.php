@@ -4,7 +4,6 @@
     $PageSection = "Cotizaciones de Compras";
 ?>
 
-
   <div class="pagetitle">
     <h1><?php echo $PageSection; ?></h1>
     <nav>
@@ -20,7 +19,7 @@
   $id = 'cotizaciones_compras';
   $ButtonAddLabel = "Nueva Cotización";
   $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data,true,'ButtonsInRow');
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, 'ButtonsInRow');
   CreateModalForm(
     [
       'id'=> $id, 
@@ -42,7 +41,6 @@
       CreateSelect(['id'=>'kid_tiempo_entrega','etiqueta'=>'Tiempo de Entrega','required' => ''],$tiempos_entrega),
       CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago','required' => ''],$tipos_pago),
       CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '']),
-      
       CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
     ]);
     $id = 'ordenes_compras';
@@ -65,152 +63,82 @@
           CreateInput(['id'=>'kid_proveedor-SetData','etiqueta'=>'Proveedor','required' => '','readonly' => '']),
         ]);
 
-        // Modal de pantalla completa para detalles de cotizaciones
-        $id = 'detalles_cotizaciones_compras';
-        $ButtonAddLabel = "Nuevo Detalle de Cotización";
-        $titulos = ['ID', 'Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
-      
-        ob_start();
-        CreateTable($id, $ButtonAddLabel, $titulos, [], false, [], '', $atributos = [
-            'data-select-column'=>'1',
-            'data-input-fill'=>'[kid_cotizacion_compra]'
-        ]);
-        $detailsTableOutput = ob_get_clean();
-    
-        CreateModal([
-          'id'=> $id.'-View', 
-          'Title'=>'Detalle de Cotización',
-          'Title2'=>'',
-          'Title3'=>'',
-          'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
-          'method'=>'POST',
-          'action'=>'bd/crudSummit.php',
-          'bloque'=>'compras'
-        ],
-        [
-          $detailsTableOutput
-        ],
-        ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+    // Modal de pantalla completa para detalles de cotizaciones
+    $id = 'detalles_cotizaciones_compras';
+    $ButtonAddLabel = "Nuevo Detalle de Cotización";
+    $titulos = ['ID', 'Cotización','Articulos','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+  
+    ob_start();
+    CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', [
+        'data-select-column'=>'1',
+        'data-input-fill'=>'[kid_cotizacion_compra]'
+    ]);
+    $detailsTableOutput = ob_get_clean();
 
-        // Script específico para actualizar el título del modal
-        echo '<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Capturar el evento de clic en el botón de ver detalles
-            document.querySelectorAll(".ModalNewAdd3").forEach(function(button) {
-                button.addEventListener("click", function(e) {
-                    // Obtener el nombre de la cotización de la fila actual
-                    const row = this.closest("tr");
-                    if (row) {
-                        const cells = row.querySelectorAll("td");
-                        if (cells.length >= 2) {
-                            const cotizacionName = cells[1].textContent.trim();
-                            
-                            // Actualizar el título inmediatamente
-                            const headerSpan = document.getElementById("cotizacion-nombre-header");
-                            if (headerSpan) {
-                                headerSpan.textContent = cotizacionName;
-                            }
-                            
-                            // También actualizar cuando el modal se muestre completamente
-                            $("#modalCRUDdetalles_cotizaciones_compras-View").on("shown.bs.modal", function() {
-                                const headerSpan = document.getElementById("cotizacion-nombre-header");
-                                if (headerSpan) {
-                                    headerSpan.textContent = cotizacionName;
-                                }
-                                
-                                // También actualizar directamente el título del modal
-                                const modalTitle = $(this).find(".modal-title");
-                                if (modalTitle.length && !modalTitle.text().includes(cotizacionName)) {
-                                    modalTitle.html("Detalle de Cotización: <strong>" + cotizacionName + "</strong>");
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-        });
-        </script>';
+  CreateModal([
+  'id'=> $id.'-View', 
+  'Title'=>'Detalle de Cotización',
+  'Title2'=>'',
+  'Title3'=>'',
+  'ModalType'=>'modal-fullscreen modal-dialog-scrollable', 
+  'method'=>'POST',
+  'action'=>'bd/crudSummit.php',
+  'bloque'=>'compras'
+],
+[
+  $detailsTableOutput
+],
+[
+  '<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>'
+]);
 
-        // Modal para agregar/editar detalles de cotización
-        CreateModalForm([
-            'id'=> $id, 
-            'Title'=>$ButtonAddLabel,
-            'Title2'=>'Editar Detalle de Cotización',
-            'Title3'=>'Ver Detalle de Cotización',
-            'ModalType'=>'modal-dialog-scrollable', 
-            'method'=>'POST',
-            'action'=>'bd/crudSummit.php',
-            'bloque'=>'compras',
-            'data-select-column'=>'[1]',
-            'data-input-fill'=>'[kid_cotizacion_compra]',
-            'onSubmit'=>'return validateDetallesCotizacion(this);'
-          ],
-          [
-            CreateInput(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','readonly'=>'','class'=>'OnEditReadOnly']),
-            CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
-            CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
-            CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-            CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly'=>'readonly','class'=>'MUL-2']),
-            CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly'=>'readonly','class'=>'RESULT-1 RESULT-3']),
-            CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly'=>'readonly','class'=>'RESULT-2 RESULT-4']),
-            CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4'])
-          ]);
+    // Modal para agregar/editar detalles de cotización
+    CreateModalForm([
+        'id'=> $id, 
+        'Title'=>$ButtonAddLabel,
+        'Title2'=>'Editar Detalle de Cotización',
+        'Title3'=>'Ver Detalle de Cotización',
+        'ModalType'=>'modal-dialog-scrollable', 
+        'method'=>'POST',
+        'action'=>'bd/crudSummit.php',
+        'bloque'=>'compras',
+        'data-select-column'=>'[1]',
+        'data-input-fill'=>'[kid_cotizacion_compra]',
+        'onSubmit'=>'return validateDetallesCotizacion(this);'
+      ],
+      [
+        CreateInput(['id'=>'kid_cotizacion_compra','etiqueta'=>'Cotización','required' => '','readonly'=>'','class'=>'OnEditReadOnly']),
+        CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
+        CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
+        CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
+        CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly'=>'readonly','class'=>'MUL-2']),
+        CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly'=>'readonly','class'=>'RESULT-1 RESULT-3']),
+        CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly'=>'readonly','class'=>'RESULT-2 RESULT-4']),
+        CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4'])
+      ]);
 
-        CreateModalForm(
-          [
-            'id'=> 'proveedores_cuadro_comparativo', 
-            'Title'=>'Seleccione Revisores',
-            'Title2'=>'',
-            'Title3'=>'',
-            'PrimaryButttonName'=>'Enviar',
-            'ModalType'=>'modal-dialog-scrollable', 
-            'method'=>'POST',
-            'action'=>'bd/crudSummit.php',
-            'bloque'=>'compras'
-          ],
-          [
-            CreateSelect(['id'=>'kid_revisor_ingenieria','etiqueta'=>'Revisor de Ingeniería','required' => ''],$colaboradores),
-            CreateSelect(['id'=>'kid_revisor_servicios','etiqueta'=>'Revisor de Ingeniería de servicios','required' => ''],$colaboradores),
-            CreateSelect(['id'=>'kid_revisor_proveedores','etiqueta'=>'Revisor de Proveedores','required' => ''],$colaboradores)
-            
-          ]);
+    CreateModalForm(
+      [
+        'id'=> 'proveedores_cuadro_comparativo', 
+        'Title'=>'Seleccione Revisores',
+        'Title2'=>'',
+        'Title3'=>'',
+        'PrimaryButttonName'=>'Enviar',
+        'ModalType'=>'modal-dialog-scrollable', 
+        'method'=>'POST',
+        'action'=>'bd/crudSummit.php',
+        'bloque'=>'compras'
+      ],
+      [
+        CreateSelect(['id'=>'kid_revisor_ingenieria','etiqueta'=>'Revisor de Ingeniería','required' => ''],$colaboradores),
+        CreateSelect(['id'=>'kid_revisor_servicios','etiqueta'=>'Revisor de Ingeniería de servicios','required' => ''],$colaboradores),
+        CreateSelect(['id'=>'kid_revisor_proveedores','etiqueta'=>'Revisor de Proveedores','required' => ''],$colaboradores)
+      ]);
 ?>
 <?php
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content
 
-  // Agregar JavaScript personalizado para manejar el título del modal
-  $wrapper_dashboard .= '
-  <script>
-    // Cuando el DOM esté listo
-    document.addEventListener("DOMContentLoaded", function() {
-      // Manejar el botón "Ver Detalles"
-      $(document).on("click", ".ModalNewAdd3", function(e) {
-        // Obtener el nombre de la cotización de la fila actual
-        const cotizacionName = $(this).closest("tr").find("td").eq(1).text().trim();
-        
-        // Almacenar el nombre para uso posterior
-        window.currentCotizacionName = cotizacionName;
-        
-        // Función para actualizar el título del modal
-        function updateModalTitle() {
-          if (window.currentCotizacionName) {
-            // Actualizar el título directamente
-            $("#cotizacion-nombre-header").text(window.currentCotizacionName);
-            
-            // También actualizar el título completo como respaldo
-            const modalTitle = $("#modalCRUDdetalles_cotizaciones_compras-View .modal-title");
-            if (modalTitle.length) {
-              modalTitle.html("<span>Detalle de Cotización: </span><strong>" + window.currentCotizacionName + "</strong>");
-            }
-          }
-        }
-        
-        // Ejecutar inmediatamente y también después de que el modal se muestre
-        setTimeout(updateModalTitle, 100);
-        $("#modalCRUDdetalles_cotizaciones_compras-View").on("shown.bs.modal", updateModalTitle);
-      });
-    });
-  </script>';
+  // NO agregamos ningún script inline aquí para el título del modal, todo debe estar en cotizaciones_compras_script.php
 
   include 'wrapper.php'; // Incluye el wrapper
 ?>

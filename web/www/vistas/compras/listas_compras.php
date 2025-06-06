@@ -43,7 +43,7 @@
     $titulos = ['ID', 'Lista de Compras','Insumos','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
   
     ob_start();
-    CreateTable($id, $ButtonAddLabel, $titulos, [], false, [], '', $atributos = ['data-select-column'=>2]);
+    CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = ['data-select-column'=>2]);
     $detailsTableOutput = ob_get_clean();
 
   CreateModal( [

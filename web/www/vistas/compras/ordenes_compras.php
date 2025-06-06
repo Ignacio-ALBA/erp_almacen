@@ -18,15 +18,15 @@
 
   $id = 'ordenes_compras';
   $ButtonAddLabel = "Nueva Orden de Compra";
-  $titulos = ['ID', 'Código Externo', 'Orden de Compra', 'Proveedor', 'Monto Total', 'Monto Neto', 'Fecha de Creación'];
+  $titulos = ['ID', 'Código Externo', 'Orden de Compra', 'Proveedor', 'Monto Total', 'Monto Neto', 'Fecha de Creación','Estatus'];
   
-  // Definir los botones de acción
+  // Define custom buttons for the table
   $botones_acciones = [
-    '<button type="button" class="ModalDataView btn btn-primary" modalCRUD="'.$id.'"><i class="bi bi-eye"></i> Ver</button>',
-    '<button type="button" class="ModalDataEdit btn btn-warning" modalCRUD="'.$id.'"><i class="bi bi-pencil"></i> Editar</button>',
-    '<button type="button" class="ModalDataDelete btn btn-danger" modalCRUD="'.$id.'"><i class="bi bi-trash"></i> Eliminar</button>',
-    '<button type="button" class="ModalNewAdd3 btn btn-info" modalCRUD="'.$id.'"><i class="bi bi-list-check"></i> Ver Detalles</button>',
-    '<button type="button" class="IniciarPesaje btn btn-success" modalCRUD="'.$id.'"><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>'
+    '<button type="button" class="ModalDataView btn btn-primary primary" modalCRUD=${modalCRUD}><i class="bi bi-eye"></i> Ver</button>',
+    '<button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=${modalCRUD}><i class="bi bi-pencil"></i> Editar</button>',
+    '<button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD=${modalCRUD}><i class="bi bi-trash"></i> Eliminar</button>',
+    '<button type="button" class="ModalNewAdd3 btn btn-info info" modalCRUD=${modalCRUD}><i class="bi bi-list-check"></i> Ver Detalles</button>',
+    '<button type="button" class="IniciarPesaje btn btn-success success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>'
   ];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true,'ButtonsInRow');
   CreateModalForm(
@@ -43,8 +43,8 @@
     [
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'orden_compras','etiqueta'=>'Orden de Compras','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'80','id'=>'codigo_externo','etiqueta'=>'Código Externo','required' => '']),
-      CreateInput(['type'=>'text','id'=>'kid_proyecto','etiqueta'=>'Proyecto','required' => '','readonly' => '','div_style'=>'display:none;','class'=>'OnEditReadOnly']),
-      CreateSelect(['id'=>'kid_proveedor','type'=>'text','id'=>'kid_proveedor','etiqueta'=>'Proveedor','required' => '','class'=>'OnEditReadOnly'],$proveedores),
+      CreateInput(['type'=>'text','id'=>'kid_proyecto','etiqueta'=>'Proyecto','readonly' => '','div_style'=>'display:none;','class'=>'OnEditReadOnly']),
+      CreateSelect(['id'=>'kid_proveedor','type'=>'text','id'=>'kid_proveedor','etiqueta'=>'Proveedor','class'=>'OnEditReadOnly'],$proveedores),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '']),
       CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '', 'readonly' => '']),
       //CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
@@ -55,7 +55,7 @@
   $titulos = ['ID', 'Orden de Compra','Materia Prima','Cantidad','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
 
   ob_start();
-  CreateTable($id, null, $titulos, [], false, [], '', ['data-select-column'=>'[1]']);
+  CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', ['data-select-column'=>'[1]']);
   $detailsTableOutput = ob_get_clean();
 
   CreateModal([
