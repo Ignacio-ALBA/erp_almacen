@@ -115,9 +115,40 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
 
         initializeModal();
 
+        // Lógica para llenar automáticamente el campo de Orden de Compra al agregar detalle
+
+let currentOrdenName = '';
+
+// 1. Al dar clic en "Ver Detalles", guarda el nombre de la orden seleccionada
+$(document).on('click', '.ModalNewAdd3', function(e) {
+    // Asume que la columna 2 es la de "Orden de Compra"
+    const ordenName = $(this).closest('tr').find('td').eq(2).text().trim();
+    currentOrdenName = ordenName;
+    sessionStorage.setItem('currentOrdenName', currentOrdenName);
+});
+
+// 2. Al dar clic en "Nuevo Detalle" dentro del modal de detalles
+$(document).on('click', '#modalCRUDdetalles_ordenes_compras-View .btn-primary', function(e) {
+    sessionStorage.setItem('currentOrdenName', currentOrdenName);
+    $(document).one('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
+        if (currentOrdenName) {
+            $('#kid_orden_compras').val(currentOrdenName);
+        }
+    });
+});
+
+// 3. Cuando se abre el modal de "Nuevo Detalle" (seguridad extra)
+$(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
+    const savedOrdenName = sessionStorage.getItem('currentOrdenName');
+    if (savedOrdenName) {
+        setTimeout(function() {
+            $('#kid_orden_compras').val(savedOrdenName);
+        }, 300);
+    }
+});
+
         // Variables para rastrear la orden actual
         let currentOrdenId = '';
-        let currentOrdenName = '';
 
         // Función para actualizar el título del modal con el nombre de la orden
         function updateModalTitle(ordenName) {
