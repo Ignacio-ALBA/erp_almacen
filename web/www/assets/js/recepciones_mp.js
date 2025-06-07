@@ -16,10 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnConectarBalanza  = document.getElementById('btn_conectar_balanza');
     const pesoBasculaInput    = document.getElementById('peso_bascula');
     const btnGuardarPesaje    = document.getElementById('btn_guardar_pesaje');
+    const btnFinalizarRecepcion = document.getElementById('btn_finalizar_recepcion');
     // Si existen los botones individuales de QR o PDF los soportamos pero ocultos
     const btnGenerarQR        = document.getElementById('btn_generar_qr');
     const btnGenerarPDF       = document.getElementById('btn_generar_pdf');
     let qrCanvas = null;
+    let lastIdRecepcionMP = null; // Para saber cuál fue la última recepción
 
     // Carga inicial de datos de la orden
     if (numPedidoInput)      numPedidoInput.value      = idOrdenCompra;
@@ -31,56 +33,49 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('selected_orden_compra_id');
     localStorage.removeItem('selected_orden_compra_proveedor');
 
-    // Llenar insumos desde API
-    if (idOrdenCompra) {
-        fetch('/bd/crudEndpoint.php?api=get_detalles_orden&id=' + encodeURIComponent(idOrdenCompra))
+    // Llenar insumos desde API y manejo de errores visual
+    function cargarInsumosOrden() {
+        if (!idOrdenCompra || !insumoSelect) return;
+        insumoSelect.innerHTML = '<option>Cargando insumos...</option>';
+         fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_detalles_orden&id=' + encodeURIComponent(idOrdenCompra))
             .then(response => response.json())
             .then(data => {
-                if (data.ok && Array.isArray(data.detalles)) {
-                    populateInsumoDropdown(data.detalles);
+                insumoSelect.innerHTML = '';
+                if (!data.ok || !Array.isArray(data.detalles) || data.detalles.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'No hay insumos para esta orden';
+                    insumoSelect.appendChild(opt);
+                } else {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Seleccione un insumo';
+                    insumoSelect.appendChild(defaultOption);
+                    data.detalles.forEach(insumo => {
+                        const option = document.createElement('option');
+                        option.value = insumo.kid_articulo;
+                        option.textContent = insumo.nombre_articulo;
+                        option.dataset.cantidad = insumo.cantidad;
+                        insumoSelect.appendChild(option);
+                    });
                 }
+                // Disparar change para actualizar la cantidad si ya hay uno seleccionado
+                insumoSelect.dispatchEvent(new Event('change'));
+            })
+            .catch(e => {
+                insumoSelect.innerHTML = '<option>Error al cargar insumos</option>';
+                alert('Error cargando insumos: ' + e.message);
             });
     }
+    cargarInsumosOrden();
 
-    function populateInsumoDropdown(insumos) {
-        if (insumoSelect) {
-            insumoSelect.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Seleccione un insumo';
-            insumoSelect.appendChild(defaultOption);
-            insumos.forEach(insumo => {
-                const option = document.createElement('option');
-                option.value = insumo.kid_articulo;
-                option.textContent = insumo.nombre_articulo;
-                option.dataset.cantidad = insumo.cantidad;
-                if (insumo.id_detalle_recepcion_compras) {
-                    option.dataset.idDetalleRecepcion = insumo.id_detalle_recepcion_compras;
-                }
-                insumoSelect.appendChild(option);
-            });
-        }
-    }
-
-    // Al seleccionar insumo, muestra cantidad solicitada y peso de tarima si corresponde
+    // Mostrar cantidad al seleccionar un insumo
     insumoSelect?.addEventListener('change', function () {
         const opt = this.options[this.selectedIndex];
         cantidadInput.value = opt && opt.dataset.cantidad ? opt.dataset.cantidad : '';
-        // Si se selecciona modo por detalle, carga el peso desde la API
-        if (modoPesajeSelect.value === 'por_detalle_tarima' && opt.dataset.idDetalleRecepcion) {
-            fetch(`/bd/crudEndpoint.php?api=get_peso_tarima_by_detalle&id_detalle_recepcion_compras=${opt.dataset.idDetalleRecepcion}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success && data.peso_tarima !== null) {
-                        setTarimaValue(data.peso_tarima, data.descripcion || '');
-                    } else {
-                        setTarimaValue('', 'No se encontró el peso de la tarima.');
-                    }
-                });
-        }
     });
 
-    // Modo de pesaje y tarima dinámico
+    // Modo de pesaje y tarima dinámico (igual que antes)
     modoPesajeSelect?.addEventListener('change', function () {
         contenedorTarima.innerHTML = '';
         localStorage.removeItem('peso_tarima');
@@ -104,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('peso_tarima', this.value);
             }
         } else if (this.value === 'estatico') {
-            fetch('/bd/crudEndpoint.php?api=get_pesos_tarimas')
+            fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_pesos_tarimas')
                 .then(r => r.json())
                 .then(data => {
                     let opts = '<option value="">Seleccione un peso</option>';
@@ -121,30 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.setItem('peso_tarima', this.value);
                     }
                 });
-        } else if (this.value === 'por_detalle_tarima') {
-            const opt = insumoSelect.options[insumoSelect.selectedIndex];
-            if (opt && opt.dataset.idDetalleRecepcion) {
-                fetch(`/bd/crudEndpoint.php?api=get_peso_tarima_by_detalle&id_detalle_recepcion_compras=${opt.dataset.idDetalleRecepcion}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        setTarimaValue(data.peso_tarima, data.descripcion || '');
-                    });
-            } else {
-                setTarimaValue('', 'Seleccione un insumo primero.');
-            }
         }
     });
 
-    function setTarimaValue(valor, descripcion) {
-        contenedorTarima.innerHTML = `
-            <label class="form-label">Peso de Tarima</label>
-            <input type="number" class="form-control form-control-sm mb-1" id="peso_tarima_detalle" value="${valor !== null ? valor : ''}" readonly>
-            <small>${descripcion || ''}</small>
-        `;
-        localStorage.setItem('peso_tarima', valor !== null ? valor : '');
-    }
-
-    // Lógica para conectar con la báscula
+    // Lógica para conectar con la báscula...
     btnConectarBalanza?.addEventListener('click', async () => {
         try {
             const port = await navigator.serial.requestPort();
@@ -161,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConectarBalanza.classList.add('btn-success');
 
             const decoder = new TextDecoderStream();
-            const inputDone = port.readable.pipeTo(decoder.writable);
+            port.readable.pipeTo(decoder.writable);
             const inputStream = decoder.readable;
             const reader = inputStream.getReader();
 
@@ -216,155 +191,157 @@ FECHA Y HORA:       ${data.fechaHora}
         );
     }
 
-    // === UNIFICADO: GUARDAR PESAJE (también genera QR y PDF) ===
+    // === GUARDAR PESAJE (QR, PDF, BD, errores por paso) ===
     btnGuardarPesaje?.addEventListener('click', async () => {
-        const datos = getEtiquetaData();
-
-        // 1. Mostrar etiqueta
-        let etiqueta = formatoEtiquetaVisual(datos);
-        let preview = document.getElementById('etiqueta_preview');
-        if (!preview) {
-            preview = document.createElement('pre');
-            preview.id = 'etiqueta_preview';
-            document.body.appendChild(preview);
-        }
-        preview.textContent = etiqueta;
-
-        // 2. Generar QR con qrcode.js
-        let qrDiv = document.getElementById('qr_code');
-        if (!qrDiv) {
-            qrDiv = document.createElement('div');
-            qrDiv.id = 'qr_code';
-            document.body.appendChild(qrDiv);
-        }
-        qrDiv.innerHTML = '';
-        // Usando qrcode.js clásico
-        new QRCode(qrDiv, {
-            text: JSON.stringify({
-                insumo: datos.nombreInsumo,
-                proveedor: datos.proveedor,
-                fecha_hora: datos.fechaHora,
-                peso_kg: datos.pesoNeto,
-                peso_tarima: datos.pesoTarima
-            }),
-            width: 200,
-            height: 200,
-            correctLevel: QRCode.CorrectLevel.H
-        });
-        qrCanvas = qrDiv.querySelector('canvas');
-
-        // 3. Generar PDF con pdf-lib
-        const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
-        const pdfDoc = await PDFDocument.create();
-        const page = pdfDoc.addPage([425.25, 283.5]); // 15cm x 10cm en puntos
-        const rotation = degrees(90);
-        page.setRotation(rotation);
-        const { width, height } = page.getSize();
-
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-        // Título y barra
-        page.drawText('FORCIP', {
-            x: (width / 2) - 70, y: height - 80, size: 40, font: fontBold, color: rgb(0, 0, 0),
-        });
-        page.drawRectangle({
-            x: 0, y: height - 130, width: width, height: 30, color: rgb(0, 0, 0),
-        });
-        page.drawText(datos.nombreInsumo, {
-            x: 14, y: height - 120, size: 20, font: fontBold, color: rgb(1, 1, 1),
-        });
-
-        // Etiqueta visual
-        const etiquetaLines = etiqueta.split('\n');
-        let yPos = height - 160;
-        for (const line of etiquetaLines) {
-            page.drawText(line, { x: 60, y: yPos, size: 13, font, color: rgb(0, 0, 0) });
-            yPos -= 15;
-        }
-
-        // Convertir QR a imagen y dibujar
-        const qrImage = qrCanvas.toDataURL('image/png');
-        const qrImageBytes = await fetch(qrImage).then((res) => res.arrayBuffer());
-        const qrImageEmbed = await pdfDoc.embedPng(qrImageBytes);
-        const qrSize = 120;
-        page.drawImage(qrImageEmbed, {
-            x: width - qrSize - 10,
-            y: 30,
-            width: qrSize,
-            height: qrSize,
-        });
-
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'etiqueta-recepcion.pdf';
-        link.click();
-
-        // 4. GUARDAR EN BD
-        const formData = {
-            recepcion_mp: 'Pesaje OC ' + datos.numPedido,
-            numero_tarimas: parseInt(datos.numTarimas) || 1,
-            numero_parets: 0,
-            codigo_externo: '', // Si tienes un campo para esto
-            grupo_cotizacion: 1, // Ajusta según tu lógica
-            kid_proyecto: null, // Si tienes este dato
-            kid_proveedor: proveedorOrdenInput.value, // Debe ser el ID, ajusta si lo tienes
-            kid_orden_compras: datos.numPedido,
-            kid_almacen: null, // Si tienes este dato
-            monto_total: 0,
-            monto_neto: 0,
-            kid_creacion: null,
-            fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-            kid_estatus: 1,
-            kid_ubicacion_almacen: null,
-            // Detalles
-            detalles: [{
-                kid_articulo: insumoSelect.value,
-                cantidad_tarimas: parseFloat(datos.numTarimas) || 1,
-                cantidad_parets: 0,
-                costo_unitario_neto: 0,
-                costo_unitario_total: 0,
-                monto_neto: 0,
-                porcentaje_descuento: 0,
-                monto_total: 0,
-                peso_real: parseFloat(datos.pesoNeto) || 0,
-                valor_codigoqr: JSON.stringify({
+        try {
+            // 1. Generar QR
+            const datos = getEtiquetaData();
+            const etiqueta = formatoEtiquetaVisual(datos);
+            let qrDiv = document.getElementById('qr_code');
+            if (!qrDiv) {
+                qrDiv = document.createElement('div');
+                qrDiv.id = 'qr_code';
+                document.body.appendChild(qrDiv);
+            }
+            qrDiv.innerHTML = '';
+            new QRCode(qrDiv, {
+                text: JSON.stringify({
                     insumo: datos.nombreInsumo,
                     proveedor: datos.proveedor,
                     fecha_hora: datos.fechaHora,
                     peso_kg: datos.pesoNeto,
                     peso_tarima: datos.pesoTarima
                 }),
-                imagen_codigo_qr: '', // Puedes guardar la ruta si la subes,
+                width: 200,
+                height: 200,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            // Espera a que el canvas exista
+            await new Promise((res) => setTimeout(res, 400));
+            qrCanvas = qrDiv.querySelector('canvas');
+            if (!qrCanvas) throw new Error('No se pudo generar el código QR');
+
+            // 2. Generar PDF
+            const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage([425.25, 283.5]);
+            const rotation = degrees(90);
+            page.setRotation(rotation);
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            let yPos = page.getSize().height - 80;
+            for (const line of etiqueta.split('\n')) {
+                page.drawText(line, { x: 60, y: yPos, size: 13, font, color: rgb(0, 0, 0) });
+                yPos -= 15;
+            }
+            const qrImage = qrCanvas.toDataURL('image/png');
+            const qrImageBytes = await fetch(qrImage).then((res) => res.arrayBuffer());
+            const qrImageEmbed = await pdfDoc.embedPng(qrImageBytes);
+            page.drawImage(qrImageEmbed, {
+                x: page.getSize().width - 120 - 10,
+                y: 30,
+                width: 120,
+                height: 120,
+            });
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'etiqueta-recepcion.pdf';
+            link.click();
+
+            // 3. Guardar en BD (AJAX)
+            const formData = {
+                recepcion_mp: 'Pesaje OC ' + datos.numPedido,
+                numero_tarimas: parseInt(datos.numTarimas) || 1,
+                numero_parets: 0,
+                codigo_externo: '',
+                grupo_cotizacion: 1,
+                kid_proyecto: null,
+                kid_proveedor: proveedorOrdenInput.value,
+                kid_orden_compras: datos.numPedido,
+                kid_almacen: null,
+                monto_total: 0,
+                monto_neto: 0,
                 kid_creacion: null,
                 fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-                kid_estatus: 1
-            }]
-        };
+                kid_estatus: 1,
+                kid_ubicacion_almacen: null,
+                detalles: [{
+                    kid_articulo: insumoSelect.value,
+                    cantidad_tarimas: parseFloat(datos.numTarimas) || 1,
+                    cantidad_parets: 0,
+                    costo_unitario_neto: 0,
+                    costo_unitario_total: 0,
+                    monto_neto: 0,
+                    porcentaje_descuento: 0,
+                    monto_total: 0,
+                    peso_real: parseFloat(datos.pesoNeto) || 0,
+                    valor_codigoqr: JSON.stringify({
+                        insumo: datos.nombreInsumo,
+                        proveedor: datos.proveedor,
+                        fecha_hora: datos.fechaHora,
+                        peso_kg: datos.pesoNeto,
+                        peso_tarima: datos.pesoTarima
+                    }),
+                    imagen_codigo_qr: '', // Si necesitas guardar la ruta
+                    kid_creacion: null,
+                    fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
+                    kid_estatus: 1
+                }]
+            };
 
-        // Enviar por AJAX a crudSummit
-        await fetch('/bd/crudSummit.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                modalCRUD: 'recepciones_mp',
-                opcion: 1,
-                formDataJson: formData
-            })
-        })
-        .then(res => res.json())
-        .then(resp => {
-            if(resp.status === 'success') {
-                alert('Pesaje guardado correctamente');
-            } else {
-                alert('Error al guardar pesaje');
-            }
-        })
-        .catch(e => alert('Error al guardar pesaje'));
-
+            const response = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ modalCRUD: 'recepciones_mp', opcion: 1, formDataJson: formData })
+            });
+            const result = await response.json();
+            if (result.status !== 'success') throw new Error('Error al guardar en la BD');
+            alert('Pesaje guardado correctamente');
+            // Guarda el id de la recepción para luego mostrar sus detalles
+            lastIdRecepcionMP = result.id_recepcion_mp || null;
+        } catch (e) {
+            alert('Error en el proceso: ' + e.message);
+        }
     });
+
+    // Finalizar recepción y mostrar detalles en modal
+    btnFinalizarRecepcion?.addEventListener('click', async () => {
+        // Si tienes el id de la última recepción, consulta los detalles y muestra el modal
+        if (!lastIdRecepcionMP) {
+            alert('No se encontró la recepción recién guardada. Guarda un pesaje antes.');
+            return;
+        }
+        try {
+           const resp = await fetch(`/vistas/almacen_mp/bd/crudEndpoint.php?api=get_detalles_recepcion_mp&id=${lastIdRecepcionMP}`);
+            const data = await resp.json();
+            if (!data.ok || !Array.isArray(data.detalles) || data.detalles.length === 0) {
+                alert('No hay detalles para esta recepción.');
+                return;
+            }
+            // Llena la tabla del modal
+            const tbody = document.getElementById('modal_detalles_recepcion_mp_tbody');
+            tbody.innerHTML = '';
+            data.detalles.forEach(det => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${det.kid_articulo}</td>
+                                <td>${det.cantidad_tarimas}</td>
+                                <td>${det.peso_real}</td>
+                                <td>${det.valor_codigoqr}</td>`;
+                tbody.appendChild(tr);
+            });
+            // Muestra el modal
+            const modal = new bootstrap.Modal(document.getElementById('modal_detalles_recepcion_mp'));
+            modal.show();
+        } catch (e) {
+            alert('No se pudo cargar los detalles: ' + e.message);
+        }
+    });
+
+    // Utilidad para obtener peso de báscula
+    function obtenerPesoBascula() {
+        return parseFloat(pesoBasculaInput.value) || 0;
+    }
 
     // Para compatibilidad, deja los eventos de los botones QR/PDF si existen
     btnGenerarQR?.addEventListener('click', () => {
@@ -447,8 +424,4 @@ FECHA Y HORA:       ${data.fechaHora}
         link.download = 'etiqueta-recepcion.pdf';
         link.click();
     });
-
-    function obtenerPesoBascula() {
-        return parseFloat(pesoBasculaInput.value) || 0;
-    }
 });

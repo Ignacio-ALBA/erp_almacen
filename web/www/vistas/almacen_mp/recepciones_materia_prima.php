@@ -174,7 +174,7 @@ echo '<div>';
 echo CreateInput([
     'type' => 'number',
     'id' => 'num_tarimas',
-    'etiqueta' => 'Número de Tarimas/Parets',
+    'etiqueta' => 'Número de Tarimas',
     'value' => '',
     'class' => 'form-control form-control-sm',
     'min' => '1'
@@ -197,7 +197,7 @@ echo '<div>';
 echo CreateInput([
     'type' => 'number',
     'id' => 'cantidad_insumo',
-    'etiqueta' => 'Cantidad Solicitada',
+    'etiqueta' => 'Peso Estimado (Kg)',
     'readonly' => 'readonly',
     'value' => '',
     'class' => 'form-control form-control-sm'
@@ -210,9 +210,9 @@ echo CreateSelect([
     'class' => 'form-control form-control-sm'
 ], [
     ['valor' => '', 'texto' => 'Selecciona tu manera de pesar la tarima', 'pordefecto' => 1],
-    ['valor' => 'Automatico', 'texto' => 'Pesaje Automático', 'pordefecto' => 0],
-    ['valor' => 'Manual', 'texto' => 'Captura Manual', 'pordefecto' => 0],
-    ['valor' => 'Estatico', 'texto' => 'Captura Estática', 'pordefecto' => 0]
+    ['valor' => 'Pesaje Automatico', 'texto' => 'Pesaje Automático', 'pordefecto' => 0],
+    ['valor' => 'Captura Manual', 'texto' => 'Captura Manual', 'pordefecto' => 0],
+    ['valor' => 'Captura Estatica', 'texto' => 'Captura Estática', 'pordefecto' => 0]
 ]);
 echo '</div>';
 echo '<div id=\"contenedor_valor_tarima\">';
@@ -248,16 +248,18 @@ echo CreateSelect([
 echo '</div>';
 echo '</div>';
 
-// Botones
-echo '<div class="row mt-3">
-        <button type="button" id="btn_guardar_pesaje" class="btn btn-secondary ms-2">
-            <i class="bi bi-qr-code"></i> Guardar Pesaje
-        </button>
-         <button type="button" id="btn_finalizar_recepcion" class="btn btn-primary">
-            <i class="bi bi-check-circle"></i> Finalizar recepción
-        </button>
-    </div>
-</div>';
+echo '<div class="row mt-3 justify-content-center">';
+echo '  <div class="col-auto">';
+echo '      <button type="button" id="btn_guardar_pesaje" class="btn btn-secondary">';
+echo '          <i class="bi bi-qr-code"></i> Guardar Pesaje';
+echo '      </button>';
+echo '  </div>';
+echo '  <div class="col-auto">';
+echo '      <button type="button" id="btn_finalizar_recepcion" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_detalles_recepcion_mp">';
+echo '          <i class="bi bi-check-circle"></i> Finalizar recepción';
+echo '      </button>';
+echo '  </div>';
+echo '</div>';
 
 echo '</div></div>';
 
@@ -291,16 +293,33 @@ echo '</div></div>';
     ]);
 
      // Add centered button
-echo '<div class="row mt-2">
-    <div class="col-12 text-center">
-        <button type="button" id="btn_guardar_incompleto" class="btn btn-warning me-2">
-            <i class="bi bi-exclamation-triangle"></i> Guardar pesaje incompleto
-        </button>
-        <button type="button" id="btn_finalizar_recepcion" class="btn btn-primary">
-            <i class="bi bi-check-circle"></i> Finalizar recepción
-        </button>
-    </div>
-</div>';
+
+
+// Modal para mostrar detalles de la recepción
+echo '<div class="modal fade" id="modal_detalles_recepcion_mp" tabindex="-1" aria-labelledby="modalDetallesRecepcionMPLabel" aria-hidden="true">';
+echo '  <div class="modal-dialog modal-lg">';
+echo '    <div class="modal-content">';
+echo '      <div class="modal-header">';
+echo '        <h5 class="modal-title" id="modalDetallesRecepcionMPLabel">Detalles de la Recepción</h5>';
+echo '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>';
+echo '      </div>';
+echo '      <div class="modal-body">';
+echo '        <table class="table table-sm table-bordered">';
+echo '          <thead>';
+echo '            <tr>';
+echo '              <th>Insumo</th>';
+echo '              <th>Cantidad Tarimas</th>';
+echo '              <th>Peso Real</th>';
+echo '              <th>QR</th>';
+echo '            </tr>';
+echo '          </thead>';
+echo '          <tbody id="modal_detalles_recepcion_mp_tbody"></tbody>';
+echo '        </table>';
+echo '      </div>';
+echo '    </div>';
+echo '  </div>';
+echo '</div>';
+
 
 
     $id='detalles_recepciones_compras';
