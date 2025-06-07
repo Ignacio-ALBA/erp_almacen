@@ -26,7 +26,7 @@
     '<button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=${modalCRUD}><i class="bi bi-pencil"></i> Editar</button>',
     '<button type="button" class="ModalDataDelete btn btn-danger danger" modalCRUD=${modalCRUD}><i class="bi bi-trash"></i> Eliminar</button>',
     '<button type="button" class="ModalNewAdd3 btn btn-info info" modalCRUD=${modalCRUD}><i class="bi bi-list-check"></i> Ver Detalles</button>',
-    '<button type="button" class="IniciarPesaje btn btn-success success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Pesaje</button>'
+    '<button type="button" class="IniciarPesaje btn btn-success success" modalCRUD=${modalCRUD}><i class="bi bi-box-seam"></i> Iniciar Recepción</button>'
   ];
   CreateTable($id, $ButtonAddLabel, $titulos, $data,true,'ButtonsInRow');
   CreateModalForm(

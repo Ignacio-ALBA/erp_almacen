@@ -202,5 +202,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     initializeModal();
+    // Al dar click en "Ver Detalles"
+$(document).on("click", ".ModalNewAdd3", function(e) {
+    const listaName = $(this).closest("tr").find("td").eq(2).text().trim();
+    window.currentListaName = listaName;
+
+    function updateModalTitle() {
+        if (window.currentListaName) {
+            const modalTitle = $("#modalCRUDdetalles_listas_compras-View .modal-title");
+            if (modalTitle.length) {
+                modalTitle.html('<span>Detalle de Lista de Compras: </span><strong>' + window.currentListaName + '</strong>');
+            }
+        }
+    }
+    setTimeout(updateModalTitle, 100);
+    $("#modalCRUDdetalles_listas_compras-View").on("shown.bs.modal", updateModalTitle);
+});
 });
 </script>
