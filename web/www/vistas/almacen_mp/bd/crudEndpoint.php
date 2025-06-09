@@ -46,7 +46,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['api'])) {
             echo json_encode($response);
             exit;
             break;
-
+case 'get_pesos_tarimas':
+    header('Content-Type: application/json; charset=utf-8');
+    $response = ['ok' => false, 'pesos' => []];
+    
+    try {
+        // Si tienes una tabla con pesos de tarimas, utiliza esta consulta
+        $sql = "SELECT id, descripcion, valor FROM pesos_tarimas WHERE kid_estatus = 1 ORDER BY descripcion";
+        $stmt = $conexion->prepare($sql);
+        $stmt->execute();
+        $pesos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $response['ok'] = true;
+        $response['pesos'] = $pesos;
+    } catch (Exception $e) {
+        // Si no tienes una tabla, proporciona algunos valores predeterminados
+        $response['ok'] = true;
+        $response['pesos'] = [
+            ['id' => 1, 'descripcion' => 'Tarima estándar', 'valor' => 25],
+            ['id' => 2, 'descripcion' => 'Tarima ligera', 'valor' => 15],
+            ['id' => 3, 'descripcion' => 'Tarima reforzada', 'valor' => 35]
+        ];
+    }
+    
+    echo json_encode($response);
+    exit;
+    break;
             if (isset($_GET['api']) && $_GET['api'] === 'get_peso_tarima_by_detalle') {
     header('Content-Type: application/json');
     require_once "conexion.php"; // Asegúrate de que este archivo crea la variable $conexion (mysqli o PDO)

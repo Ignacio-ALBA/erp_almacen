@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Este archivo ahora solo genera variables PHP necesarias y carga el JavaScript desde un archivo externo
  * Este enfoque evita que el analizador PHP Intelephense genere errores al analizar código JavaScript
@@ -19,23 +20,27 @@ if (file_exists($logo_path)) {
     error_log("El logotipo no se pudo cargar desde la ruta: " . $logo_path);
     $logoBase64 = ''; // Imagen por defecto o vacío
 }
+
 ?>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"nonce="<?php echo $nonce_value; ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js" nonce="<?php echo $nonce_value; ?>"></script>
+<script src="/assets/js/jspdf.umd.min.js" nonce="<?php echo $nonce_value; ?>"></script>
+
 <script nonce="<?php echo $nonce_value; ?>">
     // Pasar el logotipo como una variable global en formato Base64
     const logoBase64 = "<?php echo $logoBase64; ?>";
 </script>
 
 
-?>
-<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js" nonce="<?php echo $nonce; ?>"></script>
-
-<script src="/assets/js/qrcode.min.js"></script>
-<script src="/assets/js/jspdf.umd.min.js"></script>
 
 
 
+
+
+<script src="/assets/js/recepciones_mp.js?v=<?php echo time(); ?>" nonce="<?php echo $nonce_value; ?>"></script>
 <!-- Cargar el archivo JavaScript externo -->
-<script  type="module" src="/assets/js/recepciones_mp.js?v=<?php echo time(); ?>"></script>
+<!-- <script  type="module" src="/assets/js/recepciones_mp.js?v=<?php echo time(); ?>"></script>-->
 <!--<script src="/assets/js/codigoqr.js?v=<?php echo time(); ?>"></script>-->
 <?php 
 // Cierre del archivo PHP - esto evita errores de análisis en PHP
