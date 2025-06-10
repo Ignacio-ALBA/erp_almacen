@@ -72,6 +72,60 @@ case 'get_pesos_tarimas':
     echo json_encode($response);
     exit;
     break;
+
+     case 'get_almacenes':
+        header('Content-Type: application/json; charset=utf-8');
+        $response = ['ok' => false, 'data' => []];
+        
+        try {
+            $sql = "SELECT id_almacen AS kid_almacen, almacen AS nombre 
+                    FROM almacenes 
+                    WHERE kid_estatus = 1";
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute();
+            $almacenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $response['ok'] = true;
+            $response['data'] = $almacenes;
+        } catch (Exception $e) {
+            $response['message'] = 'Error al obtener almacenes: ' . $e->getMessage();
+        }
+        
+        echo json_encode($response);
+        exit;
+        break;
+
+    case 'get_ubicaciones':
+        header('Content-Type: application/json; charset=utf-8');
+        $response = ['ok' => false, 'data' => []];
+        
+        if (!isset($_GET['id_almacen'])) {
+            $response['message'] = 'ID de almacén requerido';
+            echo json_encode($response);
+            exit;
+        }
+
+        try {
+            $id_almacen = intval($_GET['id_almacen']);
+            $sql = "SELECT id_ubicacion_almacen AS kid_locacion_almacen, 
+                           ubicacion_almacen AS nombre 
+                    FROM ubicaciones_almacen 
+                    WHERE kid_almacen = :id 
+                    AND kid_estatus = 1";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':id', $id_almacen, PDO::PARAM_INT);
+            $stmt->execute();
+            $ubicaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $response['ok'] = true;
+            $response['data'] = $ubicaciones;
+        } catch (Exception $e) {
+            $response['message'] = 'Error al obtener ubicaciones: ' . $e->getMessage();
+        }
+        
+        echo json_encode($response);
+        exit;
+        break;
             if (isset($_GET['api']) && $_GET['api'] === 'get_peso_tarima_by_detalle') {
     header('Content-Type: application/json');
     require_once "conexion.php"; // Asegúrate de que este archivo crea la variable $conexion (mysqli o PDO)

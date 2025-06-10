@@ -30,6 +30,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'recepciones_mp':
                 $tabla = 'recepciones_mp';
                 $idcolumn = "id_recepcion_mp";
+
+                 // Agregar verificación para la opción 'finalizar'
+        if ($opcion === 'finalizar') {
+            try {
+                $id_recepcion_mp = intval($formDataJson['id_recepcion_mp']);
+                $stmt = $conexion->prepare("UPDATE recepciones_mp SET kid_estatus = 2 WHERE id_recepcion_mp = :id");
+                $stmt->execute([':id' => $id_recepcion_mp]);
+                
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Recepción finalizada'
+                ]);
+                exit;
+            } catch (Exception $e) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'No se pudo finalizar: ' . $e->getMessage()
+                ]);
+                exit;
+            }
+        }
+
+        // Si no es finalizar, continuar con el flujo normal de inserción
+        if ($opcion == 1) {
+             if (empty($formDataJson['kid_orden_compras']) || empty($formDataJson['detalles'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos']);
+                exit;
+            }
                 $kid_orden_compras = $formDataJson['kid_orden_compras'];
                 $usuarioActual = $_SESSION["s_id"] ?? null;
                 $fechaActual = date('Y-m-d H:i:s');

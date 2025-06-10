@@ -144,20 +144,24 @@ if($result){
             $data_query_compras = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
             $estatus = GetEstatusLabels();
-            $caseEstatus = "CASE \n";
-            foreach ($estatus as $key => $value) {
-                $caseEstatus .= "    WHEN rc.kid_estatus = $key THEN '$value'\n";
-            }
-            $caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
-            $consultaselect = "SELECT rc.id_recepcion_compras,
-                rc.recepcion_compras,
-                (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = rc.kid_proveedor LIMIT 1) AS kid_proveedor,
-                (SELECT almacen FROM almacenes alm WHERE alm.id_almacen  = rc.kid_almacen LIMIT 1) AS kid_almacen
-            FROM recepciones_compras rc
-            WHERE rc.kid_estatus !=3";
-            $resultado = $conexion->prepare($consultaselect);
-            $resultado->execute();
-            $data_query_recepciones = $resultado->fetchAll(PDO::FETCH_ASSOC);
+           $caseEstatus = "CASE \n";
+foreach ($estatus as $key => $value) {
+    $caseEstatus .= "    WHEN rm.kid_estatus = $key THEN '$value'\n";
+}
+$caseEstatus .= "    ELSE 'Desconocido' \nEND AS kid_estatus";
+
+$consultaselect = "SELECT rm.id_recepcion_mp,
+    rm.recepcion_mp,
+    (SELECT proveedor FROM proveedores prov WHERE prov.id_proveedor = rm.kid_proveedor LIMIT 1) AS kid_proveedor,
+    (SELECT almacen FROM almacenes alm WHERE alm.id_almacen = rm.kid_almacen LIMIT 1) AS kid_almacen,
+    rm.numero_tarimas,
+    rm.peso_tarimas
+FROM recepciones_mp rm
+WHERE rm.kid_estatus != 3";
+
+$resultado = $conexion->prepare($consultaselect);
+$resultado->execute();
+$data_query_recepciones = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
             $consultaselect = "SELECT 
                 u.id_colaborador,

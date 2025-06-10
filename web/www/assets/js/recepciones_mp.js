@@ -4,6 +4,20 @@
 // <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 // Además, tu PHP debe inyectar el logo así:
 // <script>const logoBase64 = "<?= $logoBase64 ?>";</script>
+async function finalizarRecepcionMp(idRecepcionMp) {
+    let resp = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'modalCRUD=recepciones_mp&opcion=finalizar&id_recepcion_mp=' + encodeURIComponent(idRecepcionMp)
+    });
+    let data = await resp.json();
+    if (data.status === 'success') {
+        alert('Recepción finalizada correctamente');
+        // Puedes actualizar la UI, recargar la tabla, etc.
+    } else {
+        alert('Error al finalizar: ' + data.message);
+    }
+}
 
 async function guardarPesajeRecepcionMP() {
     try {
@@ -135,6 +149,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let qrCanvas = null;
     let lastIdRecepcionMP = null; // Para saber cuál fue la última recepción
 
+
+    // === CARGA DINÁMICA DE ALMACENES Y UBICACIONES ===
+
+// Cargar almacenes al cargar la página
+fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_almacenes')
+  .then(r => r.json())
+  .then(res => {
+    if (res.ok) {
+      let sel = document.getElementById('almacen_destino');
+      if (!sel) return;
+      sel.innerHTML = '';
+      res.data.forEach(a => {
+        let opt = document.createElement('option');
+        opt.value = a.kid_almacen;
+        opt.textContent = a.nombre;
+        sel.appendChild(opt);
+      });
+      // Trigger el evento para cargar ubicaciones del primero por defecto
+      sel.dispatchEvent(new Event('change'));
+    }
+  });
+
+// Cargar ubicaciones al cambiar almacén
+document.getElementById('almacen_destino').addEventListener('change', function() {
+  let idAlmacen = this.value;
+  fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_ubicaciones&id_almacen=' + encodeURIComponent(idAlmacen))
+    .then(r => r.json())
+    .then(res => {
+      if (res.ok) {
+        let sel = document.getElementById('contenedor_destino');
+        if (!sel) return;
+        sel.innerHTML = '';
+        res.data.forEach(u => {
+          let opt = document.createElement('option');
+          opt.value = u.kid_locacion_almacen;
+          opt.textContent = u.nombre;
+          sel.appendChild(opt);
+        });
+      }
+    });
+});
     // Carga inicial de datos de la orden
     if (numPedidoInput)      numPedidoInput.value      = idOrdenCompra;
     if (nombreOrdenInput)    nombreOrdenInput.value    = nombreOrdenCompra;
@@ -266,7 +321,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         }
     });
-
+    // Ejemplo de uso cuando el usuario presiona el botón finalizar recepción
+document.getElementById('btn_finalizar_recepcion').addEventListener('click', function() {
+    if (window.lastIdRecepcionMP) {
+        finalizarRecepcionMp(window.lastIdRecepcionMP);
+    } else {
+        alert('No hay recepción activa.');
+    }
+});
     // Lógica para conectar con la báscula
     btnConectarBalanza?.addEventListener('click', async () => {
         try {
