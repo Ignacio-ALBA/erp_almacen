@@ -5,6 +5,112 @@
 // Además, tu PHP debe inyectar el logo así:
 // <script>const logoBase64 = "<?= $logoBase64 ?>";</script>
 
+async function guardarPesajeRecepcionMP() {
+    try {
+        // 1. Recolectar datos de inputs y selects
+        const idOrdenCompra = document.getElementById('num_pedido').value;
+        const almacenDestino = document.getElementById('almacen_destino').value;
+        const numTarimas = document.getElementById('num_tarimas').value;
+        const insumoSelect = document.getElementById('insumo_peso');
+        const kidArticulo = insumoSelect.value;
+        const pesoEstimado = document.getElementById('cantidad_insumo').value;
+        const pesoReal = document.getElementById('peso_bascula').value;
+        const contenedorDestino = document.getElementById('contenedor_destino').value;
+        const valorCodigoQR = window.valorCodigoQR || ''; // Debes tener esto generado antes (ver flujo QR)
+        const imagenCodigoQR = window.imagenCodigoQR || '';
+        const usuarioActual = window.usuarioActual || null; // Puedes guardar el id de colaborador en window al cargar la página
+        const fechaCreacion = new Date().toISOString().slice(0,19).replace('T',' ');
+        
+        // Validar datos mínimos
+        if (!idOrdenCompra || !almacenDestino || !kidArticulo || !pesoReal || !contenedorDestino) {
+            alert('Faltan datos obligatorios para guardar el pesaje');
+            return;
+        }
+
+        // 2. Obtener info de la OC y detalle (para los campos que requieren ser copiados)
+        // Puedes obtener estos datos al cargar la OC y guardarlos en un objeto, por ejemplo:
+        // window.ordenCompraInfo y window.detallesOrdenCompra (verifica tu flujo)
+        const orden = window.ordenCompraInfo || {};
+        const detalle = (window.detallesOrdenCompra || []).find(d => d.kid_articulo == kidArticulo) || {};
+        // Si no tienes estos objetos, puedes hacer un fetch sincronizado aquí, pero es mejor hacerlo al cargar la OC
+
+        // 3. Preparar el objeto de encabezado y detalles
+        const encabezado = {
+            codigo_externo: orden.codigo_externo,
+            grupo_cotizacion: orden.grupo_cotizacion,
+            kid_proyecto: orden.kid_proyecto,
+            kid_proveedor: orden.kid_proveedor,
+            kid_orden_compras: idOrdenCompra,
+            monto_total: orden.monto_total,
+            monto_neto: orden.monto_neto,
+            kid_almacen: almacenDestino,
+            kid_recibe: usuarioActual,
+            numero_tarimas: numTarimas,
+            // campos automáticos
+            kid_creacion: usuarioActual,
+            fecha_creacion: fechaCreacion,
+            kid_estatus: 1
+        };
+
+        // Diferencia de peso y retención IVA
+        const diferenciaPeso = parseFloat(pesoReal) - parseFloat(pesoEstimado);
+        const retencionIVA = detalle.porcentaje_descuento ?? 0;
+
+        const detalleObj = {
+            kid_articulo: kidArticulo,
+            peso_estimado: pesoEstimado,
+            peso_real: pesoReal,
+            cantidad_tarimas: numTarimas || 1,
+            cantidad_parets: 0,
+            kid_locacion_almacen: contenedorDestino,
+            costo_unitario_total: detalle.costo_unitario_total || 0,
+            costo_unitario_neto: detalle.costo_unitario_neto || 0,
+            monto_total: detalle.monto_total || 0,
+            monto_neto: detalle.monto_neto || 0,
+            retencion_iva: retencionIVA,
+            diferencia_peso: diferenciaPeso,
+            valor_codigoqr: valorCodigoQR,
+            imagen_codigo_qr: imagenCodigoQR,
+            kid_creacion: usuarioActual,
+            fecha_creacion: fechaCreacion,
+            kid_estatus: 1
+        };
+
+        // 4. Armar el payload para el backend
+        const payload = {
+            modalCRUD: "recepciones_mp",
+            opcion: 1, // Insertar
+            formDataJson: {
+                ...encabezado,
+                detalles: [detalleObj]
+            }
+        };
+
+        // 5. Enviar al backend
+        const resp = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: Object.entries(payload).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "object" ? JSON.stringify(v) : v)}`).join('&')
+        });
+        const data = await resp.json();
+
+        if (data.status === 'success') {
+            alert('Pesaje guardado correctamente');
+            // Elimina el insumo del select para evitar duplicidad
+            insumoSelect.querySelector(`option[value="${kidArticulo}"]`)?.remove();
+            // Bloquea los campos que deben quedar readonly tras la creación de la recepción
+            document.getElementById('num_tarimas').readOnly = true;
+            document.getElementById('almacen_destino').readOnly = true;
+            // Actualiza el id de recepción si lo devuelve el backend
+            window.lastIdRecepcionMP = data.id_recepcion_mp || window.lastIdRecepcionMP;
+        } else {
+            alert("Error al guardar: " + (data.message || 'Error desconocido'));
+        }
+    } catch (err) {
+        alert('Error al guardar pesaje: ' + err.message);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // === INICIO LÓGICA PARA LLENAR LOS INPUTS DE ORDEN, PROVEEDOR Y NOMBRE ===
     const idOrdenCompra = localStorage.getItem('selected_orden_compra_id') || '';
@@ -284,7 +390,17 @@ FECHA Y HORA:       ${data.fechaHora}
             } else {
                 throw new Error('No se pudo generar el código QR');
             }
-
+            // Guardar datos del QR en window para usarlos después
+            window.valorCodigoQR = JSON.stringify({
+            insumo: datos.nombreInsumo,
+            proveedor: datos.proveedor,
+            fecha_hora: datos.fechaHora,
+            peso_kg: datos.pesoNeto,
+            peso_tarima: datos.pesoTarima
+          });
+        window.imagenCodigoQR = qrDataUrl;
+        // 4. Ahora llama la función que arma el payload y guarda en BD
+        await guardarPesajeRecepcionMP();
             // 2. Generar PDF
             const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
             const pdfDoc = await PDFDocument.create();
@@ -474,6 +590,7 @@ FECHA Y HORA:       ${data.fechaHora}
             return;
         }
         try {
+            
             const resp = await fetch(`/vistas/almacen_mp/bd/crudEndpoint.php?api=get_detalles_recepcion_mp&id=${lastIdRecepcionMP}`);
             const data = await resp.json();
             if (!data.ok || !Array.isArray(data.detalles) || data.detalles.length === 0) {
