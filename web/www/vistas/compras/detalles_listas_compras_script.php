@@ -11,14 +11,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const montoTotal = form.querySelector('input[name="monto_total"], #monto_total');
         const montoNeto = form.querySelector('input[name="monto_neto"], #monto_neto');
         const porcentajeDescuento = form.querySelector('input[name="porcentaje_descuento"], #porcentaje_descuento');
-
+        const total = form.querySelector('input[name="total"], #total');
         const camposRequeridos = {
             cantidad,
             costoUnitarioTotal,
             costoUnitarioNeto,
             montoTotal,
             montoNeto,
-            porcentajeDescuento
+            porcentajeDescuento,
+            total
         };
 
         const camposFaltantes = Object.entries(camposRequeridos)
@@ -49,14 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const resultMul2 = cantidadVal * costoUnitarioNetoVal;
 
                 // RESULT-1 y RESULT-3: monto_total sin y con descuento
-                const montoTotalSinDescuento = resultMul1;
-                const montoTotalConDescuento = montoTotalSinDescuento * (1 - (descuentoVal/100));
-                montoTotal.value = montoTotalConDescuento.toFixed(2);
+                   // RESULT-1: monto_total sin descuento
+        montoTotal.value = resultMul1.toFixed(2);
 
-                // RESULT-2 y RESULT-4: monto_neto sin y con descuento
-                const montoNetoSinDescuento = resultMul2;
-                const montoNetoConDescuento = montoNetoSinDescuento * (1 - (descuentoVal/100));
-                montoNeto.value = montoNetoConDescuento.toFixed(2);
+        // RESULT-2: monto_neto sin descuento
+        montoNeto.value = resultMul2.toFixed(2);
+
+        // TOTAL: monto_neto - descuento (valor directo)
+        const totalFinal = resultMul2 - descuentoVal;
+        total.value = totalFinal.toFixed(2);
+
             } catch (error) {
                 // Silently handle errors
             }

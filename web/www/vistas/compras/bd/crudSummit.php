@@ -314,10 +314,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     a.articulo AS kid_articulo,
                     dlc.cantidad,
                     dlc.costo_unitario_total,
-                    dlc.costo_unitario_neto,
-                    CONCAT(dlc.porcentaje_descuento,' %'),
                     dlc.monto_total,
+                    dlc.costo_unitario_neto,
                     dlc.monto_neto,
+                    CONCAT(dlc.porcentaje_descuento, ''),
+                    dlc.total,
                     dlc.fecha_creacion
                 FROM detalles_listas_compras dlc
                 LEFT JOIN listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
@@ -340,7 +341,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : null;
                 $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : null;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-
+                // Asegúrate que fecha_entrega esté presente antes de la limpieza
+    $newformDataJson['fecha_entrega'] = isset($formDataJson['fecha_entrega']) ? 
+        $formDataJson['fecha_entrega'] : null;
+    
                 $editformDataJson = CleanJson($formDataJson);
                 $newformDataJson = $formDataJson;
                 $newformDataJson['grupo'] = 1;
@@ -384,6 +388,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     cc.kid_estatus,
                     u.email AS kid_creacion,
                     COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                    cc.fecha_entrega,
+                    cc.fecha_cotizacion,
                     cc.fecha_creacion
                 FROM cotizaciones_compras cc
                 LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
@@ -599,6 +605,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         cc.kid_estatus,
                         u.email AS kid_creacion,
                         COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                        cc.kid_tiempo_entrega,
+                        cc.fecha_cotizacion,
+                        cc.fecha_entrega,
                         cc.fecha_creacion
                     FROM cotizaciones_compras cc
                     LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto

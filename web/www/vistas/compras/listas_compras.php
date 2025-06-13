@@ -40,7 +40,7 @@
 
     $id='detalles_listas_compras';
     $ButtonAddLabel = "Nuevo Detalle";
-    $titulos = ['ID', 'Lista de Compras','Insumos','Cantidad De Super Sacos','Costo Unitario Total','Costo Unitario Neto','Monto Total','Monto Neto','Fecha de creación'];
+$titulos = ['ID', 'Programa de Compras','Insumo','Cantidad (KG)','Precio por Kg','SubTotal','Precio por Kg (IVA)','Monto IVA','Retención de IVA','Total','Fecha de creación'];
   
     ob_start();
     CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = ['data-select-column'=>2]);
@@ -78,14 +78,15 @@
     'data-input-fill'=>'[kid_lista_compras]'
   ],
   [
-    CreateInput(['id'=>'kid_lista_compras','etiqueta'=>'Lista de Compras','required' => '','readonly' => 'readonly','class'=>'OnEditReadOnly']),
+    CreateInput(['id'=>'kid_lista_compras','etiqueta'=>'Programa de Compras','required' => '','readonly' => 'readonly','class'=>'OnEditReadOnly']),
     CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly','data-validation'=>'required'],$articulos),
-    CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
-    CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-    CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
-    CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
-    CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
-    CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Porcentaje de Descuento','required' => '','class'=>'DESC-3 DESC-4']),
+    CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad (KG)','required' => '','class'=>'MUL-1 MUL-2']),
+    CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Precio por Kg (MXN)','required' => '','class'=>'MUL-1']),
+    CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Subtotal','required' => '','readonly' => '','class'=>'RESULT-1']),
+    CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA)','required' => '','readonly' => '','class'=>'MUL-2']),
+    CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto IVA','required' => '','readonly' => '','class'=>'RESULT-2']),
+    CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Retencion IVA','required' => '','class'=>'DESC']),
+    CreateInput(['type'=>'number','id'=>'total','etiqueta'=>'Total','required' => '','readonly' => '','class'=>'RESULT-TOTAL'])
   ]);
 
 

@@ -41,13 +41,16 @@
     ],
     [
       CreateSelect(['id'=>'kid_orden_compras','etiqueta'=>'Orden de Compras','required' => '','class'=>'OnEditReadOnly'],$ordenes),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => ''],$articulos),
-      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
-      CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '']),
-      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto Neto','required' => '','readonly' => '']),
-    ]);
+      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => ''],$articulos),
+      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad (KG)','required' => '','class'=>'MUL-1 MUL-2']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Precio por Kg (MXN)','required' => '','class'=>'MUL-1']),
+      CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Subtotal','required' => '','readonly' => '']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA)','required' => '','readonly' => '','class'=>'MUL-2']),
+      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto IVA','required' => '','readonly' => '']),
+      CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'Retencion IVA','required' => '','class'=>'DESC-3 DESC-4']),
+      CreateInput(['type'=>'number','id'=>'total','etiqueta'=>'Total','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),]);
+
+
 
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer
 

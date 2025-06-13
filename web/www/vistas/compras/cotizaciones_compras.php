@@ -18,7 +18,7 @@
 
   $id = 'cotizaciones_compras';
   $ButtonAddLabel = "Nueva Cotización";
-  $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Fecha de creación'];
+  $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Tiempo de Entrega','Fecha de cotización','Fecha de entrega','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, 'ButtonsInRow');
   CreateModalForm(
     [
@@ -32,13 +32,14 @@
       'bloque'=>'compras'
     ],
     [
-      CreateInput(['type'=>'text','maxlength'=>'97','id'=>'cotizacion_compras','etiqueta'=>'Cotización','required' => '']),
-      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','required'=>'','class'=>'OnEditReadOnly'],$proyectos),
+      CreateInput(['type'=>'text','maxlength'=>'97','id'=>'cotizacion_compras','etiqueta'=>'Folio Cotización','required' => '']),
+      CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$proyectos),
       CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Proveedor','required' => ''],$proveedores),
       CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
       CreateSelect(['id'=>'kid_tiempo_entrega','etiqueta'=>'Tiempo de Entrega','required' => ''],$tiempos_entrega),
-      CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago','required' => ''],$tipos_pago),
+      CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago'],$tipos_pago),
       CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '']),
+     // CreateInput(['id'=>'fecha_entrega','type'=>'date','etiqueta'=>'Fecha Tentativa de Entrega','required' => '']),
       CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
     ]);
     

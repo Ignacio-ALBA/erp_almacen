@@ -84,6 +84,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+      // ---------- FECHA POR DEFAULT AL ABRIR MODAL PRINCIPAL -----------
+    $(document).on('show.bs.modal', '#modalCRUDcotizaciones_compras', function () {
+        const fechaEntregaField = document.getElementById('fecha_entrega');
+        if (fechaEntregaField) {
+            const today = new Date().toISOString().split('T')[0];
+            if (!fechaEntregaField.value) {
+                fechaEntregaField.value = today;
+            }
+        }
+    });
+
     // ---------- LÓGICA DE MODAL DE DETALLES DE COTIZACIÓN -----------
     let currentCotizacionId = '';
     let currentCotizacionName = '';

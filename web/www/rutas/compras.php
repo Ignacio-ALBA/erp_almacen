@@ -108,10 +108,11 @@ if($resultado){
                 a.articulo AS kid_articulo,
                 dlc.cantidad,
                 dlc.costo_unitario_total,
-                dlc.costo_unitario_neto,
-                CONCAT(dlc.porcentaje_descuento,' %'),
                 dlc.monto_total,
+                dlc.costo_unitario_neto,
                 dlc.monto_neto,
+                CONCAT(dlc.porcentaje_descuento,''),
+                dlc.total,
                 dlc.fecha_creacion
             FROM detalles_listas_compras dlc
             LEFT JOIN listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
@@ -158,10 +159,14 @@ if($resultado){
                 $caseEstatus,
                 u.email AS kid_creacion,
                 COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                te.tiempo_entrega AS kid_tiempo_entrega,
+                cc.fecha_cotizacion,
+                cc.fecha_entrega,
                 cc.fecha_creacion
             FROM cotizaciones_compras cc
             LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
             LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
+            LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
             LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
             LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
             WHERE cc.kid_estatus != 3";

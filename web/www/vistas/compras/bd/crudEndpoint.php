@@ -156,9 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         a.articulo AS kid_articulo,
                         dlc.cantidad,
                         dlc.costo_unitario_total,
-                        dlc.costo_unitario_neto,
                         dlc.monto_total,
+                        dlc.costo_unitario_neto,
                         dlc.monto_neto,
+                        dlc.porcentaje_descuento,
+                        dlc.total,
                         dlc.fecha_creacion
                     FROM detalles_listas_compras dlc
                     LEFT JOIN listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
@@ -177,14 +179,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $consultaselect = "SELECT dlc.id_detalle_lista_compras,
                         lc.lista_compra AS kid_lista_compras,
                         a.articulo AS kid_articulo,
-                        a.id_articulo,
                         dlc.cantidad,
                         dlc.costo_unitario_total,
-                        dlc.costo_unitario_neto,
                         dlc.monto_total,
+                        dlc.costo_unitario_neto,
                         dlc.monto_neto,
-                        dlc.fecha_creacion,
                         dlc.porcentaje_descuento
+                        dlc.total,
+                        dlc.fecha_creacion
                     FROM detalles_listas_compras dlc
                     LEFT JOIN listas_compras lc ON dlc.kid_lista_compras = lc.id_lista_compra
                     LEFT JOIN articulos a ON dlc.kid_articulo = a.id_articulo
@@ -222,9 +224,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     es.estatus AS kid_estatus,
-                    cc.fecha_cotizacion,
                     te.tiempo_entrega AS kid_tiempo_entrega,
-                    tp.tipo_pago AS kid_tipo_pago,
+                    cc.fecha_cotizacion,
+                    cc.fecha_entrega,
                     cc.especificaciones_adicionales,
                     cc.fecha_creacion
                 FROM cotizaciones_compras cc

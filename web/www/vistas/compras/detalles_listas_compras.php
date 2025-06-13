@@ -4,7 +4,7 @@
 
     
 
-    $PageSection = "Detalles de Listas de Compras";
+    $PageSection = "Detalles de Programa de Compras";
 ?>
 
 
@@ -21,8 +21,8 @@
 <?php 
 
   $id = 'detalles_listas_compras';
-  $ButtonAddLabel = "Nueva Cotización";
-  $titulos = ['ID', 'Lista de Compras','Insumo','Cantidad de Super Sacos','Costo Unitario Total','Costo Unitario Neto','Descuento','Monto Total','Monto Neto','Fecha de creación'];
+  $ButtonAddLabel = "Nuevo Detalle";
+  $titulos = ['ID', 'Programa de Compras','Insumo','Cantidad (KG)','Precio por Kg','SubTotal','Precio por Kg (IVA)','Monto IVA','Retención de IVA','Total','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data);
   CreateModalForm(
     [
@@ -40,14 +40,13 @@
     [
       CreateSelect(['id'=>'kid_lista_compras','etiqueta'=>'Cotización','required' => '','class'=>'OnEditReadOnly'],$listas_compras),
       CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Insumo','required' => '','class'=>'OnEditReadOnly'],$articulos),
-      CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Proveedor','required' => '','class'=>'OnEditReadOnly'],$articulos),
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad (Kg)','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Precio Por Kg (MXN)','required' => '','class'=>'MUL-1']),
-      CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Subtotal','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
-      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA) ','required' => '','div_style'=>'display:none;','class'=>'MUL-2']),
-      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto IVA','required' => '','readonly' => '','class'=>'RESULT-2 RESULT-4']),
-      CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'RETENCIÓN DE IVA','required' => '','class'=>'DESC-3 DESC-4']),
-        CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'TOTAL','required' => '','class'=>'DESC-3 DESC-4']),
+      CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Subtotal','required' => '','readonly' => '','class'=>'RESULT-1']),
+      CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Precio Por Kg (IVA)','required' => '','div_style'=>'display:none;','class'=>'MUL-2']),
+      CreateInput(['type'=>'number','id'=>'monto_neto','etiqueta'=>'Monto IVA','required' => '','readonly' => '','class'=>'RESULT-2']),
+      CreateInput(['type'=>'number','value'=>'0','id'=>'porcentaje_descuento','etiqueta'=>'RETENCIÓN DE IVA','required' => '','class'=>'DESC']),
+      CreateInput(['type'=>'number','id'=>'total','etiqueta'=>'Total','required' => '','readonly' => '','class'=>'RESULT-TOTAL'])
     ]);
 
   $wrapper_dashboard = ob_get_clean(); // Obtiene el contenido del buffer y lo asigna a $content

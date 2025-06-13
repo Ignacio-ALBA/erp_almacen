@@ -11,14 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const montoTotal = form.querySelector('input[name="monto_total"], #monto_total');
         const montoNeto = form.querySelector('input[name="monto_neto"], #monto_neto');
         const porcentajeDescuento = form.querySelector('input[name="porcentaje_descuento"], #porcentaje_descuento');
-
+        const total = form.querySelector('input[name="total"], #total');
+        
         const camposRequeridos = {
             cantidad,
             costoUnitarioTotal,
             costoUnitarioNeto,
             montoTotal,
             montoNeto,
-            porcentajeDescuento
+            porcentajeDescuento,
+            total
         };
 
         // Verificar que todos los campos necesarios existen
@@ -27,32 +29,37 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!todosCamposExisten) return; // Si falta algún campo, no configurar los cálculos
 
         function updateCalculations() {
-            if (cantidad && costoUnitarioTotal && montoTotal) {
-                const cantidadValue = parseFloat(cantidad.value) || 0;
-                const costoUnitarioTotalValue = parseFloat(costoUnitarioTotal.value) || 0;
-                montoTotal.value = (cantidadValue * costoUnitarioTotalValue).toFixed(2);
-            }
+     if (cantidad && costoUnitarioTotal && montoTotal) {
+        const cantidadValue = parseFloat(cantidad.value) || 0;
+        const costoUnitarioTotalValue = parseFloat(costoUnitarioTotal.value) || 0;
+        // MUL-1: cantidad * costo_unitario_total
+        montoTotal.value = (cantidadValue * costoUnitarioTotalValue).toFixed(2);
+    }
 
-            if (cantidad && costoUnitarioNeto && montoNeto) {
-                const cantidadValue = parseFloat(cantidad.value) || 0;
-                const costoUnitarioNetoValue = parseFloat(costoUnitarioNeto.value) || 0;
-                montoNeto.value = (cantidadValue * costoUnitarioNetoValue).toFixed(2);
-            }
+    if (cantidad && costoUnitarioNeto && montoNeto) {
+        const cantidadValue = parseFloat(cantidad.value) || 0;
+        const costoUnitarioTotalValue = parseFloat(costoUnitarioTotal.value) || 0;
+        // MUL-2: cantidad * costo_unitario_neto
+        const costoUnitarioNetoValue = costoUnitarioTotalValue * 1.16;
+        costoUnitarioNeto.value = costoUnitarioNetoValue.toFixed(2);
+        montoNeto.value = (cantidadValue * costoUnitarioNetoValue).toFixed(2);
+    }
 
-            if (costoUnitarioTotal && costoUnitarioNeto && porcentajeDescuento) {
-                const porcentajeDescuentoValue = parseFloat(porcentajeDescuento.value) || 0;
-                const costoUnitarioTotalValue = parseFloat(costoUnitarioTotal.value) || 0;
-                costoUnitarioNeto.value = (costoUnitarioTotalValue * (1 + porcentajeDescuentoValue / 100)).toFixed(2);
-            }
+    if (costoUnitarioTotal && costoUnitarioNeto && porcentajeDescuento) {
+        const costoUnitarioTotalValue = parseFloat(costoUnitarioTotal.value) || 0;
+        // Calcular costo unitario neto siempre con 16%
+        costoUnitarioNeto.value = (costoUnitarioTotalValue * 1.16).toFixed(2);
+    }
 
-            if (montoTotal && montoNeto && porcentajeDescuento) {
-                const porcentajeDescuentoValue = parseFloat(porcentajeDescuento.value) || 0;
-                const montoTotalValue = parseFloat(montoTotal.value) || 0;
-                montoNeto.value = (montoTotalValue * (1 + porcentajeDescuentoValue / 100)).toFixed(2);
-            }
-        }
+    if (montoTotal && montoNeto && porcentajeDescuento && total) {
+        const montoNetoValue = parseFloat(montoNeto.value) || 0;
+        const descuentoValue = parseFloat(porcentajeDescuento.value) || 0;
+        // TOTAL: monto_neto - descuento (valor directo)
+        total.value = (montoNetoValue - descuentoValue).toFixed(2);
+    }
+}
 
-        [cantidad, costoUnitarioTotal, costoUnitarioNeto, porcentajeDescuento].forEach(campo => {
+        [cantidad, costoUnitarioTotal, costoUnitarioNeto, porcentajeDescuento, total].forEach(campo => {
             if (campo) {
                 campo.addEventListener('input', updateCalculations);
             }
