@@ -181,7 +181,7 @@ if ($resultado) {
                     c.fecha_creacion
                 FROM clientes c
                 WHERE c.kid_estatus != 3
-                AND c.kid_almacen = :kid_almacen
+                AND c.id_almacen = :kid_almacen
                 ORDER BY c.nombre";
         $resultado = $conexion->prepare($consultaselect);
         $resultado->bindParam(':kid_almacen', $_SESSION["s_id_almacen"]);
