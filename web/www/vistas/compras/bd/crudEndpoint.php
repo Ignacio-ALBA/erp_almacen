@@ -179,12 +179,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $consultaselect = "SELECT dlc.id_detalle_lista_compras,
                         lc.lista_compra AS kid_lista_compras,
                         a.articulo AS kid_articulo,
+                        a.id_articulo,
                         dlc.cantidad,
                         dlc.costo_unitario_total,
                         dlc.monto_total,
                         dlc.costo_unitario_neto,
                         dlc.monto_neto,
-                        dlc.porcentaje_descuento
+                        dlc.porcentaje_descuento,
                         dlc.total,
                         dlc.fecha_creacion
                     FROM detalles_listas_compras dlc

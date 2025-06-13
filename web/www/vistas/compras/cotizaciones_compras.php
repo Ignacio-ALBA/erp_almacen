@@ -39,7 +39,7 @@
       CreateSelect(['id'=>'kid_tiempo_entrega','etiqueta'=>'Tiempo de Entrega','required' => ''],$tiempos_entrega),
       CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago'],$tipos_pago),
       CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '']),
-     // CreateInput(['id'=>'fecha_entrega','type'=>'date','etiqueta'=>'Fecha Tentativa de Entrega','required' => '']),
+      CreateInput(['id'=>'fecha_entrega','type'=>'date','etiqueta'=>'Fecha Tentativa de Entrega','required' => '']),
       CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
     ]);
     
