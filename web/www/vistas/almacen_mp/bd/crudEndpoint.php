@@ -107,9 +107,9 @@ case 'get_pesos_tarimas':
 
         try {
             $id_almacen = intval($_GET['id_almacen']);
-            $sql = "SELECT id_ubicacion_almacen AS kid_locacion_almacen, 
-                           ubicacion_almacen AS nombre 
-                    FROM ubicaciones_almacen 
+            $sql = "SELECT id_ubicacion AS kid_locacion_almacen, 
+                           codigo_localizacion AS nombre 
+                    FROM ubicacion_almacen 
                     WHERE kid_almacen = :id 
                     AND kid_estatus = 1";
             $stmt = $conexion->prepare($sql);

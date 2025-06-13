@@ -457,53 +457,53 @@ $navItems = [
     'route' => '/rutas/almacen_mp.php',
     'subitems' => [
       [
-        "label" => "Pesaje De Materia Prima",
+        "label" => "Recepción De Materia Prima",
         "href" => "/recepciones_materia_prima",
         "permiso" => [
-          "crear_recepciones_compras",
-          "editar_recepciones_compras",
-          "ver_recepciones_compras",
-          "eliminar_recepciones_compras"
+          "crear_recepciones_mp",
+          "editar_recepciones_mp",
+          "ver_recepciones_mp",
+          "eliminar_recepciones_mp"
         ]
       ],
       [
         "label" => "Contenido de Recepciones",
         "href" => "/detalles_recepciones_mp",
         "permiso" => [
-          "crear_detalles_recepciones_compras",
-          "editar_detalles_recepciones_compras",
-          "ver_detalles_recepciones_compras",
-          "eliminar_detalles_recepciones_compras"
+          "crear_detalles_recepciones_mp",
+          "editar_detalles_recepciones_mp",
+          "ver_detalles_recepciones_mp",
+          "eliminar_detalles_recepciones_mp"
         ]
       ],
       [
         "label" => "Comentarios de Recepciones",
         "href" => "/comentarios_recepciones_mp",
         "permiso" => [
-          "crear_comentarios_recepciones",
-          "editar_comentarios_recepciones",
-          "ver_comentarios_recepciones",
-          "eliminar_comentarios_recepciones"
+          "crear_comentarios_recepciones_mp",
+          "editar_comentarios_recepciones_mp",
+          "ver_comentarios_recepciones_mp",
+          "eliminar_comentarios_recepciones_mp"
         ]
       ],
       [
         "label" => "Reportes",
         "href" => "/reportes",
         "permiso" => [
-          "crear_detalles_recepciones_compras",
-          "editar_detalles_recepciones_compras",
-          "ver_detalles_recepciones_compras",
-          "eliminar_detalles_recepciones_compras"
+          "crear_detalles_recepciones_mp",
+          "editar_detalles_recepciones_mp",
+          "ver_detalles_recepciones_mp",
+          "eliminar_detalles_recepciones_mp"
         ]
       ],
       [
         "label" => "Mermas",
         "href" => "/mermas_mp",
         "permiso" => [
-          "crear_mermas",
-          "editar_mermas",
-          "ver_mermas",
-          "eliminar_mermas"
+          "crear_mermas_mp",
+          "editar_mermas_mp",
+          "ver_mermas_mp",
+          "eliminar_mermas_mp"
         ]
       ]
     ]
@@ -519,30 +519,30 @@ $navItems = [
         "label" => "Recepción MP",
         "href" => "/recepciones_produccion",
         "permiso" => [
-          "crear_recepciones_prod",
-          "editar_recepciones_prod",
-          "ver_recepciones_prod",
-          "eliminar_recepciones_prod"
+          "crear_recepciones_produccion",
+          "editar_recepciones_produccion",
+          "ver_recepciones_produccion",
+          "eliminar_recepciones_produccion"
         ]
       ],
       [
         "label" => "Contenido de Recepciones",
         "href" => "/detalles_recepciones_prod",
         "permiso" => [
-          "crear_detalles_recepciones_prod",
-          "editar_detalles_recepciones_prod",
-          "ver_detalles_recepciones_prod",
-          "eliminar_detalles_recepciones_prod"
+          "crear_detalles_recepciones_produccion",
+          "editar_detalles_recepciones_produccion",
+          "ver_detalles_recepciones_produccion",
+          "eliminar_detalles_recepciones_produccion"
         ]
       ],
       [
         "label" => "Comentarios de Recepciones",
         "href" => "/comentarios_recepciones_prod",
         "permiso" => [
-          "crear_comentarios_recepciones_prod",
-          "editar_comentarios_recepciones_prod",
-          "ver_comentarios_recepciones_prod",
-          "eliminar_comentarios_recepciones_prod"
+          "crear_comentarios_recepciones_produccion",
+          "editar_comentarios_recepciones_produccion",
+          "ver_comentarios_recepciones_produccion",
+          "eliminar_comentarios_recepciones_produccion"
         ]
       ],
       [
@@ -569,21 +569,20 @@ $navItems = [
         "label" => "Mermas",
         "href" => "/mermas_prod",
         "permiso" => [
-          "crear_mermas_prod",
-          "editar_mermas_prod",
-          "ver_mermas_prod",
-          "eliminar_mermas_prod"
-         
+          "crear_mermas_produccion",
+          "editar_mermas_produccion",
+          "ver_mermas_produccion",
+          "eliminar_mermas_produccion"
         ]
       ],
       [
         "label" => "Producto Terminado",
         "href" => "/producto_terminado",
         "permiso" => [
-          "crear_producto_terminado",
-          "editar_producto_terminado",
-          "ver_producto_terminado",
-          "eliminar_producto_terminado"
+          "crear_pesaje_produccion",
+          "editar_pesaje_produccion",
+          "ver_pesaje_produccion",
+          "eliminar_pesaje_produccion"
         ]
       ]
     ]

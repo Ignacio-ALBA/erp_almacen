@@ -19,12 +19,15 @@ async function finalizarRecepcionMp(idRecepcionMp) {
     }
 }
 
-async function guardarPesajeRecepcionMP() {
+async function guardarPesajeRecepcionMP(extra = {}) {
     try {
         // 1. Recolectar datos de inputs y selects
         const idOrdenCompra = document.getElementById('num_pedido').value;
         const almacenDestino = document.getElementById('almacen_destino').value;
-        const numTarimas = document.getElementById('num_tarimas').value;
+ // Número de tarimas SIEMPRE de aquí:
+const numTarimas = document.getElementById('num_tarimas').value;
+ const pesoTarimas = extra.peso_tarimas || '';
+        // campos automáticos
         const insumoSelect = document.getElementById('insumo_peso');
         const kidArticulo = insumoSelect.value;
         const pesoEstimado = document.getElementById('cantidad_insumo').value;
@@ -34,7 +37,7 @@ async function guardarPesajeRecepcionMP() {
         const imagenCodigoQR = window.imagenCodigoQR || '';
         const usuarioActual = window.usuarioActual || null; // Puedes guardar el id de colaborador en window al cargar la página
         const fechaCreacion = new Date().toISOString().slice(0,19).replace('T',' ');
-        
+        //const pdf_generado = extra.pdf_generado || '';
         // Validar datos mínimos
         if (!idOrdenCompra || !almacenDestino || !kidArticulo || !pesoReal || !contenedorDestino) {
             alert('Faltan datos obligatorios para guardar el pesaje');
@@ -59,8 +62,8 @@ async function guardarPesajeRecepcionMP() {
             monto_neto: orden.monto_neto,
             kid_almacen: almacenDestino,
             kid_recibe: usuarioActual,
-            numero_tarimas: numTarimas,
-            // campos automáticos
+            numero_tarimas: parseInt(numTarimas) || 1,
+            peso_tarimas: extra.peso_tarimas || '',
             kid_creacion: usuarioActual,
             fecha_creacion: fechaCreacion,
             kid_estatus: 1
@@ -74,8 +77,6 @@ async function guardarPesajeRecepcionMP() {
             kid_articulo: kidArticulo,
             peso_estimado: pesoEstimado,
             peso_real: pesoReal,
-            cantidad_tarimas: numTarimas || 1,
-            cantidad_parets: 0,
             kid_locacion_almacen: contenedorDestino,
             costo_unitario_total: detalle.costo_unitario_total || 0,
             costo_unitario_neto: detalle.costo_unitario_neto || 0,
@@ -85,6 +86,7 @@ async function guardarPesajeRecepcionMP() {
             diferencia_peso: diferenciaPeso,
             valor_codigoqr: valorCodigoQR,
             imagen_codigo_qr: imagenCodigoQR,
+             pdf_generado: extra.pdf_generado || '',
             kid_creacion: usuarioActual,
             fecha_creacion: fechaCreacion,
             kid_estatus: 1
@@ -461,8 +463,20 @@ FECHA Y HORA:       ${data.fechaHora}
             peso_tarima: datos.pesoTarima
           });
         window.imagenCodigoQR = qrDataUrl;
+
+           // === OBTENER PESO DE TARIMA SEGUN EL TIPO DE PESAJE ===
+        let pesoTarimas = '';
+        if (document.getElementById('peso_tarima')) {
+            pesoTarimas = document.getElementById('peso_tarima').value;
+        } else if (document.getElementById('peso_tarima_manual')) {
+            pesoTarimas = document.getElementById('peso_tarima_manual').value;
+        } else if (document.getElementById('peso_tarima_estatico')) {
+            pesoTarimas = document.getElementById('peso_tarima_estatico').value;
+        }
+        // fallback: si alguna lógica lo puso en localStorage
+        if (!pesoTarimas) pesoTarimas = localStorage.getItem('peso_tarima') || '';
+
         // 4. Ahora llama la función que arma el payload y guarda en BD
-        await guardarPesajeRecepcionMP();
             // 2. Generar PDF
             const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
             const pdfDoc = await PDFDocument.create();
@@ -582,17 +596,23 @@ FECHA Y HORA:       ${data.fechaHora}
             });
 
             const pdfBytes = await pdfDoc.save();
+                 const pdfBase64 = btoa(
+          new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'etiqueta-recepcion.pdf';
             link.click();
-
+       await guardarPesajeRecepcionMP({
+            peso_tarimas: pesoTarimas,
+            pdf_generado: pdfBase64
+        });
             // 3. Guardar en BD (AJAX)
+              /*
             const formData = {
                 recepcion_mp: 'Pesaje OC ' + datos.numPedido,
-                numero_tarimas: parseInt(datos.numTarimas) || 1,
-                numero_parets: 0,
+                peso_tarima: datos.pesoTarima,
                 codigo_externo: '',
                 grupo_cotizacion: 1,
                 kid_proyecto: null,
@@ -604,11 +624,8 @@ FECHA Y HORA:       ${data.fechaHora}
                 kid_creacion: null,
                 fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
                 kid_estatus: 1,
-                kid_ubicacion_almacen: null,
                 detalles: [{
                     kid_articulo: insumoSelect.value,
-                    cantidad_tarimas: parseFloat(datos.numTarimas) || 1,
-                    cantidad_parets: 0,
                     costo_unitario_neto: 0,
                     costo_unitario_total: 0,
                     monto_neto: 0,
@@ -620,10 +637,10 @@ FECHA Y HORA:       ${data.fechaHora}
                         proveedor: datos.proveedor,
                         fecha_hora: datos.fechaHora,
                         peso_kg: datos.pesoNeto,
-                        peso_tarima: datos.pesoTarima
                     }),
                     imagen_codigo_qr: qrDataUrl,
                     kid_creacion: null,
+                    kid_ubicacion_almacen: null,
                     fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
                     kid_estatus: 1
                 }]
@@ -638,6 +655,7 @@ FECHA Y HORA:       ${data.fechaHora}
             if (result.status !== 'success') throw new Error('Error al guardar en la BD');
             alert('Pesaje guardado correctamente');
             lastIdRecepcionMP = result.id_recepcion_mp || null;
+              */
         } catch (e) {
             console.error('Error completo:', e);
             alert('Error en el proceso: ' + e.message);

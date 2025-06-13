@@ -34,10 +34,10 @@ if($resultado){
        
         case 'recepciones_produccion':
             $perms = [
-                "crear_recepciones_prod",
-                "editar_recepciones_prod",
-                "ver_recepciones_prod",
-                "eliminar_recepciones_prod"
+                "crear_recepciones_produccion",
+                "editar_recepciones_produccion",
+                "ver_recepciones_produccion",
+                "eliminar_recepciones_produccion"
             ];
 
             checkPerms($perms);
@@ -172,10 +172,10 @@ if($resultado){
             break;
         case 'detalles_recepciones_prod':
             $perms = [
-                "crear_detalles_recepciones_prod",
-                    "editar_detalles_recepciones_prod",
-                    "ver_detalles_recepciones_prod",
-                    "eliminar_detalles_recepciones_prod"
+                "crear_detalles_recepciones_produccion",
+                    "editar_detalles_recepciones_produccion",
+                    "ver_detalles_recepciones_produccion",
+                    "eliminar_detalles_recepciones_produccion"
                    ];
         
                     checkPerms($perms);
@@ -223,10 +223,10 @@ if($resultado){
 
               case 'producto_terminado':
             $perms = [
-                    "crear_producto_terminado",
-                    "editar_producto_terminado",
-                    "ver_producto_terminado",
-                    "eliminar_producto_terminado"
+                    "crear_pesaje_produccion",
+                    "editar_pesaje_produccion",
+                    "ver_pesaje_produccion",
+                    "eliminar_pesaje_produccion"
                    ];
         
                     checkPerms($perms);
@@ -272,10 +272,10 @@ if($resultado){
             break;
         case 'comentarios_recepciones_prod':
             $perms = [
-                "crear_comentarios_recepciones_prod",
-                    "editar_comentarios_recepciones_prod",
-                    "ver_comentarios_recepciones_prod",
-                    "eliminar_comentarios_recepciones_prod"
+                "crear_comentarios_recepciones_produccion",
+                    "editar_comentarios_recepciones_produccion",
+                    "ver_comentarios_recepciones_produccion",
+                    "eliminar_comentarios_recepciones_produccion"
                    ];
         
                     checkPerms($perms);
@@ -312,10 +312,10 @@ if($resultado){
 
    case 'mermas_prod':
                 $perms = [
-                        "crear_mermas_prod",
-                        "editar_mermas_prod",
-                        "ver_mermas_prod",
-                        "eliminar_mermas_prod"
+                        "crear_mermas_produccion",
+                        "editar_mermas_produccion",
+                        "ver_mermas_produccion",
+                        "eliminar_mermas_produccion"
                    ];
         
                     checkPerms($perms);

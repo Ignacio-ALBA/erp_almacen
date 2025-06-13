@@ -708,7 +708,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ?GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
                 //$formDataJson['kid_proveedor'] = (isset($formDataJson['kid_proveedor']) && !is_numeric($formDataJson['kid_proveedor'])) ? GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-                $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;
+                $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : 1;
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $editformDataJson = CleanJson($formDataJson);

@@ -1,8 +1,7 @@
 <?php
-session_start();
-require_once '../../../includes/db.php';
 $objeto = new Conexion();
 $conexion = $objeto->Conectar();
+
 
 $data_script['botones_acciones'] = [
     '<button class="ModalDataView btn btn-primary primary" modalCRUD="${modalCRUD}"><i class="bi bi-eye"></i> Ver</button>',
@@ -11,6 +10,7 @@ $data_script['botones_acciones'] = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("POST en crudSummit.php: " . print_r($_POST, true));
     if (isset($_POST['modalCRUD']) && isset($_POST['opcion']) && isset($_POST['formDataJson'])) {
         $modalCRUD = $_POST['modalCRUD'];
         $opcion = $_POST['opcion'];
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tabla = 'recepciones_mp';
                 $idcolumn = "id_recepcion_mp";
 
-                 // Agregar verificación para la opción 'finalizar'
+   // Verificar la opción
         if ($opcion === 'finalizar') {
             try {
                 $id_recepcion_mp = intval($formDataJson['id_recepcion_mp']);
@@ -42,22 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'status' => 'success',
                     'message' => 'Recepción finalizada'
                 ]);
-                exit;
             } catch (Exception $e) {
                 echo json_encode([
                     'status' => 'error',
                     'message' => 'No se pudo finalizar: ' . $e->getMessage()
                 ]);
-                exit;
             }
-        }
+        } 
 
         // Si no es finalizar, continuar con el flujo normal de inserción
-        if ($opcion == 1) {
-             if (empty($formDataJson['kid_orden_compras']) || empty($formDataJson['detalles'])) {
-                echo json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos']);
-                exit;
-            }
+          else if ($opcion == 1) {
                 $kid_orden_compras = $formDataJson['kid_orden_compras'];
                 $usuarioActual = $_SESSION["s_id"] ?? null;
                 $fechaActual = date('Y-m-d H:i:s');
@@ -92,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $camposRecepcion = [
                             'recepcion_mp'        => 'Recepción OC ' . $orden['id_orden_compras'],
                             'numero_tarimas'      => $formDataJson['numero_tarimas'] ?? 1,
-                            'numero_parets'       => 0,
+                            'peso_tarimas'       => $formDataJson['peso_tarimas'] ?? 0,
                             'codigo_externo'      => $orden['codigo_externo'],
                             'grupo_cotizacion'    => $orden['grupo_cotizacion'],
                             'kid_proyecto'        => $orden['kid_proyecto'],
@@ -104,8 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'monto_neto'          => $orden['monto_neto'],
                             'kid_creacion'        => $usuarioActual,
                             'fecha_creacion'      => $fechaActual,
-                            'kid_estatus'         => 1,
-                            'kid_ubicacion_almacen' => $formDataJson['kid_ubicacion_almacen'] ?? null
+                            'kid_estatus'         => 1
                         ];
 
                         // 4. Insertar encabezado
@@ -134,20 +127,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // 6. Preparar datos del detalle
                         $camposDetalle = [
                             'kid_articulo'         => $detalle['kid_articulo'],
-                            'cantidad_tarimas'     => $detalle['cantidad_tarimas'] ?? 1,
-                            'cantidad_parets'      => $detalle['cantidad_parets'] ?? 0,
                             'kid_recepcion_mp'     => $id_recepcion_mp,
                             'costo_unitario_total' => $detOrden['costo_unitario_total'],
                             'costo_unitario_neto'  => $detOrden['costo_unitario_neto'],
                             'monto_total'          => $detOrden['monto_total'],
                             'monto_neto'           => $detOrden['monto_neto'],
-                            'porcentaje_descuento' => $detOrden['porcentaje_descuento'] ?? 0,
+                            'retencion_iva' => $detOrden['porcentaje_descuento'] ?? 0,
                             'kid_locacion_almacen' => $detalle['kid_locacion_almacen'] ?? null,
                             'peso_real'            => $detalle['peso_real'],
                             'peso_estimado'        => $detOrden['cantidad'],
                             'diferencia_peso'      => $detalle['diferencia_peso'],
                             'valor_codigoqr'       => $detalle['valor_codigoqr'],
                             'imagen_codigo_qr'     => $detalle['imagen_codigo_qr'],
+                            'pdf_generado'       => $detalle['pdf_generado'] ?? null,
                             'kid_creacion'         => $usuarioActual,
                             'fecha_creacion'       => $fechaActual,
                             'kid_estatus'          => 1
@@ -188,21 +180,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
 
                 } catch (Exception $e) {
-                    $conexion->rollBack();
-                    echo json_encode([
-                        'status' => 'error',
-                        'message' => $e->getMessage()
-                    ]);
-                }
-                break;
-
-            default:
+                $conexion->rollBack();
                 echo json_encode([
                     'status' => 'error',
-                    'message' => 'Operación no válida'
+                    'message' => $e->getMessage()
                 ]);
-                break;
+            }
         }
+        break;
+
+    default:
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Operación no válida'
+        ]);
+        break;
+}
     } else {
         echo json_encode([
             'status' => 'error',

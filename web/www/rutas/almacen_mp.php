@@ -113,17 +113,17 @@ if($resultado){
     break;
         case 'detalles_recepciones_mp':
             $perms = [
-                "crear_detalles_recepciones_compras",
-                    "editar_detalles_recepciones_compras",
-                    "ver_detalles_recepciones_compras",
-                    "eliminar_detalles_recepciones_compras"
-                   ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
+                "crear_detalles_recepciones_mp",
+                "editar_detalles_recepciones_mp",
+                "ver_detalles_recepciones_mp",
+                "eliminar_detalles_recepciones_mp"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
                         }
                     }
             $vista = 'detalles_recepciones_mp';
@@ -163,10 +163,10 @@ if($resultado){
 
             case 'reportes':
     $perms = [
-       "crear_detalles_recepciones_compras",
-          "editar_detalles_recepciones_compras",
-          "ver_detalles_recepciones_compras",
-          "eliminar_detalles_recepciones_compras"
+       "crear_detalles_recepciones_mp",
+          "editar_detalles_recepciones_mp",
+          "ver_detalles_recepciones_mp",
+          "eliminar_detalles_recepciones_mp"
     ];
     checkPerms($perms);
 
@@ -229,10 +229,10 @@ if($resultado){
 
         case 'comentarios_recepciones_mp':
             $perms = [
-                "crear_comentarios_recepciones",
-                    "editar_comentarios_recepciones",
-                    "ver_comentarios_recepciones",
-                    "eliminar_comentarios_recepciones"
+                "crear_comentarios_recepciones_mp",
+                    "editar_comentarios_recepciones_mp",
+                    "ver_comentarios_recepciones_mp",
+                    "eliminar_comentarios_recepciones_mp"
                    ];
         
                     checkPerms($perms);
@@ -269,17 +269,17 @@ if($resultado){
 
             case 'mermas_mp':
                 $perms = [
-                    "crear_mermas",
-                        "editar_mermas",
-                        "ver_mermas",
-                        "eliminar_mermas"
-                   ];
-        
-                    checkPerms($perms);
-                    $acciones = ['ver_', 'editar_', 'eliminar_'];
-                    foreach ($acciones as $index => $accion) {
-                        if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
-                            unset($data_script['botones_acciones'][$index]);
+                    "crear_mermas_mp",
+                    "editar_mermas_mp",
+                    "ver_mermas_mp",
+                    "eliminar_mermas_mp"
+                ];
+
+                checkPerms($perms);
+                $acciones = ['ver_', 'editar_', 'eliminar_'];
+                foreach ($acciones as $index => $accion) {
+                    if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                        unset($data_script['botones_acciones'][$index]);
                         }
                     }
                 $vista = 'mermas';
