@@ -159,6 +159,7 @@ if($resultado){
                 $caseEstatus,
                 u.email AS kid_creacion,
                 COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+                t.nombre_transporte AS kid_transporte,
                 te.tiempo_entrega AS kid_tiempo_entrega,
                 cc.fecha_cotizacion,
                 cc.fecha_entrega,
@@ -167,6 +168,7 @@ if($resultado){
             LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
             LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
             LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
+            LEFT JOIN transportes t ON cc.kid_transporte = t.id_transporte
             LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
             LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
             WHERE cc.kid_estatus != 3";
@@ -233,6 +235,7 @@ if($resultado){
             $data['data_show']['tipos_pago'] = GetTiposPagoListForSelect();
             $data['data_show']['colaboradores'] = GetUsuariosListForSelect();
             $data['data_show']['articulos'] = GetArticulosListForSelect();
+            $data['data_show']['transporte'] = GetTransportesListForSelect();
 
          
             $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];

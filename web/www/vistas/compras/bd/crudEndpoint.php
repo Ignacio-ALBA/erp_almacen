@@ -225,7 +225,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     p.proyecto AS kid_proyecto,
                     prov.proveedor AS kid_proveedor,
                     es.estatus AS kid_estatus,
+                    tp.tipo_pago AS kid_tipo_pago,
                     te.tiempo_entrega AS kid_tiempo_entrega,
+                    t.nombre_transporte AS kid_transporte,
                     cc.fecha_cotizacion,
                     cc.fecha_entrega,
                     cc.especificaciones_adicionales,
@@ -234,8 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
                 LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
                 LEFT JOIN estatus es ON cc.kid_estatus = es.id_estatus
-                LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
-                LEFT JOIN tipos_pagos tp ON cc.kid_tipo_pago = tp.id_tipo_pago 
+                LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega
+                LEFT JOIN transportes t ON cc.kid_transporte = t.id_transporte
+                LEFT JOIN tipos_pagos tp ON cc.kid_tipo_pago = tp.id_tipo_pago
                 WHERE cc.kid_estatus != 3 AND cc.id_cotizacion_compra = :id";
                 $resultado = $conexion->prepare($consultaselect);
                 $resultado->bindParam(':id', $elementID);

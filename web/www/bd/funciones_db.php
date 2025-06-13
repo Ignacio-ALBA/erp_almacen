@@ -757,6 +757,22 @@ function GetArticulosListForSelect($condiciones  = []){
     ], $data);
     return $data;
 }
+
+function GetTransportesListForSelect($condiciones  = []){
+    global $conexion;
+    list($condiciones_str, $parametros) = AddConditions($condiciones);
+    $consulta = "SELECT id_transporte, nombre_transporte FROM transportes WHERE kid_estatus != 3 $condiciones_str";
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute();
+    $data = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    $data = array_map(fn($item) => [
+        'valor' => $item['id_transporte'],
+        'text' => $item['nombre_transporte'],
+        'pordefecto' => 0
+    ], $data);
+    return $data;
+};
+
 function GetProduccionesListForSelect($condiciones  = []){
     global $conexion;
     // Construir las condiciones y parámetros

@@ -18,7 +18,7 @@
 
   $id = 'cotizaciones_compras';
   $ButtonAddLabel = "Nueva Cotización";
-  $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Tiempo de Entrega','Fecha de cotización','Fecha de entrega','Fecha de creación'];
+  $titulos = ['ID', 'Cotización','Grupo','Proveedor','Estado','La Creo','La Autorizo','Transporte','Tiempo de Entrega','Fecha de cotización','Fecha de entrega','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, 'ButtonsInRow');
   CreateModalForm(
     [
@@ -40,6 +40,7 @@
       CreateSelect(['id'=>'kid_tipo_pago','etiqueta'=>'Tipo de Pago'],$tipos_pago),
       CreateInput(['id'=>'fecha_cotizacion','type'=>'date','etiqueta'=>'Fecha de Cotización','required' => '']),
       CreateInput(['id'=>'fecha_entrega','type'=>'date','etiqueta'=>'Fecha Tentativa de Entrega','required' => '']),
+      CreateSelect(['id'=>'kid_transporte','etiqueta'=>'Transporte','required' => ''],$transporte),
       CreateTextArea(['id'=>'especificaciones_adicionales','maxlength'=>'300','etiqueta'=>'Especificaciones Adicionales','required' => '']),
     ]);
     
