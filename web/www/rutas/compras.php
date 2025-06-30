@@ -187,7 +187,7 @@ if($resultado){
         if($row['kid_estatus'] != 5) {
             $bloque = 'compras';
             $modalCRUD = 'update_estatus_cotizaciones_compras';
-            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="Autorizar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check-circle"></i> Autorizar</button>';
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="Autorizado" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check-circle"></i> Autorizar</button>';
             array_unshift($botones_acciones, $nuevo_boton);
         }
                  // Comentados los botones de Contenido y Cuadro Comparativo

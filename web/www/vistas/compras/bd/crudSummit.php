@@ -461,8 +461,8 @@ case 'cotizaciones_compras':
         }
         $newformDataJson = $editformDataJson;
     }
-    
-    $newformDataJson['fecha_actualizacion'] = date('Y-m-d H:i:s');
+
+    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
 
     $consultaselect = "SELECT cc.id_cotizacion_compra,
         cc.cotizacion_compras,
@@ -555,13 +555,13 @@ case 'update_estatus_cotizaciones_compras':
             $updateSql = "UPDATE cotizaciones_compras 
                          SET kid_estatus = :kid_estatus,
                              kid_autorizo = :kid_autorizo,
-                             fecha_actualizacion = :fecha_actualizacion
+                             fecha_creacion = :fecha_creacion
                          WHERE id_cotizacion_compra = :id";
             
             $stmt = $conexion->prepare($updateSql);
             $stmt->bindParam(':kid_estatus', $estatusID, PDO::PARAM_INT);
             $stmt->bindParam(':kid_autorizo', $_SESSION["s_id"], PDO::PARAM_INT);
-            $stmt->bindValue(':fecha_actualizacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(':fecha_creacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             
             if (!$stmt->execute()) {
@@ -569,7 +569,7 @@ case 'update_estatus_cotizaciones_compras':
             }
 
             // Si el estado es "Autorizar", crear orden de compra
-            if($formDataJson['UpdateEstatus'] == 'Autorizar') {
+            if($formDataJson['UpdateEstatus'] == 'Autorizado') {
                 // Insertar nueva orden de compra
                 $consulordenes = "INSERT INTO ordenes_compras (
                     orden_compras,
@@ -680,7 +680,7 @@ case 'update_estatus_cotizaciones_compras':
             $editformDataJson = [
                 'kid_estatus' => $estatusID,
                 'kid_autorizo' => $_SESSION["s_id"],
-                'fecha_actualizacion' => date('Y-m-d H:i:s')
+                'fecha_creacion' => date('Y-m-d H:i:s')
             ];
 
         } catch(Exception $e) {
