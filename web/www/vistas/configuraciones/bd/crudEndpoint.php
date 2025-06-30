@@ -470,7 +470,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
+case 'transportes':
+    // Log para debugging
+    error_log("Procesando transportes - ID: " . $elementID);
+    
+    if(isset($_POST['opcion'])) {
+        $consultaselect = "SELECT id_transporte, 
+            nombre_transporte, 
+            fecha_creacion
+        FROM transportes 
+        WHERE kid_estatus != 3 
+        AND id_transporte = :id";
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->bindParam(':id', $elementID);
+        $resultado->execute();
+        $data['data'] = $resultado->fetchAll(PDO::FETCH_NUM);
+        $data['options'] = [];
 
+    } else {
+        $consultaselect = "SELECT * 
+        FROM transportes 
+        WHERE kid_estatus != 3 
+        AND id_transporte = :id";
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->bindParam(':id', $elementID);
+        $resultado->execute();
+        $data = $resultado->fetch(PDO::FETCH_ASSOC);
+        
+        // Solo establecer id_transporte a null si se encontraron datos
+        if ($data) {
+            $data['id_transporte'] = null;
+        }
+    }
+
+    // Verifica si se encontraron datos y retorna la respuesta apropiada
+    if ($data) {
+        error_log("Datos encontrados para transporte: " . print_r($data, true));
+        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+        return; // Asegura que el código termina aquí si hay éxito
+    } else {
+        error_log("No se encontraron datos para transporte ID: " . $elementID);
+        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+        return; // Asegura que el código termina aquí si no hay datos
+    }
+    break;
             case 'detalles_planeaciones_actividades':
                 if(isset($_POST['opcion'])) {
                     $consultaselect = "SELECT dpa.id_detalle_planeacion_actividad, 

@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     rfc,
                     email1,
                     CASE 
-                        WHEN pordefecto = 1 THEN 'SÍ' 
+                        WHEN pordefecto = 1 THEN 'SI' 
                         ELSE 'NO' 
                     END AS pordefecto,
                     fecha_creacion

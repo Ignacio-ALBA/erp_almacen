@@ -102,6 +102,33 @@ if($resultado){
                     }
                 $vista = 'tipos_comentarios';
                 break;
+                 case 'transportes': 
+                $perms =  [
+                "crear_transportes",
+                "editar_transportes",
+                "ver_transportes",
+                "eliminar_transportes"
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'transportes';
+            $consultaselect = "SELECT 
+            id_transporte,
+            nombre_transporte,
+            fecha_creacion FROM transportes
+             WHERE kid_estatus = 1";
+               $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+            $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            $data['data_show']['botones_acciones'] = $data_script['botones_acciones'];
+       break;
             case 'tipos_estados':
                 $perms = [
                     "crear_estatus",

@@ -1490,44 +1490,66 @@ $(document).ready(function() {
             event.preventDefault();
             var formDataJson = {};
             var form_error = false;
+            var missing_fields = []; // Array to store missing field names
             var additionalData = new FormData();
+            
             $(`#form${modalCRUD} input, #form${modalCRUD} select, #form${modalCRUD} textarea`).each(function() {
                 var id = $(this).attr('id');
-                var value;
+                var value = $(this).val();
+                var label = $(this).prev('label').text() || id;
+                var isRequired = $(this).prop('required');
+                var isHidden = $(this).parent().is(':hidden');
             
-                // Para checkboxes, obtenemos el estado (checked) en lugar del valor
+
+                     console.log('Campo:', {
+            id: id,
+            value: value,
+            isRequired: isRequired,
+            isHidden: isHidden,
+            type: $(this).prop('type'),
+            tagName: $(this).prop('tagName')
+        });
+
+                // Skip hidden fields validation  
+        if (isHidden) {
+            console.log(`Saltando validación de campo oculto: ${id}`);
+            return;
+        }
+                 // Skip hidden fields validation  
+        if ($(this).parent().is(':hidden')) {
+            return;
+        }
+
+      if (id) { 
+            if (isRequired && (value === "" || value === " " || value === null || value === undefined)) { 
+                form_error = true;
+                $(`#error_${id}`).text("Campo Obligatorio");
+                missing_fields.push(label);
+                console.log(`Campo requerido faltante: ${id}, valor actual: ${value}`);
+            } else {
+                $(`#error_${id}`).text("");
                 if ($(this).is(':checkbox')) {
-                    value = $(this).is(':checked') ? 1 : 0; // o el valor que desees almacenar
+                    formDataJson[id] = $(this).is(':checked') ? 1 : 0;
                 } else {
-                    value = $(this).val();
-                }
-            
-                if (id) { 
-                    if ($(this).is(':required') && (value === "" || value === " " || value === null || value === undefined || ($(this).is(':checkbox') && !$(this).is(':checked')))) { 
-                        // Manejo de inputs de texto, selects y checkboxes
-                        form_error = true;
-                        $(`#error_${id}`).text("Campo Obligatorio");
+                    if($(this).is('input[type="file"]')){
+                        const archivo = $(this)[0].files[0];
+                        additionalData.append(id, archivo);
                     } else {
-                        $(`#error_${id}`).text("");
-                        //$(this).removeClass('is-invalid');
-                        if ($(this).is(':checkbox')) {
-                            formDataJson[id] = $(this).is(':checked') ? 1 : 0; // Almacena 1 si está activado, 0 si no
-                        } else {
-                            if($(this).is('input[type="file"]')){
-                                const archivo = $(this)[0].files[0];
-                                additionalData.append(id, archivo);
-                            }else{
-                                formDataJson[id] = value; // Almacena el valor de otros inputs
-                            }
-                        }
+                        formDataJson[id] = value;
                     }
                 }
-            });
-        
-            if (form_error) {
-                console.log('Por favor, complete todos los campos requeridos.');
-                return;
             }
+        }
+    });
+
+    if (form_error) {
+        console.log('Detalles del error de validación:', {
+            missing_fields: missing_fields,
+            formData: formDataJson
+        });
+        alert('Por favor complete los siguientes campos: ' + missing_fields.join(', '));
+        return false;
+    }
         
             console.log(formDataJson);
             var AlertDataSimilar = $(`#form${modalCRUD}`).attr('alertdatasimilar') === 'true';

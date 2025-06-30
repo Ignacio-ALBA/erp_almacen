@@ -21,7 +21,7 @@
 
   $id = 'proveedores';
   $ButtonAddLabel = "Nuevo Proveedor";
-  $titulos = ['ID', 'Orden','Código','Proveedores','Calificación','Razón Social','RFC','Correo','Por Defecto','Fecha de creación'];
+  $titulos = ['ID', 'Orden','Código','Proveedores','Calificación','Razón Social','RFC','Por Defecto','Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones,'StaticButtons');
   CreateModalForm(
     [
@@ -35,7 +35,7 @@
       'bloque'=>'catalogo'
     ],
     [
-      CreateInput(['type'=>'text','maxlength'=>'16','id'=>'clave','etiqueta'=>'Clave de proveedor','required' => '']),
+      CreateInput(['type'=>'text','maxlength'=>'16','id'=>'codigo','etiqueta'=>'Clave de proveedor','required' => '']),
       CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'proveedor','etiqueta'=>'Proveedor','required' => '']),
       CreateInput(['type'=>'text','maxlength'=>'100','id'=>'razon_social','etiqueta'=>'Razón Social/Denominación Social','required' => '']),

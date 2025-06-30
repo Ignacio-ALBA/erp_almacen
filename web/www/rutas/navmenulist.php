@@ -1067,7 +1067,17 @@ $navItems = [
           "ver_estatus",
           "eliminar_estatus"
         ]
-      ]
+        ],
+        [
+          "label" => "Transportes",
+          "href" => "/transportes",
+          "permiso" => [
+            "crear_transportes",
+            "editar_transportes",
+            "ver_transportes",
+            "eliminar_transportes"
+          ]
+        ]
     ]
   ]
 ];

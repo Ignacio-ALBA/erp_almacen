@@ -231,7 +231,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ColumnsCheck = [];
                 $text_colums_edit = [];
                 break;
-            
+           case 'transportes':
+    $tabla = 'transportes';
+    $idcolumn = 'id_transporte';
+    
+    // Get data from formDataJson instead of direct POST
+    $editformDataJson = CleanJson($formDataJson);
+    $newformDataJson = $formDataJson;
+    
+    // Set default values for new records
+    if ($opcion == 1) {
+        $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+        $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+        $newformDataJson['kid_estatus'] = 1;
+    }
+
+    // Define the select query
+    $consultaselect = "SELECT 
+        id_transporte, 
+        nombre_transporte,
+        fecha_creacion 
+        FROM $tabla 
+        WHERE $idcolumn = :$idcolumn 
+        AND kid_estatus != 3";
+
+    // Define columns to check for duplicates/similar values
+    $ColumnsCheck = [
+        ['column' => 'nombre_transporte', 'check_similar' => true]
+    ];
+
+    // Function to map results
+    $fuc_mapping = function ($row) {
+        global $estatus;
+        if (isset($row['kid_estatus'])) {
+            $row['kid_estatus'] = $estatus[$row['kid_estatus']];
+        }
+        return $row;
+    };
+
+    // Define columns for edit comparison
+    $text_colums_edit = [
+        'nombre_transporte' => 'nombre_transporte',
+        'kid_estatus' => 'kid_estatus'
+    ];
+
+    break;
             default:
             $data_return = ['status' => 'error', 'message' => 'Operación no válida'];
                 break;

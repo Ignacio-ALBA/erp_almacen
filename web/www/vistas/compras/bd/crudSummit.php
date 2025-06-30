@@ -238,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newformDataJson = $formDataJson;
                 $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                $newformDataJson['kid_estatus'] = 8;
+                $newformDataJson['kid_estatus'] = 1;
                 $newformDataJson['kid_autorizo'] = 0;
                 $estatus = GetEstatusLabels();
                 $caseEstatus = "CASE \n";
@@ -328,329 +328,412 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ColumnsCheck = [];
                 break;
 
-            case 'cotizaciones_compras':
-                $tabla = 'cotizaciones_compras';
-                $idcolumn= "id_cotizacion_compra";
-                $defaultProjectId = GetDefaultProjectId();
-                /*-------------------- Obtener Tablas Foráneas --------------------*/
-                $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? 
-                GetIDProyectoByName($formDataJson['kid_proyecto']) : $defaultProjectId;
-                $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ?GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
-                //$formDataJson['kid_articulo'] = isset($formDataJson['kid_articulo']) ?GetIDArticuloByName($formDataJson['kid_articulo']) : null;
-                $formDataJson['kid_estatus'] = isset($formDataJson['kid_estatus']) ? GetIDEstatusByName($formDataJson['kid_estatus']) : null;
-                $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : null;
-                $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : null;
-                /*------------------- Fin Obtener Tablas Foráneas ------------------*/
-                // Asegúrate que fecha_entrega esté presente antes de la limpieza
-    $newformDataJson['fecha_entrega'] = isset($formDataJson['fecha_entrega']) ? 
-        $formDataJson['fecha_entrega'] : null;
+            
+
+case 'cotizaciones_compras':
+    $tabla = 'cotizaciones_compras';
+    $idcolumn = "id_cotizacion_compra";
+    $defaultProjectId = GetDefaultProjectId();
+
+    // Debug logging
+    error_log("Form Data Received: " . print_r($formDataJson, true));
     
-                $editformDataJson = CleanJson($formDataJson);
-                $newformDataJson = $formDataJson;
-                $newformDataJson['grupo'] = 1;
-                $newformDataJson['kid_estatus'] = 8;
+    // Convertir el estatus a ID antes de procesar si existe
+    if (isset($formDataJson['kid_estatus'])) {
+        $estatusID = GetIDEstatusByName($formDataJson['kid_estatus']);
+        if ($estatusID === null) {
+            print json_encode([
+                'status' => 'error',
+                'message' => 'Estatus no válido: ' . $formDataJson['kid_estatus']
+            ]);
+            exit;
+        }
+        $formDataJson['kid_estatus'] = $estatusID;
+    }
 
-                if($opcion == 1){
-                    $consultaselect = "SELECT MAX(grupo)
-                    FROM cotizaciones_compras
-                    WHERE kid_proyecto = :kid_proyecto AND kid_proveedor = :kid_proveedor AND kid_estatus != 3;";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':kid_proyecto', $formDataJson['kid_proyecto']);
-                    $resultado->bindParam(':kid_proveedor', $formDataJson['kid_proveedor']);
-                    $resultado->execute();
-                    $grupo = $resultado->fetchColumn() ?: null;
-                    
-                    if ($grupo === null) {
-                        $consultaselect = "SELECT MAX(grupo)
-                                        FROM cotizaciones_compras
-                                        WHERE kid_proyecto = :kid_proyecto AND kid_estatus != 3;";
-                        $resultado = $conexion->prepare($consultaselect);
-                        $resultado->bindParam(':kid_proyecto', $formDataJson['kid_proyecto']);
-                        $resultado->execute();
-                        $grupo = $resultado->fetchColumn() ?? null;
-                        $grupo++;
-                    }
+    // Procesar kid_transporte antes de la validación
+    if (isset($formDataJson['kid_transporte'])) {
+        if (is_numeric($formDataJson['kid_transporte'])) {
+            $formDataJson['kid_transporte'] = (string)$formDataJson['kid_transporte'];
+        } else {
+            $formDataJson['kid_transporte'] = GetIDTransporteByName($formDataJson['kid_transporte']);
+        }
+        error_log("kid_transporte processed: " . $formDataJson['kid_transporte']);
+    }
+
+    // Establece valores por defecto para campos requeridos
+    $defaults = [
+        'kid_proyecto' => $defaultProjectId,
+        'kid_estatus' => 1, // Default status for new records
+        'grupo' => 1,
+        'kid_creacion' => $_SESSION["s_id"],
+        'kid_autorizo' => 0,
+        'fecha_creacion' => date('Y-m-d H:i:s'),
+        'fecha_cotizacion' => date('Y-m-d H:i:s'),
+        'fecha_entrega' => date('Y-m-d H:i:s')
+    ];
+    
+    /*-------------------- Obtener Tablas Foráneas --------------------*/
+    $formDataJson['kid_proyecto'] = isset($formDataJson['kid_proyecto']) ? 
+        GetIDProyectoByName($formDataJson['kid_proyecto']) : $defaultProjectId;
+    
+    $formDataJson['kid_proveedor'] = isset($formDataJson['kid_proveedor']) ? 
+        GetIDProveedorByName($formDataJson['kid_proveedor']) : null;
+    
+    $formDataJson['kid_tiempo_entrega'] = isset($formDataJson['kid_tiempo_entrega']) ? 
+        GetIDTiempoEntregaByName($formDataJson['kid_tiempo_entrega']) : null;
+
+    $formDataJson['kid_tipo_pago'] = isset($formDataJson['kid_tipo_pago']) ? 
+        GetIDTipoPagoByName($formDataJson['kid_tipo_pago']) : null;
+    /*------------------- Fin Obtener Tablas Foráneas ------------------*/
+
+    // Validación de campos requeridos
+    $required_fields = [
+        'cotizacion_compras',
+        'kid_proyecto',
+        'kid_proveedor', 
+        'kid_tiempo_entrega',
+        'kid_transporte',
+        'kid_tipo_pago',
+        'fecha_cotizacion',
+        'fecha_entrega'
+    ];
+
+    $missing_fields = [];
+    foreach ($required_fields as $field) {
+        if (!isset($formDataJson[$field]) || 
+            ($formDataJson[$field] !== "0" && 
+             $formDataJson[$field] !== 0 && 
+             empty($formDataJson[$field]) && 
+             !is_numeric($formDataJson[$field]))) {
+            $missing_fields[] = $field;
+            error_log("Campo faltante $field: " . print_r($formDataJson[$field], true));
+        }
+    }
+
+    if (!empty($missing_fields)) {
+        error_log("Campos faltantes encontrados: " . print_r($missing_fields, true));
+        print json_encode([
+            'status' => 'error',
+            'message' => 'Campos requeridos faltantes: ' . implode(', ', $missing_fields)
+        ]);
+        exit;
+    }
+
+    // Asignar valores por defecto y mantener el estado existente en actualizaciones
+    if ($opcion == 1) {
+        $newformDataJson = array_merge($defaults, $formDataJson);
+        $editformDataJson = CleanJson($formDataJson);
+        
+        // Get next group number
+        $consultaselect = "SELECT MAX(grupo)
+            FROM cotizaciones_compras
+            WHERE kid_proyecto = :kid_proyecto AND kid_proveedor = :kid_proveedor AND kid_estatus != 3;";
+        $resultado = $conexion->prepare($consultaselect);
+        $resultado->bindParam(':kid_proyecto', $formDataJson['kid_proyecto']);
+        $resultado->bindParam(':kid_proveedor', $formDataJson['kid_proveedor']);
+        $resultado->execute();
+        $grupo = $resultado->fetchColumn() ?: null;
+        
+        if ($grupo === null) {
+            $consultaselect = "SELECT MAX(grupo)
+                FROM cotizaciones_compras
+                WHERE kid_proyecto = :kid_proyecto AND kid_estatus != 3;";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->bindParam(':kid_proyecto', $formDataJson['kid_proyecto']);
+            $resultado->execute();
+            $grupo = $resultado->fetchColumn() ?? null;
+            $grupo++;
+        }
+        
+        $newformDataJson['grupo'] = $grupo ?? 1;
+        $newformDataJson['kid_estatus'] = 1; // Status for new records
+    } else {
+        // For updates, keep existing status if not explicitly changed
+        $editformDataJson = CleanJson($formDataJson);
+        if (!isset($editformDataJson['kid_estatus'])) {
+            $consultaEstado = "SELECT kid_estatus FROM cotizaciones_compras WHERE id_cotizacion_compra = :id";
+            $stmt = $conexion->prepare($consultaEstado);
+            $stmt->bindParam(':id', $_POST['firstColumnValue'], PDO::PARAM_INT);
+            $stmt->execute();
+            $estadoActual = $stmt->fetchColumn();
+            $editformDataJson['kid_estatus'] = $estadoActual;
+        }
+        $newformDataJson = $editformDataJson;
+    }
+    
+    $newformDataJson['fecha_actualizacion'] = date('Y-m-d H:i:s');
+
+    $consultaselect = "SELECT cc.id_cotizacion_compra,
+        cc.cotizacion_compras,
+        cc.grupo,
+        p.proyecto AS kid_proyecto,
+        prov.razon_social AS kid_proveedor,
+        cc.kid_estatus,
+        u.email AS kid_creacion,
+        COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+        cc.fecha_entrega,
+        cc.fecha_cotizacion,
+        cc.fecha_creacion
+    FROM cotizaciones_compras cc
+    LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
+    LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
+    LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
+    LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u2.id_colaborador
+    WHERE cc.kid_estatus != 3 AND ".$idcolumn." = :".$idcolumn;
+
+    $fuc_mapping = function ($row) {
+        global $data_script, $estatus, $estatus_name;
+        $botones_acciones = $data_script['botones_acciones'];
+
+        $bloque = 'compras';
+        $modalCRUD = 'update_estatus_cotizaciones_compras';
+        if(!in_array($row['kid_estatus'], [5,6,7])){
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
+            array_unshift($botones_acciones,$nuevo_boton);
+        }else if($row['kid_estatus'] == 6){
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
+            array_unshift($botones_acciones,$nuevo_boton);
+        }if($row['kid_estatus'] == 7){
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
+            array_unshift($botones_acciones,$nuevo_boton);
+        }
+        
+        $hashed_id = codificar($row['id_cotizacion_compra']);
+        $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
+        array_push($botones_acciones, $nuevo_boton);
+        $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
+        array_push($botones_acciones, $nuevo_boton);
+        
+        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
+        $row['kid_estatus'] = isset($estatus[$row['kid_estatus']]) ? $estatus[$row['kid_estatus']] : 'Estado desconocido';
+        return $row;
+    };
+
+    $ColumnsCheck = [['column'=>"cotizacion_compras","check_similar"=>false]];
+break;
+
+case 'update_estatus_cotizaciones_compras':
+    $opcion = 2;
+    $id = $_POST['firstColumnValue'];
+    
+    // Inicializar editformDataJson
+    $editformDataJson = [];
+    
+    // Consultar datos actuales de la cotización
+    $consultacotizacion = "SELECT cc.id_cotizacion_compra,
+        cc.cotizacion_compras,
+        cc.grupo,
+        cc.kid_proyecto,
+        cc.kid_proveedor,
+        cc.kid_estatus,
+        cc.kid_autorizo,
+        SUM(dcc.monto_total) AS monto_total,
+        SUM(dcc.monto_neto) AS monto_neto
+    FROM cotizaciones_compras cc
+    LEFT JOIN detalles_cotizaciones_compras dcc ON cc.id_cotizacion_compra = dcc.kid_cotizacion_compra
+    WHERE cc.kid_estatus != 3 AND cc.id_cotizacion_compra = :id
+    GROUP BY cc.id_cotizacion_compra, cc.grupo, cc.kid_proyecto, cc.kid_proveedor, cc.kid_estatus";
+    
+    $resultado = $conexion->prepare($consultacotizacion);
+    $resultado->bindParam(':id', $id, PDO::PARAM_INT);
+    $resultado->execute();
+    $cotizacion = $resultado->fetch(PDO::FETCH_ASSOC);
+
+    if(isset($formDataJson['UpdateEstatus'])) {
+        try {
+            $conexion->beginTransaction();
+            
+            // Obtener y validar el ID del estatus
+            $estatusID = GetIDEstatusByName($formDataJson['UpdateEstatus']);
+            
+            if ($estatusID === null) {
+                throw new Exception("Estado no válido o no encontrado: " . $formDataJson['UpdateEstatus']);
+            }
+
+            // Actualizar estatus de la cotización
+            $updateSql = "UPDATE cotizaciones_compras 
+                         SET kid_estatus = :kid_estatus,
+                             kid_autorizo = :kid_autorizo,
+                             fecha_actualizacion = :fecha_actualizacion
+                         WHERE id_cotizacion_compra = :id";
+            
+            $stmt = $conexion->prepare($updateSql);
+            $stmt->bindParam(':kid_estatus', $estatusID, PDO::PARAM_INT);
+            $stmt->bindParam(':kid_autorizo', $_SESSION["s_id"], PDO::PARAM_INT);
+            $stmt->bindValue(':fecha_actualizacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Error al actualizar el estado de la cotización");
+            }
+
+            // Si el estado es "Autorizar", crear orden de compra
+            if($formDataJson['UpdateEstatus'] == 'Autorizar') {
+                // Insertar nueva orden de compra
+                $consulordenes = "INSERT INTO ordenes_compras (
+                    orden_compras,
+                    codigo_externo,
+                    grupo_cotizacion,
+                    kid_proyecto,
+                    kid_proveedor,
+                    monto_total,
+                    monto_neto,
+                    kid_creacion,
+                    fecha_creacion,
+                    kid_estatus
+                ) VALUES (
+                    CONCAT('Orden compra de ', :cotizacion_compras),
+                    CONCAT('COMP', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+                    :grupo_cotizacion,
+                    :kid_proyecto,
+                    :kid_proveedor,
+                    :monto_total,
+                    :monto_neto,
+                    :kid_creacion,
+                    :fecha_creacion,
+                    :kid_estatus
+                )";
+
+                $resultado = $conexion->prepare($consulordenes);
+                $resultado->bindParam(':cotizacion_compras', $cotizacion['cotizacion_compras'], PDO::PARAM_STR);
+                $resultado->bindParam(':grupo_cotizacion', $cotizacion['grupo'], PDO::PARAM_INT);
+                $resultado->bindParam(':kid_proyecto', $cotizacion['kid_proyecto'], PDO::PARAM_INT);
+                $resultado->bindParam(':kid_proveedor', $cotizacion['kid_proveedor'], PDO::PARAM_INT);
+                $resultado->bindParam(':monto_total', $cotizacion['monto_total'], PDO::PARAM_STR);
+                $resultado->bindParam(':monto_neto', $cotizacion['monto_neto'], PDO::PARAM_STR);
+                $resultado->bindParam(':kid_creacion', $_SESSION["s_id"], PDO::PARAM_INT);
+                $resultado->bindValue(':fecha_creacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+                $resultado->bindValue(':kid_estatus', 8, PDO::PARAM_INT);
+
+                if (!$resultado->execute()) {
+                    throw new Exception("Error al crear la orden de compra");
+                }
+
+                $orden_compra_id = $conexion->lastInsertId();
+
+                // Copiar detalles de la cotización
+                $consultdetalle = "SELECT kid_articulo, cantidad, costo_unitario_total, 
+                    costo_unitario_neto, monto_total, monto_neto
+                FROM detalles_cotizaciones_compras 
+                WHERE kid_estatus != 3 AND kid_cotizacion_compra = :id";
                 
-                    // Si $grupo sigue siendo null, lo igualamos a 1
-                    $newformDataJson['grupo'] = $grupo ?? 1;
+                $resultado = $conexion->prepare($consultdetalle);
+                $resultado->bindParam(':id', $cotizacion['id_cotizacion_compra'], PDO::PARAM_INT);
+                
+                if (!$resultado->execute()) {
+                    throw new Exception("Error al obtener detalles de la cotización");
                 }
                 
-                $newformDataJson['fecha_creacion']=date('Y-m-d H:i:s');
-                $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                $newformDataJson['kid_estatus'] = 8;
-                $newformDataJson['kid_autorizo'] = 0;
+                $detalles = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
-                $consultaselect = "SELECT cc.id_cotizacion_compra,
-                    cc.cotizacion_compras,
-                    cc.grupo,
-                    p.proyecto AS kid_proyecto,
-                    prov.razon_social AS kid_proveedor,
-                    cc.kid_estatus,
-                    u.email AS kid_creacion,
-                    COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
-                    cc.fecha_entrega,
-                    cc.fecha_cotizacion,
-                    cc.fecha_creacion
-                FROM cotizaciones_compras cc
-                LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
-                LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
-                LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
-                LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
-                WHERE cc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
+                // Insertar detalles en la nueva orden
+                foreach($detalles as $detalle) {
+                    $insertDetalle = "INSERT INTO detalles_ordenes_compras (
+                        kid_orden_compras,
+                        grupo_cotizacion,
+                        kid_articulo,
+                        cantidad,
+                        costo_unitario_total,
+                        costo_unitario_neto,
+                        monto_total,
+                        monto_neto,
+                        kid_creacion,
+                        fecha_creacion,
+                        kid_estatus
+                    ) VALUES (
+                        :kid_orden_compras,
+                        :grupo_cotizacion,
+                        :kid_articulo,
+                        :cantidad,
+                        :costo_unitario_total,
+                        :costo_unitario_neto,
+                        :monto_total,
+                        :monto_neto,
+                        :kid_creacion,
+                        :fecha_creacion,
+                        :kid_estatus
+                    )";
 
-                $fuc_mapping = function ($row) {
-                    global $data_script, $estatus, $estatus_name;
-                    $botones_acciones = $data_script['botones_acciones'];
-
-                    $bloque = 'compras';
-                    $modalCRUD =  'update_estatus_cotizaciones_compras';
-                    if(!in_array($row['kid_estatus'], [5,6,7])){
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
-                        array_unshift($botones_acciones,$nuevo_boton);
-                    }else if($row['kid_estatus'] == 6){
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
-                        array_unshift($botones_acciones,$nuevo_boton);
-                    }if($row['kid_estatus'] == 7){
-                        $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                        array_unshift($botones_acciones,$nuevo_boton);
-                    }
+                    $stmt = $conexion->prepare($insertDetalle);
+                    $stmt->bindParam(':kid_orden_compras', $orden_compra_id, PDO::PARAM_INT);
+                    $stmt->bindParam(':grupo_cotizacion', $cotizacion['grupo'], PDO::PARAM_INT);
+                    $stmt->bindParam(':kid_articulo', $detalle['kid_articulo'], PDO::PARAM_INT);
+                    $stmt->bindParam(':cantidad', $detalle['cantidad'], PDO::PARAM_INT);
+                    $stmt->bindParam(':costo_unitario_total', $detalle['costo_unitario_total'], PDO::PARAM_STR);
+                    $stmt->bindParam(':costo_unitario_neto', $detalle['costo_unitario_neto'], PDO::PARAM_STR);
+                    $stmt->bindParam(':monto_total', $detalle['monto_total'], PDO::PARAM_STR);
+                    $stmt->bindParam(':monto_neto', $detalle['monto_neto'], PDO::PARAM_STR);
+                    $stmt->bindParam(':kid_creacion', $_SESSION["s_id"], PDO::PARAM_INT);
+                    $stmt->bindValue(':fecha_creacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+                    $stmt->bindValue(':kid_estatus', 7, PDO::PARAM_INT);
                     
-                    $hashed_id = codificar($row['id_cotizacion_compra']);
-                    $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                    array_push($botones_acciones, $nuevo_boton);
-                    $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                    array_push($botones_acciones, $nuevo_boton);
-                    $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
-                    $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                    return $row;
-                };
-
-
-                $ColumnsCheck = [['column'=>"cotizacion_compras","check_similar"=>false]];
-                break;
-
-            case 'update_estatus_cotizaciones_compras':
-
-                $opcion = 2;
-                $id = $_POST['firstColumnValue'];
-                $consultacotizacion = "SELECT cc.id_cotizacion_compra,
-                    cc.cotizacion_compras,
-                    cc.grupo,
-                    cc.kid_proyecto,
-                    cc.kid_proveedor,
-                    cc.kid_estatus,
-                    cc.kid_autorizo,
-                    SUM(dcc.monto_total) AS monto_total,
-                    SUM(dcc.monto_neto) AS monto_neto
-                FROM cotizaciones_compras cc
-                LEFT JOIN detalles_cotizaciones_compras dcc ON cc.id_cotizacion_compra = dcc.kid_cotizacion_compra
-                WHERE cc.kid_estatus != 3 AND cc.id_cotizacion_compra = :id
-                GROUP BY cc.id_cotizacion_compra, cc.grupo, cc.kid_proyecto, cc.kid_proveedor, cc.kid_estatus";
-                $resultado = $conexion->prepare($consultacotizacion);
-                $resultado->bindParam(':id', $id);
-                $resultado->execute();
-                $cotizacion = $resultado->fetch(PDO::FETCH_ASSOC);
-
-                $tabla = 'detalles_actividades';
-                $idcolumn= "id_detalle_actividad";
-                $fuc_mapping = getButtonstoDetallesActividades();
-
-                $consultaselect = "SELECT da.id_detalle_actividad, 
-                    da.actividad,
-                    da.kid_actividad,
-                    p.proyecto,
-                    CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', u.apellido_materno) as kid_personal_asignado,
-                    da.kid_estatus,
-                    COALESCE(da.fecha_inicial_real, 'Sin Iniciar') AS fecha_inicial_real,
-                    CASE 
-                        WHEN da.fecha_inicial_real IS NOT NULL AND da.fecha_final_real IS NULL THEN 'Sin Finalizar'
-                        ELSE COALESCE(da.fecha_final_real, 'Sin Iniciar')
-                    END AS fecha_final_real,
-                    COALESCE(a.dias_totales_reales, 0) AS dias_totales_reales,
-                    COALESCE(a.horas_totales_reales, 0) AS horas_totales_reales,
-                    da.progreso
-                FROM 
-                    detalles_actividades da
-                LEFT JOIN actividades a ON da.kid_actividad = a.id_actividad 
-                LEFT JOIN proyectos p ON a.kid_proyecto = p.id_proyecto 
-                LEFT JOIN colaboradores u ON da.kid_personal_asignado = u.id_colaborador
-                WHERE da.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
-
-                $formDataJson['kid_estatus'] = isset($formDataJson['UpdateEstatus']) ? GetIDEstatusByName($formDataJson['UpdateEstatus']) : null;
-
-                unset($formDataJson['UpdateEstatus']);
-
-                $editformDataJson = CleanJson($formDataJson);
-
-
-                if(isset($formDataJson['kid_estatus']) && $editformDataJson['kid_estatus']==5 &&  $cotizacion['kid_estatus'] != 5){
-                    try {
-                        // Iniciar la transacción
-                        $conexion->beginTransaction();
-
-                        $consulordenes = "INSERT INTO ordenes_compras (
-                            orden_compras,
-                            codigo_externo,
-                            grupo_cotizacion,
-                            kid_proyecto,
-                            kid_proveedor,
-                            monto_total,
-                            monto_neto,
-                            kid_creacion,
-                            fecha_creacion,
-                            kid_estatus
-                        ) VALUES (
-                            CONCAT('Orden compra de ', :cotizacion_compras),
-                            CONCAT('COMP', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
-                            :grupo_cotizacion,
-                            :kid_proyecto,
-                            :kid_proveedor,
-                            :monto_total,
-                            :monto_neto,
-                            :kid_creacion,
-                            :fecha_creacion,
-                            :kid_estatus
-                        );";
-                        $cotizacion['monto_total'] =$cotizacion['monto_total']?$cotizacion['monto_total']:0;
-                        $cotizacion['monto_neto'] = $cotizacion['monto_neto']?$cotizacion['monto_neto']:0;
-                        
-                        // Preparar y ejecutar la consulta
-                        $resultado = $conexion->prepare($consulordenes);
-                        $resultado->bindParam(':cotizacion_compras', $cotizacion['cotizacion_compras']);
-                        $resultado->bindParam(':grupo_cotizacion', $cotizacion['grupo']);
-                        $resultado->bindParam(':kid_proyecto', $cotizacion['kid_proyecto']);
-                        $resultado->bindParam(':kid_proveedor',$cotizacion['kid_proveedor']);
-                        $resultado->bindParam(':monto_total', $cotizacion['monto_total']);
-                        $resultado->bindParam(':monto_neto', $cotizacion['monto_neto']);
-                        $resultado->bindParam(':kid_creacion', $_SESSION["s_id"]);
-                        $resultado->bindValue(':fecha_creacion', date('Y-m-d H:i:s'));
-                        $resultado->bindValue(':kid_estatus', 8);
-                        
-                        if ($resultado->execute()) {
-                            $orden_compra_id = $conexion->lastInsertId();
-                            // Array para almacenar los IDs de los artículos insertados
-                            $insertedItems = [];
-
-                            $consultdetalle = "SELECT id_detalle_cotizacion_compras,
-                                kid_articulo,
-                                cantidad,
-                                costo_unitario_total,
-                                costo_unitario_neto,
-                                monto_total,
-                                monto_neto,
-                                fecha_creacion
-                            FROM detalles_cotizaciones_compras
-                            WHERE kid_estatus != 3 AND kid_cotizacion_compra  = :id";
-                            $resultado = $conexion->prepare($consultdetalle);
-                            $resultado->bindParam(':id', $cotizacion['id_cotizacion_compra']);
-                            $resultado->execute();
-                            $detalles_cotizacion = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-                            $insertQuery = "INSERT INTO detalles_ordenes_compras (kid_orden_compras,grupo_cotizacion, kid_articulo, cantidad, costo_unitario_total, costo_unitario_neto, monto_total, monto_neto,kid_creacion, fecha_creacion ,kid_estatus) 
-                            VALUES (:kid_orden_compras,:grupo_cotizacion, :kid_articulo, :cantidad, :costo_unitario_total, :costo_unitario_neto, :monto_total, :monto_neto, :kid_creacion, :fecha_creacion ,:kid_estatus)";
-
-                            $insertStmt = $conexion->prepare($insertQuery);
-                            
-
-                            foreach ($detalles_cotizacion as $detalle) {
-                                $insertStmt->bindParam(':kid_orden_compras', $orden_compra_id);
-                                $insertStmt->bindParam(':grupo_cotizacion', $cotizacion['grupo']);
-                                $insertStmt->bindParam(':kid_articulo', $detalle['kid_articulo']);
-                                $insertStmt->bindParam(':cantidad', $detalle['cantidad']);
-                                $insertStmt->bindParam(':costo_unitario_total', $detalle['costo_unitario_total']);
-                                $insertStmt->bindParam(':costo_unitario_neto', $detalle['costo_unitario_neto']);
-                                $insertStmt->bindParam(':monto_total', $detalle['monto_total']);
-                                $insertStmt->bindParam(':monto_neto', $detalle['monto_neto']);
-                                $insertStmt->bindParam(':kid_creacion', $_SESSION["s_id"]);
-                                $insertStmt->bindValue(':fecha_creacion', date('Y-m-d H:i:s'));
-                                $insertStmt->bindValue(':kid_estatus', 7);
-                                
-                                // Ejecutar la inserción
-                                if ($insertStmt->execute()) {
-                                    // Almacenar el ID del artículo insertado
-                                    $insertedItems[] = $detalle['kid_articulo'];
-                                    
-                                } else {
-                                    throw new Exception("Error en la inserción para el artículo: " . $detalle['kid_articulo']);
-                                }
-                            }
-                        }
-
-                        
-
-                        // Si todas las inserciones fueron exitosas, confirmar la transacción
-                        $conexion->commit();
-                    // echo "Todas las inserciones se realizaron correctamente.<br>";
-                        $editformDataJson['kid_estatus']=5;
-                        $editformDataJson['kid_autorizo']=$_SESSION["s_id"];
-                        
-
-
-                    } catch (Exception $e) {
-                        // Si hubo un error, revertir la transacción
-                        $conexion->rollBack();
-                        echo "Transacción fallida: " . $e->getMessage() . "<br>";
+                    if (!$stmt->execute()) {
+                        throw new Exception("Error al insertar detalle de orden");
                     }
-
                 }
+            }
 
-                $tabla = 'cotizaciones_compras';
-                $idcolumn= "id_cotizacion_compra";
+            $conexion->commit();
+            
+            // Actualizar el array editformDataJson para la respuesta
+            $editformDataJson = [
+                'kid_estatus' => $estatusID,
+                'kid_autorizo' => $_SESSION["s_id"],
+                'fecha_actualizacion' => date('Y-m-d H:i:s')
+            ];
 
-                $consultaselect = "SELECT cc.id_cotizacion_compra,
-                        cc.cotizacion_compras,
-                        cc.grupo,
-                        p.proyecto AS kid_proyecto,
-                        prov.razon_social AS kid_proveedor,
-                        cc.kid_estatus,
-                        u.email AS kid_creacion,
-                        COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
-                        cc.kid_tiempo_entrega,
-                        cc.fecha_cotizacion,
-                        cc.fecha_entrega,
-                        cc.fecha_creacion
-                    FROM cotizaciones_compras cc
-                    LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
-                    LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
-                    LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
-                    LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
-                    WHERE cc.kid_estatus != 3 and ".$idcolumn." = :".$idcolumn;
+        } catch(Exception $e) {
+            $conexion->rollBack();
+            error_log("Error en actualización de estatus: " . $e->getMessage());
+            print json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            exit;
+        }
+    }
 
-                    $fuc_mapping = function ($row) {
-                        global $data_script, $estatus, $estatus_name;
-                        $botones_acciones = $data_script['botones_acciones'];
+    // Establecer variables para la consulta final
+    $tabla = 'cotizaciones_compras';
+    $idcolumn = "id_cotizacion_compra";
+    
+    // Consulta para obtener datos actualizados
+    $consultaselect = "SELECT cc.id_cotizacion_compra,
+        cc.cotizacion_compras,
+        cc.grupo,
+        p.proyecto AS kid_proyecto,
+        prov.razon_social AS kid_proveedor,
+        cc.kid_estatus,
+        u.email AS kid_creacion,
+        COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+        cc.kid_tiempo_entrega,
+        cc.fecha_cotizacion,
+        cc.fecha_entrega,
+        cc.fecha_creacion
+    FROM cotizaciones_compras cc
+    LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
+    LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
+    LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
+    LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u2.id_colaborador
+    WHERE cc.kid_estatus != 3 AND " . $idcolumn . " = :" . $idcolumn;
 
-                        $bloque = 'compras';
-                        $modalCRUD =  'update_estatus_cotizaciones_compras';
-                        if(!in_array($row['kid_estatus'], [5,6,7])){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }else if($row['kid_estatus'] == 6){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }if($row['kid_estatus'] == 7){
-                            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                            array_unshift($botones_acciones,$nuevo_boton);
-                        }
-                        
-                        $hashed_id = codificar($row['id_cotizacion_compra']);
-                        $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
-                        array_push($botones_acciones, $nuevo_boton);
-                        $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
-                        array_push($botones_acciones, $nuevo_boton);
-                        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
-                        $row['kid_estatus'] = $estatus[$row['kid_estatus']];
-                        return $row;
-                    };
+    $fuc_mapping = function ($row) {
+        global $data_script, $estatus;
+        $botones_acciones = $data_script['botones_acciones'];
+        
+        if($row['kid_estatus'] != 5) {
+            $bloque = 'compras';
+            $modalCRUD = 'update_estatus_cotizaciones_compras';
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="Autorizar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check-circle"></i> Autorizar</button>';
+            array_unshift($botones_acciones, $nuevo_boton);
+        }
 
+        $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
+        $row['kid_estatus'] = isset($estatus[$row['kid_estatus']]) ? $estatus[$row['kid_estatus']] : 'Estado desconocido';
+        return $row;
+    };
 
-
-                //debug($editformDataJson);
-                $ColumnsCheck = [];
-
-                $text_colums_edit = [];
-            break;
-
+    $ColumnsCheck = [];
+    $text_colums_edit = [];
+break;
 
             case 'detalles_cotizaciones_compras':
                 $tabla = 'detalles_cotizaciones_compras';

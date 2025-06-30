@@ -180,12 +180,11 @@ if($resultado){
     // Consulta de resumen
     $consultaselect = "SELECT 
             COUNT(*) AS total_detalles,
-            SUM(`cantidad tarimas`) AS total_tarimas,
-            SUM(`cantidad parets`) AS total_parets,
+            SUM(`cantidad_tarimas`) AS total_tarimas,
             SUM(peso_real) AS total_peso_real,
             SUM(peso_estimado) AS total_peso_estimado,
             SUM(diferencia_peso) AS total_diferencia_peso
-        FROM detalles_recepciones_mp
+        FROM cantidad_recepciones_mp
         WHERE kid_estatus != 3
           AND fecha_creacion BETWEEN :fecha_inicio AND :fecha_fin";
 

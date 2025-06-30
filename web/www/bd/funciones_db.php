@@ -64,6 +64,15 @@ function GetIDTiempoEntregaByName($valor){
     $resultado->execute();
     return $resultado->fetchColumn() ?: null;
 }
+function GetIDTransporteByName($valor){
+    global $conexion;
+    $consult = "SELECT id_transporte FROM transportes WHERE kid_estatus
+    != 3 AND nombre_transporte =:valor";
+    $resultado = $conexion->prepare($consult);
+    $resultado->bindParam(':valor', $valor);
+    $resultado->execute();
+    return $resultado->fetchColumn() ?: null;
+}
 function GetIDProveedorByName($valor){
     global $conexion;
     $consult = "SELECT id_proveedor FROM proveedores WHERE kid_estatus != 3 AND proveedor =:valor";
@@ -158,13 +167,71 @@ function GetIDOrdenComprasByName($valor){
     return $resultado->fetchColumn() ?: null;
 }
 
-function GetIDEstatusByName($valor){
+function GetIDEstatusByName($valor) {
     global $conexion;
-    $consult = "SELECT id_estatus FROM estatus WHERE kid_estatus != 3 AND estatus =:valor";
-    $resultado = $conexion->prepare($consult);
-    $resultado->bindParam(':valor', $valor);
-    $resultado->execute();
-    return $resultado->fetchColumn() ?: null;
+    
+    // Validación inicial del parámetro
+    if (empty($valor)) {
+        error_log("GetIDEstatusByName: Valor vacío proporcionado");
+        return null;
+    }
+
+    try {
+        // Limpiar y formatear el valor de entrada
+        $valor = trim($valor);
+        
+        // Preparar y ejecutar la consulta
+        $consult = "SELECT id_estatus 
+                    FROM estatus 
+                    WHERE kid_estatus != 3 
+                    AND LOWER(estatus) = LOWER(:valor)";
+                    
+        $resultado = $conexion->prepare($consult);
+        $resultado->bindParam(':valor', $valor, PDO::PARAM_STR);
+        
+        if (!$resultado->execute()) {
+            error_log("Error al ejecutar consulta de estatus");
+            return null;
+        }
+
+        $id = $resultado->fetchColumn();
+        
+        if ($id !== false) {
+            return (int)$id;
+        }
+        
+        error_log("No se encontró ID para el estatus: " . $valor);
+        return null;
+
+    } catch (PDOException $e) {
+        error_log("Error en GetIDEstatusByName (DB): " . $e->getMessage());
+        return null;
+    }
+}
+
+function GetIDEstatusByName2($valor) {
+    global $conexion;
+    
+    // Validación inicial
+    if (empty($valor)) {
+        return null;
+    }
+
+    try {
+        $consult = "SELECT id_estatus FROM estatus WHERE kid_estatus != 3 AND estatus = :valor";
+        $resultado = $conexion->prepare($consult);
+        $resultado->bindParam(':valor', $valor);
+        $resultado->execute();
+        
+        $id = $resultado->fetchColumn();
+        
+        // Asegurarnos que retornamos un número o null
+        return ($id !== false) ? (int)$id : null;
+        
+    } catch (PDOException $e) {
+        error_log("Error en GetIDEstatusByName: " . $e->getMessage());
+        return null;
+    }
 }
 
 function GetIDAlmacenesByName($valor){

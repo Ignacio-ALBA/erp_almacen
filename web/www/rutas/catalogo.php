@@ -52,7 +52,6 @@ if ($resultado) {
                 CONCAT(calificacion,' <i class=\"bi bi-star-fill\"></i>') AS calificacion,
                 razon_social,
                 rfc,
-                email1,
                 CASE 
                     WHEN pordefecto = 1 THEN 'SÍ' 
                     ELSE 'NO' 
@@ -569,7 +568,7 @@ if ($resultado) {
             }
             $vista = 'tipos_comentarios';
             break;
-        case 'tipos_estados':
+       case 'tipos_estados':
             $perms = [
                 "crear_estatus",
                 "editar_estatus",

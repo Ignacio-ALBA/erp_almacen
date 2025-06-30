@@ -170,7 +170,7 @@ if($resultado){
             LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
             LEFT JOIN transportes t ON cc.kid_transporte = t.id_transporte
             LEFT JOIN colaboradores u ON cc.kid_creacion = u.id_colaborador
-            LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u.id_colaborador
+            LEFT JOIN colaboradores u2 ON cc.kid_autorizo = u2.id_colaborador
             WHERE cc.kid_estatus != 3";
             
             $resultado = $conexion->prepare($consultaselect);
@@ -180,31 +180,27 @@ if($resultado){
 
             $cotizaciones_compras = array_map(function ($row) {
                 global $data_script, $estatus, $estatus_name;
-                $botones_acciones = $data_script['botones_acciones'];
+                $botones_acciones = isset($data_script['botones_acciones']) ? $data_script['botones_acciones'] : [];
+    
                 
-                $bloque = 'compras';
-                $modalCRUD =  'update_estatus_cotizaciones_compras';
-                
-                // Remove the buttons commented below
-                /*
-                if(!in_array($row['kid_estatus'], [5,6,7])){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[6].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2"></i> Revisar I</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }else if($row['kid_estatus'] == 6){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[7].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-all"></i> Revisar II</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }if($row['kid_estatus'] == 7){
-                    $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="'.$estatus_name[5].'" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check2-circle"></i> Autorizar</button>';
-                    array_unshift($botones_acciones,$nuevo_boton);
-                }
-                
+              // Solo mostrar botón de autorizar si no está autorizado
+        if($row['kid_estatus'] != 5) {
+            $bloque = 'compras';
+            $modalCRUD = 'update_estatus_cotizaciones_compras';
+            $nuevo_boton = '<button class="UpdateEstatus btn btn-success" bloque="'. $bloque.'" name="Autorizar" modalCRUD="'.$modalCRUD.'"><i class="bi bi-check-circle"></i> Autorizar</button>';
+            array_unshift($botones_acciones, $nuevo_boton);
+        }
+                 // Comentados los botones de Contenido y Cuadro Comparativo
+    /*
                 $hashed_id = codificar($row['id_cotizacion_compra']);
                 $nuevo_boton = '<a href="/rutas/compras.php/detalles_cotizaciones_compras?id=' . $hashed_id . '" class="btn btn-secondary "><i class="bi bi-journal-text"></i> Contenido</a>';
                 array_push($botones_acciones, $nuevo_boton);
                 $nuevo_boton = '<button class="GenerarReporte btn btn-success success" reporte="proveedores_cuadro_comparativo" data-id="'.$hashed_id.'"><i class="bi bi-play-circle"></i> Cuadro Comparativo</button>';
                 array_push($botones_acciones, $nuevo_boton);
-                */
               
+               */
+    
+    // Mantener solo el botón de Ver Detalles
                 // Just add the button to see details in full screen modal
                 $hashed_id = codificar($row['id_cotizacion_compra']);
                 $nuevo_boton = '<button class="ModalNewAdd3 btn btn-info info" modalCRUD="detalles_cotizaciones_compras"><i class="bi bi-file-spreadsheet"></i> Ver Detalles</button>';
@@ -245,7 +241,7 @@ if($resultado){
             // Agregar referencia al script para los cálculos de cotizaciones
             $data['list_js_scripts']['../vistas/compras/cotizaciones_compras_script'] = ['data' => $data_script];
             //$data['list_js_scripts']['../vistas/compras/detalles_cotizaciones_script'] = ['data' => $data_script];
-        
+
             break;
         case 'detalles_cotizaciones_compras':
             $perms = [
