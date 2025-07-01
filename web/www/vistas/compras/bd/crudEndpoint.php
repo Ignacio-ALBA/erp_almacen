@@ -197,25 +197,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resultado->execute();
                     $data = $resultado->fetch(PDO::FETCH_ASSOC);
 
-                    if ($data) {
-                        $data['options'] = [
-                            'kid_articulo' => [
-                                [
-                                    'valor' => $data['id_articulo'],
-                                    'texto' => $data['kid_articulo'],
-                                    'pordefecto' => 1
-                                ]
-                            ]
-                        ];
-                    }
+                 // ============ AGREGA ESTA PARTE ============
+        if ($data) {
+            $data['options'] = [
+                'kid_articulo' => [
+                    [
+                        'valor' => $data['id_articulo'],
+                        'texto' => $data['kid_articulo'],
+                        'pordefecto' => 1
+                    ]
+                ]
+            ];
+            $data['kid_articulo'] = $data['id_articulo'];
+        }
+        // ============================================
 
-                    // Verifica si se encontraron datos
-                    if ($data) {
-                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                    } else {
-                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                    }
-                }
+        // Verifica si se encontraron datos
+        if ($data) {
+            print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+        } else {
+            print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+        }
+    }
                 break;
 
             case 'cotizaciones_compras':
