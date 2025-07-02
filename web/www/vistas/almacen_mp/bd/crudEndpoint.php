@@ -11,6 +11,28 @@ $data = []; // Inicializa la variable $data
 // --- INICIO: ENDPOINTS API GET tipo AJAX ---
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['api'])) {
     switch ($_GET['api']) {
+        case 'get_detalles_recepcion_mp':
+    header('Content-Type: application/json; charset=utf-8');
+    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    $response = ['ok' => false, 'detalles' => []];
+    if ($id > 0) {
+        // Revisa que estos campos existan en tu tabla detalles_recepciones_mp
+        $sql = "SELECT kid_articulo, peso_estimado, peso_real, valor_codigoqr 
+                FROM detalles_recepciones_mp 
+                WHERE kid_recepcion_mp = :id AND kid_estatus != 3";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $response['ok'] = true;
+        $response['detalles'] = $detalles;
+    }
+    echo json_encode($response);
+    exit;
+
+    echo json_encode($response);
+                print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
+                break;
         case 'get_detalles_orden':
             header('Content-Type: application/json; charset=utf-8');
             $response = ['ok' => false, 'detalles' => [], 'nombre_orden' => '', 'proveedor' => ''];
@@ -248,26 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
                 }
-                break;
-case 'get_detalles_recepcion_mp':
-    header('Content-Type: application/json; charset=utf-8');
-    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-    $response = ['ok' => false, 'detalles' => []];
-    if ($id > 0) {
-        // Cambia los campos según los de tu tabla detalles_recepciones_mp
-        $sql = "SELECT kid_articulo, cantidad_tarimas, peso_real, valor_codigoqr 
-                FROM detalles_recepciones_mp WHERE kid_recepcion_mp = :id AND kid_estatus != 3";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $response['ok'] = true;
-        $response['detalles'] = $detalles;
-    }
-                break;
-
-    echo json_encode($response);
-                print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
                 break;
         }
     } else {

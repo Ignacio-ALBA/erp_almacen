@@ -353,7 +353,7 @@ if($resultado){
                 oc.fecha_creacion,
                  $caseEstatus
             FROM ordenes_compras oc
-            WHERE oc.kid_estatus != 3";
+            WHERE oc.kid_estatus NOT IN (3,8)";
 
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();

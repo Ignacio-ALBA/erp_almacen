@@ -8,9 +8,13 @@ async function finalizarRecepcionMp(idRecepcionMp) {
     let resp = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'modalCRUD=recepciones_mp&opcion=finalizar&id_recepcion_mp=' + encodeURIComponent(idRecepcionMp)
+        body: 'modalCRUD=recepciones_mp&opcion=finalizar&formDataJson=' + encodeURIComponent(JSON.stringify({id_recepcion_mp: idRecepcionMp}))
     });
     let data = await resp.json();
+      // <-- AGREGA ESTAS DOS LÍNEAS AQUÍ -->
+    console.log('Respuesta de finalizar:', data);
+    alert('Respuesta al finalizar: ' + (data.message || JSON.stringify(data)));
+
     if (data.status === 'success') {
         alert('Recepción finalizada correctamente');
         // Puedes actualizar la UI, recargar la tabla, etc.
@@ -39,6 +43,9 @@ const numTarimas = document.getElementById('num_tarimas').value;
         const fechaCreacion = new Date().toISOString().slice(0,19).replace('T',' ');
         //const pdf_generado = extra.pdf_generado || '';
         // Validar datos mínimos
+        console.log({
+    idOrdenCompra, almacenDestino, kidArticulo, pesoReal, contenedorDestino
+});
         if (!idOrdenCompra || !almacenDestino || !kidArticulo || !pesoReal || !contenedorDestino) {
             alert('Faltan datos obligatorios para guardar el pesaje');
             return;
@@ -109,7 +116,7 @@ const numTarimas = document.getElementById('num_tarimas').value;
             body: Object.entries(payload).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "object" ? JSON.stringify(v) : v)}`).join('&')
         });
         const data = await resp.json();
-
+        console.log('Respuesta del guardado:', data);
         if (data.status === 'success') {
             alert('Pesaje guardado correctamente');
             // Elimina el insumo del select para evitar duplicidad
@@ -149,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGenerarQR        = document.getElementById('btn_generar_qr');
     const btnGenerarPDF       = document.getElementById('btn_generar_pdf');
     let qrCanvas = null;
-    let lastIdRecepcionMP = null; // Para saber cuál fue la última recepción
+    //let lastIdRecepcionMP = null; // Para saber cuál fue la última recepción
 
 
     // === CARGA DINÁMICA DE ALMACENES Y UBICACIONES ===
@@ -665,7 +672,7 @@ FECHA Y HORA:       ${data.fechaHora}
 
     // Finalizar recepción y mostrar detalles en modal
     btnFinalizarRecepcion?.addEventListener('click', async () => {
-        if (!lastIdRecepcionMP) {
+        if (!window.lastIdRecepcionMP) {
             alert('No se encontró la recepción recién guardada. Guarda un pesaje antes.');
             return;
         }
@@ -682,7 +689,7 @@ FECHA Y HORA:       ${data.fechaHora}
             data.detalles.forEach(det => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${det.kid_articulo}</td>
-                                <td>${det.cantidad_tarimas}</td>
+                                <td>${det.peso_estimado}</td>
                                 <td>${det.peso_real}</td>
                                 <td>${det.valor_codigoqr}</td>`;
                 tbody.appendChild(tr);

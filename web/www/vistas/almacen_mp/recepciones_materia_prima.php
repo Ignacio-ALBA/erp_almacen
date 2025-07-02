@@ -308,7 +308,7 @@ echo '        <table class="table table-sm table-bordered">';
 echo '          <thead>';
 echo '            <tr>';
 echo '              <th>Insumo</th>';
-echo '              <th>Cantidad Tarimas</th>';
+echo '              <th>Peso Estimado</th>';
 echo '              <th>Peso Real</th>';
 echo '              <th>QR</th>';
 echo '            </tr>';
