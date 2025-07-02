@@ -389,3 +389,98 @@ echo '<div class="row mt-3">
 
   include 'wrapper.php'; // Incluye el wrapper
 ?>
+<!-- Solo visible en móviles -->
+<style>
+@media (min-width: 768px) {
+  #qr-capture-mobile-form { display: none !important; }
+}
+@media (max-width: 767px) {
+  #qr-capture-mobile-form { display: block; }
+}
+#qr-reader {
+  width: 100%;
+  min-height: 280px;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+</style>
+
+<!-- Formulario para móviles -->
+<div id="qr-capture-mobile-form" class="container mt-2 p-2" style="background:#f8f9fa; border-radius:12px; box-shadow:0 0 8px #e0e0e0">
+  <h4 class="mb-3" style="color:#007bff; font-weight:600">Recepción por QR (Móvil)</h4>
+  <div id="qr-reader"></div>
+  <form id="form-qr-capture" autocomplete="off">
+    <div class="mb-3">
+      <label for="orden_qr" class="form-label">Orden de Producción (QR)</label>
+      <input type="text" id="orden_qr" name="orden_qr" class="form-control form-control-lg" placeholder="Escanea o escribe la Orden" required>
+    </div>
+    <div class="mb-3">
+      <label for="linea_destino" class="form-label">Línea destino</label>
+      <select id="linea_destino" name="linea_destino" class="form-control form-control-lg" required>
+        <option value="">Selecciona línea</option>
+        <option value="Linea 1">Línea 1</option>
+        <option value="Linea 2">Línea 2</option>
+        <option value="Linea 3">Línea 3</option>
+        <!-- Agrega más líneas si es necesario -->
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success btn-lg w-100">Guardar</button>
+  </form>
+  <div id="qr-success-msg" class="alert alert-success mt-2 d-none"></div>
+</div>
+
+<!-- Librería html5-qrcode desde CDN -->
+<script src="https://unpkg.com/html5-qrcode@2.3.10/html5-qrcode.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Solo inicializa si el div existe (solo mobile)
+  if(document.getElementById("qr-reader")) {
+    const qrInput = document.getElementById('orden_qr');
+    let scanning = false;
+    const qrReader = new Html5Qrcode("qr-reader");
+
+    function startQRScanner() {
+      if(scanning) return;
+      scanning = true;
+      Html5Qrcode.getCameras().then(cameras => {
+        let camId = cameras && cameras[0] ? cameras[0].id : undefined;
+        qrReader.start(
+          camId,
+          { fps: 10, qrbox: 250 },
+          qrCodeMessage => {
+            qrInput.value = qrCodeMessage;
+            qrReader.stop().then(() => {
+              scanning = false;
+              // Opcional: notificación visual
+              qrInput.classList.add('is-valid');
+              setTimeout(()=>qrInput.classList.remove('is-valid'), 1800);
+            });
+          },
+          errorMessage => {}
+        ).catch(err => { scanning = false; });
+      });
+    }
+
+    // Empieza a escanear automáticamente al cargar
+    startQRScanner();
+
+    // Si el usuario toca el input, vuelve a activar el escáner
+    qrInput.addEventListener('focus', function() {
+      if(!scanning) startQRScanner();
+    });
+
+    // Opcional: detener escáner al enviar form
+    document.getElementById("form-qr-capture").addEventListener("submit", function(e){
+      e.preventDefault();
+      if(scanning) qrReader.stop();
+      // Aquí AJAX o fetch para guardar los datos...
+      document.getElementById("qr-success-msg").classList.remove("d-none");
+      document.getElementById("qr-success-msg").textContent = "¡Recepción guardada correctamente!";
+      setTimeout(()=>document.getElementById("qr-success-msg").classList.add("d-none"), 3000);
+      this.reset();
+    });
+  }
+});
+</script>

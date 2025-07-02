@@ -102,6 +102,7 @@ if($resultado){
                             unset($data_script['botones_acciones'][$index]);
                         }
                     }
+                   
             $vista = 'detalles_listas_compras';
             $consultaselect = "SELECT dlc.id_detalle_lista_compras,
                 lc.lista_compra AS kid_lista_compras,
@@ -120,7 +121,7 @@ if($resultado){
             WHERE dlc.kid_estatus !=3";
             $resultado = $conexion->prepare($consultaselect);
             $resultado->execute();
-
+ 
             $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
             $data['data_show']['listas_compras'] = GetListaComprasForSelect();
             $data['data_show']['articulos'] = GetArticulosListForSelect();

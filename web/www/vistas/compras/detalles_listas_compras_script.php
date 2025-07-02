@@ -4,6 +4,44 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
 
 <script nonce="<?php echo $nonce_value; ?>">
 document.addEventListener('DOMContentLoaded', function() {
+    // --- 1. Forzar envío de campos requeridos (readonly o no) ---
+    function ensureRequiredFieldsAreSent(form) {
+        ['kid_lista_compras','kid_articulo'].forEach(function(fieldId){
+            var el = form.querySelector('[name="' + fieldId + '"], #' + fieldId);
+            if (el) {
+                // Si no está visible o está deshabilitado, o simplemente para forzar que siempre se envíe
+                // Borra input hidden anterior si existe
+                var prevHidden = form.querySelector('input[type="hidden"][name="' + fieldId + '"]');
+                if (prevHidden) prevHidden.remove();
+                // Si el input no está en el form (o está deshabilitado/readOnly), añade hidden
+                if (el.disabled || el.readOnly || el.type === "hidden") {
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = fieldId;
+                    hidden.value = el.value;
+                    form.appendChild(hidden);
+                }
+                // Si el select/input está habilitado, pero por seguridad forzamos también el hidden (esto evita problemas con serialización AJAX)
+                else if (!form.querySelector('input[type="hidden"][name="' + fieldId + '"]')) {
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = fieldId;
+                    hidden.value = el.value;
+                    form.appendChild(hidden);
+                }
+            }
+        });
+    }
+
+    // Aplica a todos los formularios de modales antes de enviar
+    document.body.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (form.closest('.modal')) {
+            ensureRequiredFieldsAreSent(form);
+        }
+    }, true);
+
+    // --- 2. Cálculos automáticos para el formulario ---
     function setupCalculations(form) {
         const cantidad = form.querySelector('input[name="cantidad"], #cantidad');
         const costoUnitarioTotal = form.querySelector('input[name="costo_unitario_total"], #costo_unitario_total');
@@ -50,15 +88,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const resultMul2 = cantidadVal * costoUnitarioNetoVal;
 
                 // RESULT-1 y RESULT-3: monto_total sin y con descuento
-                   // RESULT-1: monto_total sin descuento
-        montoTotal.value = resultMul1.toFixed(2);
+                // RESULT-1: monto_total sin descuento
+                montoTotal.value = resultMul1.toFixed(2);
 
-        // RESULT-2: monto_neto sin descuento
-        montoNeto.value = resultMul2.toFixed(2);
+                // RESULT-2: monto_neto sin descuento
+                montoNeto.value = resultMul2.toFixed(2);
 
-        // TOTAL: monto_neto - descuento (valor directo)
-        const totalFinal = resultMul2 - descuentoVal;
-        total.value = totalFinal.toFixed(2);
+                // TOTAL: monto_neto - descuento (valor directo)
+                const totalFinal = resultMul2 - descuentoVal;
+                total.value = totalFinal.toFixed(2);
 
             } catch (error) {
                 // Silently handle errors
@@ -106,7 +144,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const forms = modal.querySelectorAll('form');
         forms.forEach(setupCalculations);
     });
-
+document.body.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (form.closest('.modal')) {
+        ensureRequiredFieldsAreSent(form);
+        // DEBUG: Muestra los valores que realmente se van a enviar
+        console.log('-- DEBUG FORM DATA --');
+        ['kid_lista_compras','kid_articulo'].forEach(function(fieldId){
+            var el = form.querySelector('[name="' + fieldId + '"]');
+            if (el) {
+                console.log(fieldId, el.value);
+            } else {
+                console.error('NO SE ENCUENTRA el campo:', fieldId);
+            }
+        });
+    }
+}, true);
     // Inicialización inicial
     initializeModal();
-});</script>
+});
+</script>

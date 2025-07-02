@@ -45,7 +45,6 @@ $titulos = ['ID', 'Programa de Compras','Insumo','Cantidad (KG)','Precio por Kg'
     ob_start();
     CreateTable($id, $ButtonAddLabel, $titulos, [], true, [], '', $atributos = ['data-select-column'=>2]);
     $detailsTableOutput = ob_get_clean();
-
   CreateModal( [
     'id'=> $id.'-View', 
     'Title'=>'Detalle de Lista de Compras',

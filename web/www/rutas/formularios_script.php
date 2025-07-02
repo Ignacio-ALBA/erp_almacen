@@ -31,7 +31,24 @@ if (file_exists($path)) {
       });
     
 $(document).ready(function() {
-
+function ensureRequiredFieldsAreSent(form) {
+    ['kid_lista_compras','kid_articulo'].forEach(function(fieldId){
+        var el = form.querySelector('[name="' + fieldId + '"], #' + fieldId);
+        if (el) {
+            // Borra input hidden anterior si existe
+            var prevHidden = form.querySelector('input[type="hidden"][name="' + fieldId + '"]');
+            if (prevHidden) prevHidden.remove();
+            // Si el input está deshabilitado o no tiene valor, añade hidden
+            if (el.disabled || el.readOnly || el.type === "hidden" || !el.value) {
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = fieldId;
+                hidden.value = el.value;
+                form.appendChild(hidden);
+            }
+        }
+    });
+}
     function addAlert(mensaje, tipo = 'danger', tiempo = 5000) {
         const alerta = $('<div class="alert alert-' + tipo + ' bg-' + tipo + ' text-light border-0 alert-dismissible fade show" role="alert">' +
             mensaje +
@@ -1284,6 +1301,12 @@ $(document).ready(function() {
 
         $(`#form${modalCRUD}`).off('submit').on('submit', function(event) {
             event.preventDefault();
+            ensureRequiredFieldsAreSent(this);
+            console.log("DEBUG submit:");
+console.log("kid_articulo (visible):", $('#kid_articulo').val());
+console.log("kid_articulo (hidden):", $(`#form${modalCRUD} input[name="kid_articulo"][type="hidden"]`).val());
+console.log("kid_lista_compras (visible):", $('#kid_lista_compras').val());
+console.log("kid_lista_compras (hidden):", $(`#form${modalCRUD} input[name="kid_lista_compras"][type="hidden"]`).val());
             var formDataJson = {};
             var form_error = false;
             $(`#form${modalCRUD} input, #form${modalCRUD} select, #form${modalCRUD} textarea`).each(function() {
@@ -1321,15 +1344,19 @@ $(document).ready(function() {
                 console.log('Por favor, complete todos los campos requeridos.');
                 return;
             }
-        
+        // --- B. Forzar los valores manualmente ---
+formDataJson['kid_articulo'] = $('#kid_articulo').val() || $(`#form${modalCRUD} input[name="kid_articulo"][type="hidden"]`).val();
+formDataJson['kid_lista_compras'] = $('#kid_lista_compras').val() || $(`#form${modalCRUD} input[name="kid_lista_compras"][type="hidden"]`).val();
+
+// --- C. Debug del objeto enviado ---
+console.log("OBJETO ENVIADO:");
+
             console.log(formDataJson);
             data_actual
             var AlertDataSimilar = $(`#form${modalCRUD}`).attr('alertdatasimilar') === 'true';
             var additionalData = { opcion: 2, formDataJson: formDataJson,formDataOldJson:data_actual, modalCRUD:  modalCRUD.split('-')[0],firstColumnValue:firstColumnValue, AlertDataSimilar:AlertDataSimilar};
         
-            console.log('Formulario enviado para el modal:', modalCRUD);
-            console.log('Datos adicionales:', additionalData);
-            
+
             
             $.ajax({
                 url: `/vistas/${formbloque}bd/crudSummit.php`, 
