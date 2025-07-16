@@ -1538,12 +1538,8 @@ console.log("OBJETO ENVIADO:");
         });
 
                 // Skip hidden fields validation  
-        if (isHidden) {
+        if (isHidden && !isRequired) {
             console.log(`Saltando validación de campo oculto: ${id}`);
-            return;
-        }
-                 // Skip hidden fields validation  
-        if ($(this).parent().is(':hidden')) {
             return;
         }
 

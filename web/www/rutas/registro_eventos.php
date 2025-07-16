@@ -62,7 +62,24 @@ if($resultado){
                 break;
                 case 'comentarios_registro_eventos':
             $vista = 'comentarios_registro_eventos';
-            break;  
+            break;
+        case 'eventos_sistema':
+
+            $perms = [
+                "crear_eventos_sistema",
+                "editar_eventos_sistema",
+                "ver_eventos_sistema",
+                "eliminar_eventos_sistema"
+            ];
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'eventos_sistema';
+            break;
         default:
             $vista = '404'; // Vista de error 404 si no se encuentra la ruta
             break;

@@ -85,10 +85,11 @@
       'action'=>'bd/crudSummit.php',
       'bloque'=>'compras',
       'data-select-column'=>'[1]',
-      'data-input-fill'=>'[kid_orden_compras]'
+      'data-input-fill'=>'[kid_orden_compras,orden_compras_name]'
     ],
     [
-      CreateInput(['id'=>'kid_orden_compras','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
+      CreateInput(['id'=>'kid_orden_compras','etiqueta'=>'Id Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly','div_style'=>'display: none']),
+      CreateInput(['id'=>'orden_compras_name','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
       CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => ''],$articulos),
       CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),

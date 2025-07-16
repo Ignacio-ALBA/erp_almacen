@@ -958,6 +958,7 @@ break;
             case 'detalles_ordenes_compras':
                 $tabla = 'detalles_ordenes_compras';
                 $idcolumn = "id_detalle_orden_compra";
+                unset($formDataJson["orden_compras_name"]);
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 if (isset($formDataJson['kid_articulo'])) {
@@ -966,11 +967,6 @@ break;
                     }
                 }
                 
-                if (isset($formDataJson['kid_orden_compras'])) {
-                    if (!is_numeric($formDataJson['kid_orden_compras'])) {
-                        $formDataJson['kid_orden_compras'] = GetIDOrdenComprasByName($formDataJson['kid_orden_compras']);
-                    }
-                }
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
                 
                 if (!isset($formDataJson['grupo_cotizacion']) || $formDataJson['grupo_cotizacion'] === null || $formDataJson['grupo_cotizacion'] === '') {

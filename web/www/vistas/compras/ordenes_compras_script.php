@@ -118,6 +118,7 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
         // Lógica para llenar automáticamente el campo de Orden de Compra al agregar detalle
 
 let currentOrdenName = '';
+let currentOrdenId = '';
 
 // 1. Al dar clic en "Ver Detalles", guarda el nombre de la orden seleccionada
 $(document).on('click', '.ModalNewAdd3', function(e) {
@@ -125,14 +126,18 @@ $(document).on('click', '.ModalNewAdd3', function(e) {
     const ordenName = $(this).closest('tr').find('td').eq(2).text().trim();
     currentOrdenName = ordenName;
     sessionStorage.setItem('currentOrdenName', currentOrdenName);
+    currentOrdenId = $(this).closest('tr').find('td').eq(0).text().trim();
+    sessionStorage.setItem('currentOrdenId', currentOrdenId);
 });
 
 // 2. Al dar clic en "Nuevo Detalle" dentro del modal de detalles
 $(document).on('click', '#modalCRUDdetalles_ordenes_compras-View .btn-primary', function(e) {
-    sessionStorage.setItem('currentOrdenName', currentOrdenName);
+    //sessionStorage.setItem('currentOrdenName', currentOrdenName);
+    sessionStorage.setItem('currentOrdenId', currentOrdenId);
     $(document).one('shown.bs.modal', '#modalCRUDdetalles_ordenes_compras', function() {
         if (currentOrdenName) {
-            $('#kid_orden_compras').val(currentOrdenName);
+            $('#kid_orden_compras').val(currentOrdenId);
+            $('#orden_compras_name').val(sessionStorage.getItem('currentOrdenName'));
         }
     });
 });
@@ -142,13 +147,11 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
     const savedOrdenName = sessionStorage.getItem('currentOrdenName');
     if (savedOrdenName) {
         setTimeout(function() {
-            $('#kid_orden_compras').val(savedOrdenName);
+            $('#kid_orden_compras').val(currentOrdenId);
+            $('#orden_compras_name').val(savedOrdenName);
         }, 300);
     }
 });
-
-        // Variables para rastrear la orden actual
-        let currentOrdenId = '';
 
         // Función para actualizar el título del modal con el nombre de la orden
         function updateModalTitle(ordenName) {
