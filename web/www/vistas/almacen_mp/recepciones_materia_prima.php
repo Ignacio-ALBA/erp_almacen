@@ -266,7 +266,7 @@ echo '</div></div>';
 
 
   $titulos = ['ID', 'Recepción','Código Externo','Proyecto','Proveedor','Almacén','Orden de Compra','Estado','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones);
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, false,[],'',[],false);
   CreateModalForm(
     [
       'id'=> $id, 

@@ -212,6 +212,7 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
                                         row.forEach(function(cell) {
                                             newRow.append($("<td></td>").text(cell));
                                         });
+                                        newRow.append($("<td></td>").text("ACCIONES AQUI"));
                                     }
                                     table.append(newRow);
                                 });

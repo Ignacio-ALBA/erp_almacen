@@ -1,5 +1,7 @@
 
 <?php
+require_once __DIR__ . '/../rutas/Logger.php';
+
 session_start();
 
 $objeto = new Conexion();
@@ -69,6 +71,8 @@ if ($data[0]['kid_almacen'] == 1) {
         $resultado = $conexion->prepare($consulta);
         $resultado->execute();*/
         //Evento 
+        $logger = new Logger($conexion);
+        $logger->logEvento('LOGIN',"INGRESO-EXITOSO", $data[0]['id_colaborador']);
 	}else{
 	    $_SESSION["s_id"] = null;
 	    $_SESSION["s_usuario"] = null;

@@ -30,7 +30,7 @@ $PageSection = "Eventos de Sistema";
 $id = 'eventos_sistema';
 $ButtonAddLabel = "Nuevo registro";
 $titulos = ['ID', 'Email', 'Fecha Evento', 'Modulo', 'Descripcion'];
-CreateTable($id, $ButtonAddLabel, $titulos, $data, true, []);
+CreateTable($id, $ButtonAddLabel, $titulos, $data, false, [],'',[],false);
 CreateModalForm(
     [
         'id' => $id,

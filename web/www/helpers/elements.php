@@ -368,7 +368,7 @@ function CreateSelect($atributos = [], $opciones = [], $valorSeleccionado = null
     return $select_input;
 }
 
-function CreateTable($id, $buttonlabel, $titulos, $consulta, $buttonallow = true,$CustomButtons = [],$class = '',$atributos = []) {
+function CreateTable($id, $buttonlabel, $titulos, $consulta, $buttonallow = true,$CustomButtons = [],$class = '',$atributos = [],$showButtons = true) {
     $atributosString = '';
     foreach ($atributos as $key => $value) {
         // Excluir 'etiqueta' y 'placeholder' del string de atributos
@@ -409,8 +409,11 @@ function CreateTable($id, $buttonlabel, $titulos, $consulta, $buttonallow = true
         $html .= '<th style="white-space: nowrap; height:auto;'.$ancho.'">' . $titulo. '</th>';
     }
     
+    if($showButtons){
     $html .= '
-            <th>Acciones</th>
+            <th>Acciones</th>';
+    }
+    $html .= '
         </tr>
     </thead>
     <tbody>';
@@ -425,9 +428,9 @@ function CreateTable($id, $buttonlabel, $titulos, $consulta, $buttonallow = true
             $ancho_columna = '100px';
         }
         
-
-        if($CustomButtons === []){
-            $html .= '<td style="white-space: nowrap;">
+        if($showButtons){
+            if($CustomButtons === [] ){
+                $html .= '<td style="white-space: nowrap;">
                         <div class="btn-group" role="group" style="width:100%;">
                             <button type="button" class="ModalDataView btn btn-primary primary" modalCRUD=' . htmlspecialchars($id) . '><i class="bi bi-eye"></i> Ver</button>
                             <button type="button" class="ModalDataEdit btn btn-warning warning" modalCRUD=' . htmlspecialchars($id) . '><i class="bi bi-pencil"></i> Editar</button>
@@ -435,19 +438,20 @@ function CreateTable($id, $buttonlabel, $titulos, $consulta, $buttonallow = true
                         </div>
                     </td>
                     ';
-        }else if($ButtonsInRow == '') {
-            $html .= '<td style="white-space: nowrap; display:flex; flex-direction:column;">';
-            $bloques_de_botones = array_chunk($CustomButtons, 3);
-            foreach ($bloques_de_botones as $index => $bloque) {
-                $paddingStyle = ($index < count($bloques_de_botones) - 1) ? 'style="padding-bottom:10px;"' : '';
-                $html .= '<div class="btn-group" role="group" '. $paddingStyle .'>';
-                foreach($bloque as $boton) {
-                    $boton = str_replace('${modalCRUD}', htmlspecialchars($id), $boton);
-                    $html .= $boton;
+            }else if($ButtonsInRow == '') {
+                $html .= '<td style="white-space: nowrap; display:flex; flex-direction:column;">';
+                $bloques_de_botones = array_chunk($CustomButtons, 3);
+                foreach ($bloques_de_botones as $index => $bloque) {
+                    $paddingStyle = ($index < count($bloques_de_botones) - 1) ? 'style="padding-bottom:10px;"' : '';
+                    $html .= '<div class="btn-group" role="group" '. $paddingStyle .'>';
+                    foreach($bloque as $boton) {
+                        $boton = str_replace('${modalCRUD}', htmlspecialchars($id), $boton);
+                        $html .= $boton;
+                    }
+                    $html .= '</div>';
                 }
-                $html .= '</div>';
+                $html .= '</td>';
             }
-            $html .= '</td>';
         }
         
         
