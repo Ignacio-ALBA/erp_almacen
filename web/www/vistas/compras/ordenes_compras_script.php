@@ -205,17 +205,15 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
                     
                     try {
                         if(response.status === "success" && response.data) {
+                            $('#tabladetalles_ordenes_compras').DataTable().rows().remove();
                             if(Array.isArray(response.data) && response.data.length > 0) {
                                 response.data.forEach(function(row) {
-                                    let newRow = $("<tr></tr>");
                                     if(Array.isArray(row)) {
-                                        row.forEach(function(cell) {
-                                            newRow.append($("<td></td>").text(cell));
-                                        });
-                                        newRow.append($("<td></td>").text("ACCIONES AQUI"));
+                                        row[9]='';//TODO: agregar botones
+                                        $('#tabladetalles_ordenes_compras').DataTable().row.add(row);
                                     }
-                                    table.append(newRow);
                                 });
+                                $('#tabladetalles_ordenes_compras').DataTable().draw();
                             } else {
                                 table.append('<tr><td colspan="9" class="text-center">No se encontraron detalles para esta orden de compra</td></tr>');
                             }
@@ -336,3 +334,4 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
         });
     });
 </script>
+<?php include '../../../../rutas/formularios_script.php'; ?>

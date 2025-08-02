@@ -660,9 +660,8 @@ function ensureRequiredFieldsAreSent(form) {
     });
 
     function AddRow(modalCRUD,data) {
-        tableId =`tabla${modalCRUD}`
+        tableId ="tabla"+modalCRUD;
         tabla = dataTableInstances[tableId]
-        console.log($(tabla).attributes);
 
         var numColumnas = tabla.columns().count();
         

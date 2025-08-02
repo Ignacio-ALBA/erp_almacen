@@ -396,6 +396,7 @@ if($resultado){
 
             // Usar el script correcto para detalles de cotizaciones
             $data['list_js_scripts']['../vistas/compras/ordenes_compras_script'] = ['data' => $data_script];
+
             break;
         case 'detalles_ordenes_compras':
             $perms = [
@@ -467,7 +468,12 @@ if($resultado){
                 $data['data_show']['ordenes'] = GetOrdenesComprasListForSelect();
                 $data['data_show']['AllowADDButton'] = false;
             }
+
+
             $data['list_js_scripts']['../vistas/compras/detalles_ordenes_compras_script'] = ['data' => $data_script];
+
+             echo "$data_script";
+
             break;
         case 'recepcion_orden':
             $perms = [
