@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require_once $_SERVER['DOCUMENT_ROOT'].'/helpers/main.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/helpers/main.php';
 $objeto = new Conexion();
 $conexion = $objeto->Conectar();
 
@@ -12,27 +12,27 @@ $data = []; // Inicializa la variable $data
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['api'])) {
     switch ($_GET['api']) {
         case 'get_detalles_recepcion_mp':
-    header('Content-Type: application/json; charset=utf-8');
-    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-    $response = ['ok' => false, 'detalles' => []];
-    if ($id > 0) {
-        // Revisa que estos campos existan en tu tabla detalles_recepciones_mp
-        $sql = "SELECT kid_articulo, peso_estimado, peso_real, valor_codigoqr 
+            header('Content-Type: application/json; charset=utf-8');
+            $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+            $response = ['ok' => false, 'detalles' => []];
+            if ($id > 0) {
+                // Revisa que estos campos existan en tu tabla detalles_recepciones_mp
+                $sql = "SELECT kid_articulo, peso_estimado, peso_real, valor_codigoqr 
                 FROM detalles_recepciones_mp 
                 WHERE kid_recepcion_mp = :id AND kid_estatus != 3";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $response['ok'] = true;
-        $response['detalles'] = $detalles;
-    }
-    echo json_encode($response);
-    exit;
+                $stmt = $conexion->prepare($sql);
+                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                $stmt->execute();
+                $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $response['ok'] = true;
+                $response['detalles'] = $detalles;
+            }
+            echo json_encode($response);
+            exit;
 
-    echo json_encode($response);
-                print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
-                break;
+            echo json_encode($response);
+            print json_encode(['status' => 'error', 'message' => 'Operación no válida'], JSON_UNESCAPED_UNICODE);
+            break;
         case 'get_detalles_orden':
             header('Content-Type: application/json; charset=utf-8');
             $response = ['ok' => false, 'detalles' => [], 'nombre_orden' => '', 'proveedor' => ''];
@@ -68,114 +68,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['api'])) {
             echo json_encode($response);
             exit;
             break;
-case 'get_pesos_tarimas':
-    header('Content-Type: application/json; charset=utf-8');
-    $response = ['ok' => false, 'pesos' => []];
-    
-    try {
-        // Si tienes una tabla con pesos de tarimas, utiliza esta consulta
-        $sql = "SELECT id, descripcion, valor FROM pesos_tarimas WHERE kid_estatus = 1 ORDER BY descripcion";
-        $stmt = $conexion->prepare($sql);
-        $stmt->execute();
-        $pesos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $response['ok'] = true;
-        $response['pesos'] = $pesos;
-    } catch (Exception $e) {
-        // Si no tienes una tabla, proporciona algunos valores predeterminados
-        $response['ok'] = true;
-        $response['pesos'] = [
-            ['id' => 1, 'descripcion' => 'Tarima estándar', 'valor' => 25],
-            ['id' => 2, 'descripcion' => 'Tarima ligera', 'valor' => 15],
-            ['id' => 3, 'descripcion' => 'Tarima reforzada', 'valor' => 35]
-        ];
-    }
-    
-    echo json_encode($response);
-    exit;
-    break;
+        case 'get_pesos_tarimas':
+            header('Content-Type: application/json; charset=utf-8');
+            $response = ['ok' => false, 'pesos' => []];
 
-     case 'get_almacenes':
-        header('Content-Type: application/json; charset=utf-8');
-        $response = ['ok' => false, 'data' => []];
-        
-        try {
-            $sql = "SELECT id_almacen AS kid_almacen, almacen AS nombre 
-                    FROM almacenes 
-                    WHERE kid_estatus = 1";
-            $stmt = $conexion->prepare($sql);
-            $stmt->execute();
-            $almacenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            $response['ok'] = true;
-            $response['data'] = $almacenes;
-        } catch (Exception $e) {
-            $response['message'] = 'Error al obtener almacenes: ' . $e->getMessage();
-        }
-        
-        echo json_encode($response);
-        exit;
-        break;
+            try {
+                // Si tienes una tabla con pesos de tarimas, utiliza esta consulta
+                $sql = "SELECT id, descripcion, valor FROM pesos_tarimas WHERE kid_estatus = 1 ORDER BY descripcion";
+                $stmt = $conexion->prepare($sql);
+                $stmt->execute();
+                $pesos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    case 'get_ubicaciones':
-        header('Content-Type: application/json; charset=utf-8');
-        $response = ['ok' => false, 'data' => []];
-        
-        if (!isset($_GET['id_almacen'])) {
-            $response['message'] = 'ID de almacén requerido';
+                $response['ok'] = true;
+                $response['pesos'] = $pesos;
+            } catch (Exception $e) {
+                // Si no tienes una tabla, proporciona algunos valores predeterminados
+                $response['ok'] = true;
+                $response['pesos'] = [
+                    ['id' => 1, 'descripcion' => 'Tarima estándar', 'valor' => 25],
+                    ['id' => 2, 'descripcion' => 'Tarima ligera', 'valor' => 15],
+                    ['id' => 3, 'descripcion' => 'Tarima reforzada', 'valor' => 35]
+                ];
+            }
+
             echo json_encode($response);
             exit;
-        }
+            break;
 
-        try {
-            $id_almacen = intval($_GET['id_almacen']);
-            $sql = "SELECT id_ubicacion AS kid_locacion_almacen, 
+        case 'get_almacenes':
+            header('Content-Type: application/json; charset=utf-8');
+            $response = ['ok' => false, 'data' => []];
+
+            try {
+                $sql = "SELECT id_almacen AS kid_almacen, almacen AS nombre 
+                    FROM almacenes 
+                    WHERE kid_estatus = 1";
+                $stmt = $conexion->prepare($sql);
+                $stmt->execute();
+                $almacenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $response['ok'] = true;
+                $response['data'] = $almacenes;
+            } catch (Exception $e) {
+                $response['message'] = 'Error al obtener almacenes: ' . $e->getMessage();
+            }
+
+            echo json_encode($response);
+            exit;
+            break;
+
+        case 'get_insumo_peso':
+            header('Content-Type: application/json; charset=utf-8');
+            $response = ['ok' => false, 'peso' => null];
+
+            try {
+                $sql = "SELECT valor FROM configuraciones WHERE parametro ='peso_tarima' and id_status = 1";
+                $stmt = $conexion->prepare($sql);
+                $stmt->execute();
+                $peso = $stmt->fetchColumn();
+
+                if ($peso !== false) {
+                    $response['ok'] = true;
+                    $response['peso'] = floatval($peso);
+                } else {
+                    $response['message'] = 'Insumo no encontrado o sin peso estimado';
+                }
+            } catch (Exception $e) {
+                $response['message'] = 'Error al obtener peso del insumo: ' . $e->getMessage();
+            }
+
+            echo json_encode($response);
+            exit;
+            break;
+        case 'get_ubicaciones':
+            header('Content-Type: application/json; charset=utf-8');
+            $response = ['ok' => false, 'data' => []];
+
+            if (!isset($_GET['id_almacen'])) {
+                $response['message'] = 'ID de almacén requerido';
+                echo json_encode($response);
+                exit;
+            }
+
+            try {
+                $id_almacen = intval($_GET['id_almacen']);
+                $sql = "SELECT id_ubicacion AS kid_locacion_almacen, 
                            codigo_localizacion AS nombre 
                     FROM ubicacion_almacen 
                     WHERE kid_almacen = :id 
                     AND kid_estatus = 1";
-            $stmt = $conexion->prepare($sql);
-            $stmt->bindParam(':id', $id_almacen, PDO::PARAM_INT);
-            $stmt->execute();
-            $ubicaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            $response['ok'] = true;
-            $response['data'] = $ubicaciones;
-        } catch (Exception $e) {
-            $response['message'] = 'Error al obtener ubicaciones: ' . $e->getMessage();
-        }
-        
-        echo json_encode($response);
-        exit;
-        break;
-            if (isset($_GET['api']) && $_GET['api'] === 'get_peso_tarima_by_detalle') {
-    header('Content-Type: application/json');
-    require_once "conexion.php"; // Asegúrate de que este archivo crea la variable $conexion (mysqli o PDO)
-    $id_detalle = isset($_GET['id_detalle_recepcion_compras']) ? intval($_GET['id_detalle_recepcion_compras']) : 0;
-    $peso_tarima = null;
-    $descripcion = null;
+                $stmt = $conexion->prepare($sql);
+                $stmt->bindParam(':id', $id_almacen, PDO::PARAM_INT);
+                $stmt->execute();
+                $ubicaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($id_detalle > 0) {
-        $sql = "SELECT peso_tarima FROM detalles_recepciones_compras WHERE id_detalle_recepcion_compras = ?";
-        if ($stmt = $conexion->prepare($sql)) {
-            $stmt->bind_param('i', $id_detalle);
-            $stmt->execute();
-            $stmt->bind_result($peso_tarima);
-            if ($stmt->fetch()) {
-                // Si necesitas una descripción, puedes traerla también de la tabla si existe ese campo
-                $descripcion = "Peso tarima para detalle ID $id_detalle";
+                $response['ok'] = true;
+                $response['data'] = $ubicaciones;
+            } catch (Exception $e) {
+                $response['message'] = 'Error al obtener ubicaciones: ' . $e->getMessage();
             }
-            $stmt->close();
-        }
-    }
 
-    echo json_encode([
-        'peso_tarima' => $peso_tarima ? floatval($peso_tarima) : null,
-        'descripcion' => $descripcion,
-        'success' => $peso_tarima !== null
-    ]);
-    exit();
-}
+            echo json_encode($response);
+            exit;
+            break;
+            if (isset($_GET['api']) && $_GET['api'] === 'get_peso_tarima_by_detalle') {
+                header('Content-Type: application/json');
+                require_once "conexion.php"; // Asegúrate de que este archivo crea la variable $conexion (mysqli o PDO)
+                $id_detalle = isset($_GET['id_detalle_recepcion_compras']) ? intval($_GET['id_detalle_recepcion_compras']) : 0;
+                $peso_tarima = null;
+                $descripcion = null;
+
+                if ($id_detalle > 0) {
+                    $sql = "SELECT peso_tarima FROM detalles_recepciones_compras WHERE id_detalle_recepcion_compras = ?";
+                    if ($stmt = $conexion->prepare($sql)) {
+                        $stmt->bind_param('i', $id_detalle);
+                        $stmt->execute();
+                        $stmt->bind_result($peso_tarima);
+                        if ($stmt->fetch()) {
+                            // Si necesitas una descripción, puedes traerla también de la tabla si existe ese campo
+                            $descripcion = "Peso tarima para detalle ID $id_detalle";
+                        }
+                        $stmt->close();
+                    }
+                }
+
+                echo json_encode([
+                    'peso_tarima' => $peso_tarima ? floatval($peso_tarima) : null,
+                    'descripcion' => $descripcion,
+                    'success' => $peso_tarima !== null
+                ]);
+                exit();
+            }
 
         // Aquí puedes agregar más endpoints GET tipo API...
     }

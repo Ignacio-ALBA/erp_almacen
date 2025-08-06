@@ -11,7 +11,7 @@ async function finalizarRecepcionMp(idRecepcionMp) {
         body: 'modalCRUD=recepciones_mp&opcion=finalizar&formDataJson=' + encodeURIComponent(JSON.stringify({id_recepcion_mp: idRecepcionMp}))
     });
     let data = await resp.json();
-      // <-- AGREGA ESTAS DOS LÍNEAS AQUÍ -->
+    // <-- AGREGA ESTAS DOS LÍNEAS AQUÍ -->
     console.log('Respuesta de finalizar:', data);
     alert('Respuesta al finalizar: ' + (data.message || JSON.stringify(data)));
 
@@ -28,9 +28,9 @@ async function guardarPesajeRecepcionMP(extra = {}) {
         // 1. Recolectar datos de inputs y selects
         const idOrdenCompra = document.getElementById('num_pedido').value;
         const almacenDestino = document.getElementById('almacen_destino').value;
- // Número de tarimas SIEMPRE de aquí:
-const numTarimas = document.getElementById('num_tarimas').value;
- const pesoTarimas = extra.peso_tarimas || '';
+        // Número de tarimas SIEMPRE de aquí:
+        const numTarimas = document.getElementById('num_tarimas').value;
+        const pesoTarimas = extra.peso_tarimas || '';
         // campos automáticos
         const insumoSelect = document.getElementById('insumo_peso');
         const kidArticulo = insumoSelect.value;
@@ -40,12 +40,12 @@ const numTarimas = document.getElementById('num_tarimas').value;
         const valorCodigoQR = window.valorCodigoQR || ''; // Debes tener esto generado antes (ver flujo QR)
         const imagenCodigoQR = window.imagenCodigoQR || '';
         const usuarioActual = window.usuarioActual || null; // Puedes guardar el id de colaborador en window al cargar la página
-        const fechaCreacion = new Date().toISOString().slice(0,19).replace('T',' ');
+        const fechaCreacion = new Date().toISOString().slice(0, 19).replace('T', ' ');
         //const pdf_generado = extra.pdf_generado || '';
         // Validar datos mínimos
         console.log({
-    idOrdenCompra, almacenDestino, kidArticulo, pesoReal, contenedorDestino
-});
+            idOrdenCompra, almacenDestino, kidArticulo, pesoReal, contenedorDestino
+        });
         if (!idOrdenCompra || !almacenDestino || !kidArticulo || !pesoReal || !contenedorDestino) {
             alert('Faltan datos obligatorios para guardar el pesaje');
             return;
@@ -93,7 +93,7 @@ const numTarimas = document.getElementById('num_tarimas').value;
             diferencia_peso: diferenciaPeso,
             valor_codigoqr: valorCodigoQR,
             imagen_codigo_qr: imagenCodigoQR,
-             pdf_generado: extra.pdf_generado || '',
+            pdf_generado: extra.pdf_generado || '',
             kid_creacion: usuarioActual,
             fecha_creacion: fechaCreacion,
             kid_estatus: 1
@@ -113,7 +113,7 @@ const numTarimas = document.getElementById('num_tarimas').value;
         const resp = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: Object.entries(payload).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "object" ? JSON.stringify(v) : v)}`).join('&')
+            body: Object.entries(payload).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "object" ? JSON.stringify(v) : v)}`).join('&')
         });
         const data = await resp.json();
         console.log('Respuesta del guardado:', data);
@@ -141,20 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const proveedorOrdenCompra = localStorage.getItem('selected_orden_compra_proveedor') || '';
 
     // Inputs
-    const numPedidoInput      = document.getElementById('num_pedido');
-    const nombreOrdenInput    = document.getElementById('nombre_orden');
+    const numPedidoInput = document.getElementById('num_pedido');
+    const nombreOrdenInput = document.getElementById('nombre_orden');
     const proveedorOrdenInput = document.getElementById('proveedor_orden');
-    const insumoSelect        = document.getElementById('insumo_peso');
-    const cantidadInput       = document.getElementById('cantidad_insumo');
-    const modoPesajeSelect    = document.getElementById('modo_pesaje');
-    let contenedorTarima      = document.getElementById('contenedor_valor_tarima');
-    const numTarimasInput     = document.getElementById('num_tarimas');
-    const btnConectarBalanza  = document.getElementById('btn_conectar_balanza');
-    const pesoBasculaInput    = document.getElementById('peso_bascula');
-    const btnGuardarPesaje    = document.getElementById('btn_guardar_pesaje');
+    const insumoSelect = document.getElementById('insumo_peso');
+    const cantidadInput = document.getElementById('cantidad_insumo');
+    const modoPesajeSelect = document.getElementById('modo_pesaje');
+    let contenedorTarima = document.getElementById('contenedor_valor_tarima');
+    const numTarimasInput = document.getElementById('num_tarimas');
+    const btnConectarBalanza = document.getElementById('btn_conectar_balanza');
+    const pesoBasculaInput = document.getElementById('peso_bascula');
+    const btnGuardarPesaje = document.getElementById('btn_guardar_pesaje');
     const btnFinalizarRecepcion = document.getElementById('btn_finalizar_recepcion');
-    const btnGenerarQR        = document.getElementById('btn_generar_qr');
-    const btnGenerarPDF       = document.getElementById('btn_generar_pdf');
+    const btnGenerarQR = document.getElementById('btn_generar_qr');
+    const btnGenerarPDF = document.getElementById('btn_generar_pdf');
     let qrCanvas = null;
     //let lastIdRecepcionMP = null; // Para saber cuál fue la última recepción
 
@@ -162,53 +162,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // === CARGA DINÁMICA DE ALMACENES Y UBICACIONES ===
 
 // Cargar almacenes al cargar la página
-fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_almacenes')
-  .then(r => r.json())
-  .then(res => {
-    if (res.ok) {
-      let sel = document.getElementById('almacen_destino');
-      if (!sel) return;
-      sel.innerHTML = '';
-      res.data.forEach(a => {
-        let opt = document.createElement('option');
-        opt.value = a.kid_almacen;
-        opt.textContent = a.nombre;
-        sel.appendChild(opt);
-      });
-      // Trigger el evento para cargar ubicaciones del primero por defecto
-      sel.dispatchEvent(new Event('change'));
-    }
-  });
+    fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_almacenes')
+        .then(r => r.json())
+        .then(res => {
+            if (res.ok) {
+                let sel = document.getElementById('almacen_destino');
+                if (!sel) return;
+                sel.innerHTML = '';
+                res.data.forEach(a => {
+                    let opt = document.createElement('option');
+                    opt.value = a.kid_almacen;
+                    opt.textContent = a.nombre;
+                    sel.appendChild(opt);
+                });
+                // Trigger el evento para cargar ubicaciones del primero por defecto
+                sel.dispatchEvent(new Event('change'));
+            }
+        });
 
 // Cargar ubicaciones al cambiar almacén
-document.getElementById('almacen_destino').addEventListener('change', function() {
-  let idAlmacen = this.value;
-  fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_ubicaciones&id_almacen=' + encodeURIComponent(idAlmacen))
-    .then(r => r.json())
-    .then(res => {
-      if (res.ok) {
-        let sel = document.getElementById('contenedor_destino');
-        if (!sel) return;
-        sel.innerHTML = '';
-        res.data.forEach(u => {
-          let opt = document.createElement('option');
-          opt.value = u.kid_locacion_almacen;
-          opt.textContent = u.nombre;
-          sel.appendChild(opt);
-        });
-      }
+    document.getElementById('almacen_destino').addEventListener('change', function () {
+        let idAlmacen = this.value;
+        fetch('/vistas/almacen_mp/bd/crudEndpoint.php?api=get_ubicaciones&id_almacen=' + encodeURIComponent(idAlmacen))
+            .then(r => r.json())
+            .then(res => {
+                if (res.ok) {
+                    let sel = document.getElementById('contenedor_destino');
+                    if (!sel) return;
+                    sel.innerHTML = '';
+                    res.data.forEach(u => {
+                        let opt = document.createElement('option');
+                        opt.value = u.kid_locacion_almacen;
+                        opt.textContent = u.nombre;
+                        sel.appendChild(opt);
+                    });
+                }
+            });
     });
-});
     // Carga inicial de datos de la orden
-    if (numPedidoInput)      numPedidoInput.value      = idOrdenCompra;
-    if (nombreOrdenInput)    nombreOrdenInput.value    = nombreOrdenCompra;
+    if (numPedidoInput) numPedidoInput.value = idOrdenCompra;
+    if (nombreOrdenInput) nombreOrdenInput.value = nombreOrdenCompra;
     if (proveedorOrdenInput) proveedorOrdenInput.value = proveedorOrdenCompra;
 
     // Limpia localStorage
     localStorage.removeItem('selected_orden_compra');
     localStorage.removeItem('selected_orden_compra_id');
     localStorage.removeItem('selected_orden_compra_proveedor');
-    
+
     // Llenar insumos desde API y manejo de errores visual
     function cargarInsumosOrden() {
         if (!idOrdenCompra || !insumoSelect) return;
@@ -280,7 +280,7 @@ document.getElementById('almacen_destino').addEventListener('change', function()
                 <input type="number" id="peso_tarima" class="form-control form-control-sm mb-1" readonly>
                 <button type="button" class="btn btn-outline-primary btn-sm" id="btn_capturar_tarima">Capturar peso de tarima</button>
             `;
-            document.getElementById('btn_capturar_tarima').onclick = function() {
+            document.getElementById('btn_capturar_tarima').onclick = function () {
                 // Puedes agregar aquí la lógica de verificación de conexión real o simulada de balanza
                 if (typeof window.balanzaConectada !== "undefined" && !window.balanzaConectada) {
                     alert("Primero conecta la balanza.");
@@ -295,7 +295,7 @@ document.getElementById('almacen_destino').addEventListener('change', function()
                 <label for="peso_tarima_manual" class="form-label">Peso de Tarima (kg)</label>
                 <input type="number" id="peso_tarima_manual" class="form-control form-control-sm mb-1">
             `;
-            document.getElementById('peso_tarima_manual').oninput = function() {
+            document.getElementById('peso_tarima_manual').oninput = function () {
                 localStorage.setItem('peso_tarima', this.value);
             }
         } else if (this.value === 'Captura Estatica' || this.value === 'captura_estatica') {
@@ -313,7 +313,7 @@ document.getElementById('almacen_destino').addEventListener('change', function()
                         <label for="peso_tarima_estatico" class="form-label">Peso de Tarima (kg)</label>
                         <select id="peso_tarima_estatico" class="form-control form-control-sm mb-1">${opts}</select>
                     `;
-                    document.getElementById('peso_tarima_estatico').onchange = function() {
+                    document.getElementById('peso_tarima_estatico').onchange = function () {
                         localStorage.setItem('peso_tarima', this.value);
                     }
                 })
@@ -324,20 +324,20 @@ document.getElementById('almacen_destino').addEventListener('change', function()
                         <label for="peso_tarima_manual" class="form-label">Peso de Tarima (kg)</label>
                         <input type="number" id="peso_tarima_manual" class="form-control form-control-sm mb-1">
                     `;
-                    document.getElementById('peso_tarima_manual').oninput = function() {
+                    document.getElementById('peso_tarima_manual').oninput = function () {
                         localStorage.setItem('peso_tarima', this.value);
                     }
                 });
         }
     });
     // Ejemplo de uso cuando el usuario presiona el botón finalizar recepción
-document.getElementById('btn_finalizar_recepcion').addEventListener('click', function() {
-    if (window.lastIdRecepcionMP) {
-        finalizarRecepcionMp(window.lastIdRecepcionMP);
-    } else {
-        alert('No hay recepción activa.');
-    }
-});
+    document.getElementById('btn_finalizar_recepcion').addEventListener('click', function () {
+        if (window.lastIdRecepcionMP) {
+            finalizarRecepcionMp(window.lastIdRecepcionMP);
+        } else {
+            alert('No hay recepción activa.');
+        }
+    });
     // Lógica para conectar con la báscula
     btnConectarBalanza?.addEventListener('click', async () => {
         try {
@@ -361,7 +361,7 @@ document.getElementById('btn_finalizar_recepcion').addEventListener('click', fun
             const reader = inputStream.getReader();
 
             while (true) {
-                const { value, done } = await reader.read();
+                const {value, done} = await reader.read();
                 if (done) break;
                 if (value) pesoBasculaInput.value = value.trim();
             }
@@ -379,12 +379,12 @@ document.getElementById('btn_finalizar_recepcion').addEventListener('click', fun
 
     function getEtiquetaData() {
         const nombreInsumo = insumoSelect.options[insumoSelect.selectedIndex]?.textContent || '';
-        const proveedor    = proveedorOrdenInput.value;
-        const fechaHora    = (new Date()).toLocaleString('es-MX');
-        const pesoKg       = pesoBasculaInput.value || '';
-        const pesoTarima   = localStorage.getItem('peso_tarima') || '';
-        const modo         = modoPesajeSelect.value;
-        const numTarimas   = numTarimasInput.value;
+        const proveedor = proveedorOrdenInput.value;
+        const fechaHora = (new Date()).toLocaleString('es-MX');
+        const pesoKg = pesoBasculaInput.value || '';
+        const pesoTarima = localStorage.getItem('peso_tarima') || '';
+        const modo = modoPesajeSelect.value;
+        const numTarimas = numTarimasInput.value;
 
         return {
             numPedido: numPedidoInput.value,
@@ -401,7 +401,7 @@ document.getElementById('btn_finalizar_recepcion').addEventListener('click', fun
 
     function formatoEtiquetaVisual(data) {
         return (
-`----------------------------------------
+            `----------------------------------------
 ORDEN:    ${data.numPedido}
 INSUMO:   ${data.nombreInsumo}
 PROVEEDOR:${data.proveedor}
@@ -463,35 +463,35 @@ FECHA Y HORA:       ${data.fechaHora}
             }
             // Guardar datos del QR en window para usarlos después
             window.valorCodigoQR = JSON.stringify({
-            insumo: datos.nombreInsumo,
-            proveedor: datos.proveedor,
-            fecha_hora: datos.fechaHora,
-            peso_kg: datos.pesoNeto,
-            peso_tarima: datos.pesoTarima
-          });
-        window.imagenCodigoQR = qrDataUrl;
+                insumo: datos.nombreInsumo,
+                proveedor: datos.proveedor,
+                fecha_hora: datos.fechaHora,
+                peso_kg: datos.pesoNeto,
+                peso_tarima: datos.pesoTarima
+            });
+            window.imagenCodigoQR = qrDataUrl;
 
-           // === OBTENER PESO DE TARIMA SEGUN EL TIPO DE PESAJE ===
-        let pesoTarimas = '';
-        if (document.getElementById('peso_tarima')) {
-            pesoTarimas = document.getElementById('peso_tarima').value;
-        } else if (document.getElementById('peso_tarima_manual')) {
-            pesoTarimas = document.getElementById('peso_tarima_manual').value;
-        } else if (document.getElementById('peso_tarima_estatico')) {
-            pesoTarimas = document.getElementById('peso_tarima_estatico').value;
-        }
-        // fallback: si alguna lógica lo puso en localStorage
-        if (!pesoTarimas) pesoTarimas = localStorage.getItem('peso_tarima') || '';
+            // === OBTENER PESO DE TARIMA SEGUN EL TIPO DE PESAJE ===
+            let pesoTarimas = '';
+            if (document.getElementById('peso_tarima')) {
+                pesoTarimas = document.getElementById('peso_tarima').value;
+            } else if (document.getElementById('peso_tarima_manual')) {
+                pesoTarimas = document.getElementById('peso_tarima_manual').value;
+            } else if (document.getElementById('peso_tarima_estatico')) {
+                pesoTarimas = document.getElementById('peso_tarima_estatico').value;
+            }
+            // fallback: si alguna lógica lo puso en localStorage
+            if (!pesoTarimas) pesoTarimas = localStorage.getItem('peso_tarima') || '';
 
-        // 4. Ahora llama la función que arma el payload y guarda en BD
+            // 4. Ahora llama la función que arma el payload y guarda en BD
             // 2. Generar PDF
-            const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
+            const {PDFDocument, rgb, StandardFonts, degrees} = PDFLib;
             const pdfDoc = await PDFDocument.create();
             const page = pdfDoc.addPage([425.25, 283.5]);
             // ROTAR 90 grados el contenido (vertical)
             const rotation = degrees(90);
             page.setRotation(rotation);
-            const { width, height } = page.getSize();
+            const {width, height} = page.getSize();
 
             // LOGO
             try {
@@ -603,66 +603,66 @@ FECHA Y HORA:       ${data.fechaHora}
             });
 
             const pdfBytes = await pdfDoc.save();
-                 const pdfBase64 = btoa(
-          new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
-        );
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const pdfBase64 = btoa(
+                new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+            const blob = new Blob([pdfBytes], {type: 'application/pdf'});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'etiqueta-recepcion.pdf';
             link.click();
-       await guardarPesajeRecepcionMP({
-            peso_tarimas: pesoTarimas,
-            pdf_generado: pdfBase64
-        });
-            // 3. Guardar en BD (AJAX)
-              /*
-            const formData = {
-                recepcion_mp: 'Pesaje OC ' + datos.numPedido,
-                peso_tarima: datos.pesoTarima,
-                codigo_externo: '',
-                grupo_cotizacion: 1,
-                kid_proyecto: null,
-                kid_proveedor: proveedorOrdenInput.value,
-                kid_orden_compras: datos.numPedido,
-                kid_almacen: null,
-                monto_total: 0,
-                monto_neto: 0,
-                kid_creacion: null,
-                fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-                kid_estatus: 1,
-                detalles: [{
-                    kid_articulo: insumoSelect.value,
-                    costo_unitario_neto: 0,
-                    costo_unitario_total: 0,
-                    monto_neto: 0,
-                    porcentaje_descuento: 0,
-                    monto_total: 0,
-                    peso_real: parseFloat(datos.pesoNeto) || 0,
-                    valor_codigoqr: JSON.stringify({
-                        insumo: datos.nombreInsumo,
-                        proveedor: datos.proveedor,
-                        fecha_hora: datos.fechaHora,
-                        peso_kg: datos.pesoNeto,
-                    }),
-                    imagen_codigo_qr: qrDataUrl,
-                    kid_creacion: null,
-                    kid_ubicacion_almacen: null,
-                    fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-                    kid_estatus: 1
-                }]
-            };
-
-            const response = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ modalCRUD: 'recepciones_mp', opcion: 1, formDataJson: formData })
+            await guardarPesajeRecepcionMP({
+                peso_tarimas: pesoTarimas,
+                pdf_generado: pdfBase64
             });
-            const result = await response.json();
-            if (result.status !== 'success') throw new Error('Error al guardar en la BD');
-            alert('Pesaje guardado correctamente');
-            lastIdRecepcionMP = result.id_recepcion_mp || null;
-              */
+            // 3. Guardar en BD (AJAX)
+            /*
+          const formData = {
+              recepcion_mp: 'Pesaje OC ' + datos.numPedido,
+              peso_tarima: datos.pesoTarima,
+              codigo_externo: '',
+              grupo_cotizacion: 1,
+              kid_proyecto: null,
+              kid_proveedor: proveedorOrdenInput.value,
+              kid_orden_compras: datos.numPedido,
+              kid_almacen: null,
+              monto_total: 0,
+              monto_neto: 0,
+              kid_creacion: null,
+              fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
+              kid_estatus: 1,
+              detalles: [{
+                  kid_articulo: insumoSelect.value,
+                  costo_unitario_neto: 0,
+                  costo_unitario_total: 0,
+                  monto_neto: 0,
+                  porcentaje_descuento: 0,
+                  monto_total: 0,
+                  peso_real: parseFloat(datos.pesoNeto) || 0,
+                  valor_codigoqr: JSON.stringify({
+                      insumo: datos.nombreInsumo,
+                      proveedor: datos.proveedor,
+                      fecha_hora: datos.fechaHora,
+                      peso_kg: datos.pesoNeto,
+                  }),
+                  imagen_codigo_qr: qrDataUrl,
+                  kid_creacion: null,
+                  kid_ubicacion_almacen: null,
+                  fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
+                  kid_estatus: 1
+              }]
+          };
+
+          const response = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ modalCRUD: 'recepciones_mp', opcion: 1, formDataJson: formData })
+          });
+          const result = await response.json();
+          if (result.status !== 'success') throw new Error('Error al guardar en la BD');
+          alert('Pesaje guardado correctamente');
+          lastIdRecepcionMP = result.id_recepcion_mp || null;
+            */
         } catch (e) {
             console.error('Error completo:', e);
             alert('Error en el proceso: ' + e.message);
@@ -677,7 +677,7 @@ FECHA Y HORA:       ${data.fechaHora}
             return;
         }
         try {
-            
+
             const resp = await fetch(`/vistas/almacen_mp/bd/crudEndpoint.php?api=get_detalles_recepcion_mp&id=${lastIdRecepcionMP}`);
             const data = await resp.json();
             if (!data.ok || !Array.isArray(data.detalles) || data.detalles.length === 0) {

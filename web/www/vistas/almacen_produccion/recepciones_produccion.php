@@ -265,7 +265,7 @@ echo '</div></div>';
 
 
 
-  $titulos = ['ID', 'Recepción','Código Externo','Proyecto','Proveedor','Almacén','Orden de Compra','Estado','Fecha de creación'];
+  $titulos = ['ID', 'Recepción','Código Externo','Número de Tarimas', 'Peso de Tarimas','Proyecto','Proveedor','Almacén','Orden de Compra','Recibe','Reclama','Devuelve', 'Motivo de Devolución', 'Monto total', 'Monto Neto' , 'Estado', 'Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, true, $botones_acciones);
   CreateModalForm(
     [

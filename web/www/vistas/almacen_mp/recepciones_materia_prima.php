@@ -185,13 +185,13 @@ echo '</div>';
 // Fila 2: insumo, cantidad, modo pesaje, valor tarima
 echo '<div class="row input-group-4 mb-3">';
 echo '<div>';
-echo CreateSelect([
-    'type' => 'text',
+echo CreateInput([
+    'type' => 'number',
     'id' => 'insumo_peso',
     'etiqueta' => 'Insumo pesado',
     'required' => 'true',
     'class' => 'form-control form-control-sm'
-], []);
+], );
 echo '</div>';
 echo '<div>';
 echo CreateInput([
@@ -265,7 +265,7 @@ echo '</div></div>';
 
 
 
-  $titulos = ['ID', 'Recepción','Código Externo','Proyecto','Proveedor','Almacén','Orden de Compra','Estado','Fecha de creación'];
+  $titulos = ['ID', 'Recepción','Código Externo','Número de Tarimas', 'Peso de Tarimas','Proyecto','Proveedor','Almacén','Orden de Compra','Recibe','Reclama','Devuelve', 'Motivo de Devolución', 'Monto total', 'Monto Neto' , 'Estado', 'Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, false,[],'',[],false);
   CreateModalForm(
     [
