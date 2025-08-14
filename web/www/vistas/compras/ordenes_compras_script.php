@@ -334,4 +334,3 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
         });
     });
 </script>
-<?php include '../../../../rutas/formularios_script.php'; ?>
