@@ -811,7 +811,7 @@ break;
                 $newformDataJson = $formDataJson;
                 $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
                 $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
-                $newformDataJson['kid_estatus'] = 8;
+                $newformDataJson['kid_estatus'] = 1;
                 
                 // Set default value for grupo_cotizacion if not present
                 $newformDataJson['grupo_cotizacion'] = isset($newformDataJson['grupo_cotizacion']) ? $newformDataJson['grupo_cotizacion'] : 1;

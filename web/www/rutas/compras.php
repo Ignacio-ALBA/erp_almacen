@@ -472,8 +472,6 @@ if($resultado){
 
             $data['list_js_scripts']['../vistas/compras/detalles_ordenes_compras_script'] = ['data' => $data_script];
 
-             echo "$data_script";
-
             break;
         case 'recepcion_orden':
             $perms = [

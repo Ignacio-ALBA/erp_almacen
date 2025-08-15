@@ -185,13 +185,13 @@ echo '</div>';
 // Fila 2: insumo, cantidad, modo pesaje, valor tarima
 echo '<div class="row input-group-4 mb-3">';
 echo '<div>';
-echo CreateInput([
-    'type' => 'number',
+echo CreateSelect([
+    'type' => 'text',
     'id' => 'insumo_peso',
     'etiqueta' => 'Insumo pesado',
     'required' => 'true',
     'class' => 'form-control form-control-sm'
-], );
+], []);
 echo '</div>';
 echo '<div>';
 echo CreateInput([
