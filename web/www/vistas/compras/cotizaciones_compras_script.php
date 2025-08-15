@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             dataType: "json",
             success: function(response) {
-                table.empty();
+                $('#tabladetalles_cotizaciones_compras').DataTable().rows().remove();
                 let detalles = [];
                 if (response.status === "success") {
                     if (Array.isArray(response.data)) {
@@ -156,17 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (detalles.length > 0) {
                     detalles.forEach(function(row) {
-                        let newRow = $("<tr></tr>");
-                        if(Array.isArray(row)) {
-                            row.forEach(function(cell) {
-                                newRow.append($("<td></td>").text(cell));
-                            });
-                            table.append(newRow);
-                        }
+                        row[9]='<div class="btn-group" role="group" style="width:100%;"><button type="button" class="ModalDataView btn btn-primary primary" modalcrud="detalles_cotizaciones_compras"><i class="bi bi-eye"></i> Ver</button><button type="button" class="ModalDataEdit btn btn-warning warning" modalcrud="detalles_cotizaciones_compras"><i class="bi bi-pencil"></i> Editar</button><button type="button" class="ModalDataDelete btn btn-danger danger" modalcrud="detalles_cotizaciones_compras"><i class="bi bi-trash"></i> Eliminar</button></div>';
+                        $('#tabladetalles_cotizaciones_compras').DataTable().row.add(row);
                     });
-                } else {
-                    table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta cotización</td></tr>');
                 }
+                $('#tabladetalles_cotizaciones_compras').DataTable().draw();
             },
             error: function(xhr, status, error) {
                 table.empty();
