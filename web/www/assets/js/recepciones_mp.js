@@ -58,6 +58,12 @@ async function guardarPesajeRecepcionMP(extra = {}) {
         const detalle = (window.detallesOrdenCompra || []).find(d => d.kid_articulo == kidArticulo) || {};
         // Si no tienes estos objetos, puedes hacer un fetch sincronizado aquí, pero es mejor hacerlo al cargar la OC
 
+        console.log(
+            orden,
+            orden.monto_total
+
+        )
+
         // 3. Preparar el objeto de encabezado y detalles
         const encabezado = {
             codigo_externo: orden.codigo_externo,
@@ -126,6 +132,8 @@ async function guardarPesajeRecepcionMP(extra = {}) {
             document.getElementById('almacen_destino').readOnly = true;
             // Actualiza el id de recepción si lo devuelve el backend
             window.lastIdRecepcionMP = data.id_recepcion_mp || window.lastIdRecepcionMP;
+            //Descargar PDF
+            descargarPDF(pdfBase64);
         } else {
             alert("Error al guardar: " + (data.message || 'Error desconocido'));
         }
@@ -243,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Error cargando insumos: ' + e.message);
             });
     }
+
     cargarInsumosOrden();
 
     // Mostrar cantidad al seleccionar un insumo
@@ -416,52 +425,19 @@ FECHA Y HORA:       ${data.fechaHora}
         );
     }
 
-    // === GUARDAR PESAJE (QR, PDF, BD, errores por paso) ===
-    btnGuardarPesaje?.addEventListener('click', async () => {
+
+    btnGuardarPesaje?.addEventListener('click', guardarPesajeConEtiqueta);
+
+
+    async function guardarPesajeConEtiqueta() {
         try {
             if (typeof QRCode !== 'function') {
                 alert('No se pudo cargar la librería QRCode');
                 return;
             }
 
-            // 1. Generar QR con davidshimjs/qrcodejs
             const datos = getEtiquetaData();
-            const etiqueta = formatoEtiquetaVisual(datos);
-            let qrDiv = document.getElementById('qr_code');
-            if (!qrDiv) {
-                qrDiv = document.createElement('div');
-                qrDiv.id = 'qr_code';
-                document.body.appendChild(qrDiv);
-            }
-            qrDiv.innerHTML = '';
-            let qr = new QRCode(qrDiv, {
-                text: JSON.stringify({
-                    insumo: datos.nombreInsumo,
-                    proveedor: datos.proveedor,
-                    fecha_hora: datos.fechaHora,
-                    peso_kg: datos.pesoNeto,
-                    peso_tarima: datos.pesoTarima
-                }),
-                width: 200,
-                height: 200,
-                correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.H : 2 // fallback
-            });
-
-            // Espera a que el <img> o <canvas> esté disponible
-            await new Promise((res) => setTimeout(res, 400));
-
-            // davidshimjs/qrcodejs genera <img> en la mayoría de navegadores, sino <canvas>
-            let qrCanvas = qrDiv.querySelector('canvas');
-            let qrImg = qrDiv.querySelector('img');
-            let qrDataUrl = '';
-            if (qrImg && qrImg.src) {
-                qrDataUrl = qrImg.src;
-            } else if (qrCanvas) {
-                qrDataUrl = qrCanvas.toDataURL('image/png');
-            } else {
-                throw new Error('No se pudo generar el código QR');
-            }
-            // Guardar datos del QR en window para usarlos después
+            const qrDataUrl = await generarQR(datos);
             window.valorCodigoQR = JSON.stringify({
                 insumo: datos.nombreInsumo,
                 proveedor: datos.proveedor,
@@ -471,204 +447,132 @@ FECHA Y HORA:       ${data.fechaHora}
             });
             window.imagenCodigoQR = qrDataUrl;
 
-            // === OBTENER PESO DE TARIMA SEGUN EL TIPO DE PESAJE ===
-            let pesoTarimas = '';
-            if (document.getElementById('peso_tarima')) {
-                pesoTarimas = document.getElementById('peso_tarima').value;
-            } else if (document.getElementById('peso_tarima_manual')) {
-                pesoTarimas = document.getElementById('peso_tarima_manual').value;
-            } else if (document.getElementById('peso_tarima_estatico')) {
-                pesoTarimas = document.getElementById('peso_tarima_estatico').value;
-            }
-            // fallback: si alguna lógica lo puso en localStorage
-            if (!pesoTarimas) pesoTarimas = localStorage.getItem('peso_tarima') || '';
+            const pesoTarimas = obtenerPesoTarima();
+            const pdfBase64 = await generarPDF(datos, qrDataUrl);
 
-            // 4. Ahora llama la función que arma el payload y guarda en BD
-            // 2. Generar PDF
-            const {PDFDocument, rgb, StandardFonts, degrees} = PDFLib;
-            const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage([425.25, 283.5]);
-            // ROTAR 90 grados el contenido (vertical)
-            const rotation = degrees(90);
-            page.setRotation(rotation);
-            const {width, height} = page.getSize();
+            // Descargar PDF
+//            descargarPDF(pdfBase64);
 
-            // LOGO
-            try {
-                if (typeof logoBase64 !== 'undefined' && logoBase64) {
-                    const logoImageBytes = await fetch(logoBase64).then(r => r.arrayBuffer());
-                    let logoImageEmbed;
-                    if (logoBase64.startsWith('data:image/png')) {
-                        logoImageEmbed = await pdfDoc.embedPng(logoImageBytes);
-                    } else {
-                        logoImageEmbed = await pdfDoc.embedJpg(logoImageBytes);
-                    }
-                    const logoWidth = 80;
-                    const logoHeight = 80;
-                    page.drawImage(logoImageEmbed, {
-                        x: 10,
-                        y: height - logoHeight - 10,
-                        width: logoWidth,
-                        height: logoHeight,
-                    });
-                }
-            } catch (e) {
-                console.error("Error al cargar el logo en el PDF:", e);
-            }
-
-            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-            const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-            // Título "FORCIP"
-            page.drawText('FORCIP', {
-                x: 130,
-                y: height - 50,
-                size: 40,
-                font: fontBold,
-                color: rgb(0, 0, 0),
-            });
-
-            // Barra negra con el nombre del INSUMO
-            page.drawRectangle({
-                x: 0, y: height - 90, width: width, height: 30, color: rgb(0, 0, 0),
-            });
-
-            // Insumo pesado en barra negra, en blanco
-            const insumo = datos.nombreInsumo || (insumoSelect?.selectedOptions[0]?.textContent ?? '');
-            page.drawText(insumo, {
-                x: 14,
-                y: height - 82,
-                size: 20,
-                font: fontBold,
-                color: rgb(1, 1, 1),
-            });
-
-            // Proveedor (debajo de la barra negra, en negro)
-            const proveedor = datos.proveedor || (proveedorOrdenInput?.value ?? '');
-            page.drawText(`Proveedor: ${proveedor}`, {
-                x: 14,
-                y: height - 110,
-                size: 17,
-                font: font,
-                color: rgb(0, 0, 0),
-            });
-
-            // Fecha, hora, peso (peso resalta, grande)
-            const currentDate = new Date();
-            const date = currentDate.toLocaleDateString();
-            const time = currentDate.toLocaleTimeString();
-            const peso = datos.pesoNeto || (pesoBasculaInput?.value ?? '0.00');
-
-            page.drawText(`Fecha: ${date}`, {
-                x: 14,
-                y: height - 150,
-                size: 23,
-                font: font,
-                color: rgb(0, 0, 0),
-            });
-
-            page.drawText(`Hora: ${time}`, {
-                x: 14,
-                y: height - 180,
-                size: 23,
-                font: font,
-                color: rgb(0, 0, 0),
-            });
-
-            page.drawText(`Peso:`, {
-                x: 14,
-                y: height - 220,
-                size: 35,
-                font: fontBold,
-                color: rgb(0, 0, 0),
-            });
-
-            page.drawText(`${peso} kg`, {
-                x: 120,
-                y: height - 220,
-                size: 35,
-                font: fontBold,
-                color: rgb(0, 0, 0),
-            });
-
-            // QR a la derecha
-            const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
-            const qrImageEmbed = await pdfDoc.embedPng(qrImageBytes);
-            const qrSize = 120;
-            page.drawImage(qrImageEmbed, {
-                x: width - qrSize - 20,
-                y: height - 220,
-                width: qrSize,
-                height: qrSize,
-            });
-
-            const pdfBytes = await pdfDoc.save();
-            const pdfBase64 = btoa(
-                new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
-            );
-            const blob = new Blob([pdfBytes], {type: 'application/pdf'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'etiqueta-recepcion.pdf';
-            link.click();
+            // Guardar en BD
             await guardarPesajeRecepcionMP({
                 peso_tarimas: pesoTarimas,
                 pdf_generado: pdfBase64
             });
-            // 3. Guardar en BD (AJAX)
-            /*
-          const formData = {
-              recepcion_mp: 'Pesaje OC ' + datos.numPedido,
-              peso_tarima: datos.pesoTarima,
-              codigo_externo: '',
-              grupo_cotizacion: 1,
-              kid_proyecto: null,
-              kid_proveedor: proveedorOrdenInput.value,
-              kid_orden_compras: datos.numPedido,
-              kid_almacen: null,
-              monto_total: 0,
-              monto_neto: 0,
-              kid_creacion: null,
-              fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-              kid_estatus: 1,
-              detalles: [{
-                  kid_articulo: insumoSelect.value,
-                  costo_unitario_neto: 0,
-                  costo_unitario_total: 0,
-                  monto_neto: 0,
-                  porcentaje_descuento: 0,
-                  monto_total: 0,
-                  peso_real: parseFloat(datos.pesoNeto) || 0,
-                  valor_codigoqr: JSON.stringify({
-                      insumo: datos.nombreInsumo,
-                      proveedor: datos.proveedor,
-                      fecha_hora: datos.fechaHora,
-                      peso_kg: datos.pesoNeto,
-                  }),
-                  imagen_codigo_qr: qrDataUrl,
-                  kid_creacion: null,
-                  kid_ubicacion_almacen: null,
-                  fecha_creacion: new Date().toISOString().slice(0, 19).replace('T',' '),
-                  kid_estatus: 1
-              }]
-          };
-
-          const response = await fetch('/vistas/almacen_mp/bd/crudSummit.php', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({ modalCRUD: 'recepciones_mp', opcion: 1, formDataJson: formData })
-          });
-          const result = await response.json();
-          if (result.status !== 'success') throw new Error('Error al guardar en la BD');
-          alert('Pesaje guardado correctamente');
-          lastIdRecepcionMP = result.id_recepcion_mp || null;
-            */
         } catch (e) {
             console.error('Error completo:', e);
             alert('Error en el proceso: ' + e.message);
-            return;
         }
-    });
+    }
+
+
+// Generar QR y devolver su DataURL
+    async function generarQR(datos) {
+        let qrDiv = document.getElementById('qr_code');
+        if (!qrDiv) {
+            qrDiv = document.createElement('div');
+            qrDiv.id = 'qr_code';
+            document.body.appendChild(qrDiv);
+        }
+        qrDiv.innerHTML = '';
+        new QRCode(qrDiv, {
+            text: JSON.stringify({
+                insumo: datos.nombreInsumo,
+                proveedor: datos.proveedor,
+                fecha_hora: datos.fechaHora,
+                peso_kg: datos.pesoNeto,
+                peso_tarima: datos.pesoTarima
+            }),
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.H : 2
+        });
+        await new Promise(res => setTimeout(res, 400));
+        let qrImg = qrDiv.querySelector('img');
+        let qrCanvas = qrDiv.querySelector('canvas');
+        if (qrImg && qrImg.src) return qrImg.src;
+        if (qrCanvas) return qrCanvas.toDataURL('image/png');
+        throw new Error('No se pudo generar el código QR');
+    }
+
+// Obtener peso de tarima según el tipo
+    function obtenerPesoTarima() {
+        const ids = ['peso_tarima', 'peso_tarima_manual', 'peso_tarima_estatico'];
+        for (const id of ids) {
+            const el = document.getElementById(id);
+            if (el && el.value) return el.value;
+        }
+        return localStorage.getItem('peso_tarima') || '';
+    }
+
+// Generar PDF y devolver base64
+    async function generarPDF(datos, qrDataUrl) {
+        const {PDFDocument, rgb, StandardFonts, degrees} = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([425.25, 283.5]);
+        page.setRotation(degrees(90));
+        const {width, height} = page.getSize();
+
+        // Logo
+        try {
+            if (typeof logoBase64 !== 'undefined' && logoBase64) {
+                const logoImageBytes = await fetch(logoBase64).then(r => r.arrayBuffer());
+                const logoImageEmbed = logoBase64.startsWith('data:image/png')
+                    ? await pdfDoc.embedPng(logoImageBytes)
+                    : await pdfDoc.embedJpg(logoImageBytes);
+                page.drawImage(logoImageEmbed, {
+                    x: 10,
+                    y: height - 90,
+                    width: 80,
+                    height: 80,
+                });
+            }
+        } catch (e) {
+            console.error("Error al cargar el logo en el PDF:", e);
+        }
+
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+        page.drawText('FORCIP', {x: 130, y: height - 50, size: 40, font: fontBold, color: rgb(0, 0, 0)});
+        page.drawRectangle({x: 0, y: height - 90, width, height: 30, color: rgb(0, 0, 0)});
+        page.drawText(datos.nombreInsumo, {x: 14, y: height - 82, size: 20, font: fontBold, color: rgb(1, 1, 1)});
+        page.drawText(`Proveedor: ${datos.proveedor}`, {x: 14, y: height - 110, size: 17, font, color: rgb(0, 0, 0)});
+        page.drawText(`Fecha: ${new Date().toLocaleDateString()}`, {
+            x: 14,
+            y: height - 150,
+            size: 23,
+            font,
+            color: rgb(0, 0, 0)
+        });
+        page.drawText(`Hora: ${new Date().toLocaleTimeString()}`, {
+            x: 14,
+            y: height - 180,
+            size: 23,
+            font,
+            color: rgb(0, 0, 0)
+        });
+        page.drawText(`Peso:`, {x: 14, y: height - 220, size: 35, font: fontBold, color: rgb(0, 0, 0)});
+        page.drawText(`${datos.pesoNeto} kg`, {x: 120, y: height - 220, size: 35, font: fontBold, color: rgb(0, 0, 0)});
+
+        const qrImageBytes = await fetch(qrDataUrl).then(res => res.arrayBuffer());
+        const qrImageEmbed = await pdfDoc.embedPng(qrImageBytes);
+        page.drawImage(qrImageEmbed, {x: width - 140, y: height - 220, width: 120, height: 120});
+
+        const pdfBytes = await pdfDoc.save();
+        return btoa(new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+    }
+
+// Descargar PDF
+    function descargarPDF(pdfBase64) {
+        const byteCharacters = atob(pdfBase64);
+        const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: 'application/pdf'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'etiqueta-recepcion.pdf';
+        link.click();
+    }
 
     // Finalizar recepción y mostrar detalles en modal
     btnFinalizarRecepcion?.addEventListener('click', async () => {
