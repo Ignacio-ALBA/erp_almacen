@@ -608,7 +608,7 @@ case 'update_estatus_cotizaciones_compras':
                 $resultado->bindParam(':monto_neto', $cotizacion['monto_neto'], PDO::PARAM_STR);
                 $resultado->bindParam(':kid_creacion', $_SESSION["s_id"], PDO::PARAM_INT);
                 $resultado->bindValue(':fecha_creacion', date('Y-m-d H:i:s'), PDO::PARAM_STR);
-                $resultado->bindValue(':kid_estatus', 8, PDO::PARAM_INT);
+                $resultado->bindValue(':kid_estatus', 1, PDO::PARAM_INT);
 
                 if (!$resultado->execute()) {
                     throw new Exception("Error al crear la orden de compra");
