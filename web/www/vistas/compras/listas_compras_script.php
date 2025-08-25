@@ -163,31 +163,23 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             dataType: "json",
             success: function(response) {
-                table.empty();
-                console.log("Response:", response);
-
+                $('#tabladetalles_listas_compras').DataTable().rows().remove();
                 try {
                     if(response.status === "success") {
                         if(response.data && Array.isArray(response.data) && response.data.length > 0) {
                             response.data.forEach(function(row) {
-                                let newRow = $("<tr></tr>");
-                                if(Array.isArray(row)) {
-                                    row.forEach(function(cell) {
-                                        newRow.append($("<td></td>").text(cell));
-                                    });
-                                }
-                                table.append(newRow);
+                                row[11]='<div class="btn-group" role="group" style="width:100%;"><button type="button" class="ModalDataView btn btn-primary primary" modalcrud="detalles_listas_compras"><i class="bi bi-eye"></i> Ver</button><button type="button" class="ModalDataEdit btn btn-warning warning" modalcrud="detalles_listas_compras"><i class="bi bi-pencil"></i> Editar</button><button type="button" class="ModalDataDelete btn btn-danger danger" modalcrud="detalles_listas_compras"><i class="bi bi-trash"></i> Eliminar</button></div>';
+                                 $('#tabladetalles_listas_compras').DataTable().row.add(row);
                             });
                         } else {
                             table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta lista</td></tr>');
                         }
-                    } else {
-                        table.append('<tr><td colspan="10" class="text-center">No se encontraron detalles para esta lista</td></tr>');
                     }
                 } catch(err) {
                     console.error("Error procesando respuesta:", err);
                     table.append('<tr><td colspan="10" class="text-center text-danger">Error al procesar los datos</td></tr>');
                 }
+                 $('#tabladetalles_listas_compras').DataTable().draw();
             },
             error: function(xhr, status, error) {
                 console.error("Error obteniendo detalles:", error);

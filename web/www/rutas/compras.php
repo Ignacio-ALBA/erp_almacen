@@ -166,7 +166,6 @@ if($resultado){
                 cc.fecha_entrega,
                 cc.fecha_creacion
             FROM cotizaciones_compras cc
-            LEFT JOIN proyectos p ON cc.kid_proyecto = p.id_proyecto
             LEFT JOIN proveedores prov ON cc.kid_proveedor = prov.id_proveedor
             LEFT JOIN tiempos_entregas te ON cc.kid_tiempo_entrega = te.id_tiempo_entrega 
             LEFT JOIN transportes t ON cc.kid_transporte = t.id_transporte
@@ -225,7 +224,6 @@ if($resultado){
             }, $cotizaciones_compras);
 
             $data['data_show']['data'] = $cotizaciones_compras;
-            $data['data_show']['proyectos'] = GetProyectosListForSelect();
             $data['data_show']['proveedores'] = GetProvedoresListForSelect();
             $data['data_show']['estatus'] = GetEstatusListForSelect();
             $data['data_show']['tiempos_entrega'] = GetTiemposEntregaListForSelect();

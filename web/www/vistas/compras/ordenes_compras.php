@@ -71,8 +71,7 @@
   [
     $detailsTableOutput
   ],
-  ['<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCRUDdetalles_ordenes_compras">Nuevo Detalle</button>',
-   '<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
+  ['<button type="button" class="btn btn-secondary secondary" data-bs-dismiss="modal">Cancelar</button>']);
 
   CreateModalForm(
     [

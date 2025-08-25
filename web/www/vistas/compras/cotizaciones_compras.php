@@ -33,8 +33,6 @@
     ],
     [
        CreateInput(['type'=>'text','maxlength'=>'97','id'=>'cotizacion_compras','etiqueta'=>'Folio Cotización','required' => '']),
-      // Campo oculto sin required
-      //CreateSelect(['id'=>'kid_proyecto','etiqueta'=>'Proyecto','div_style'=>'display:none;','class'=>'OnEditReadOnly'],$proyectos),
       CreateSelect(['id'=>'kid_proveedor','etiqueta'=>'Proveedor','required' => ''],$proveedores),
       // Campo oculto sin required
       CreateSelect(['id'=>'kid_estatus','etiqueta'=>'Estado','div_style'=>'display:none;','class'=>'OnlyInEdit'],$estatus),
