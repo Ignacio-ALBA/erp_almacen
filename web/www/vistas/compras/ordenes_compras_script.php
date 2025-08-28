@@ -209,7 +209,7 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
                             if(Array.isArray(response.data) && response.data.length > 0) {
                                 response.data.forEach(function(row) {
                                     if(Array.isArray(row)) {
-                                        row[9]='';//TODO: agregar botones
+                                        row[9]='<div class="btn-group" role="group" style="width:100%;"><button type="button" class="ModalDataView btn btn-primary primary" modalcrud="detalles_ordenes_compras"><i class="bi bi-eye"></i> Ver</button><button type="button" class="ModalDataEdit btn btn-warning warning" modalcrud="detalles_ordenes_compras"><i class="bi bi-pencil"></i> Editar</button><button type="button" class="ModalDataDelete btn btn-danger danger" modalcrud="detalles_ordenes_compras"><i class="bi bi-trash"></i> Eliminar</button></div>';//TODO: agregar botones
                                         $('#tabladetalles_ordenes_compras').DataTable().row.add(row);
                                     }
                                 });
@@ -264,13 +264,14 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
             // Recuperar los valores guardados en el sessionStorage
             const savedOrdenName = sessionStorage.getItem('currentOrdenName');
             
+            
             console.log("Orden recuperada de sessionStorage:", savedOrdenName);
             
             if (savedOrdenName) {
                 // Asignar el valor al campo después de un breve retraso para asegurar que el DOM esté listo
                 setTimeout(function() {
-                    $('#kid_orden_compras').val(savedOrdenName);
-                    console.log("Valor establecido en kid_orden_compras:", savedOrdenName);
+                    $('#kid_orden_compras').val(sessionStorage.getItem('currentOrdenId'));
+                    console.log("Valor establecido en kid_orden_compras:", sessionStorage.getItem('currentOrdenId'));
                     
                     // Disparar evento de cambio para notificar a otros controladores
                     const event = new Event('change', { bubbles: true });
@@ -289,8 +290,8 @@ $(document).on('show.bs.modal', '#modalCRUDdetalles_ordenes_compras', function()
             console.log("Orden recuperada de sessionStorage (en shown):", savedOrdenName);
             
             if (savedOrdenName) {
-                $('#kid_orden_compras').val(savedOrdenName);
-                console.log("Valor establecido en kid_orden_compras (en shown):", savedOrdenName);
+                $('#kid_orden_compras').val(sessionStorage.getItem('currentOrdenId'));
+                console.log("Valor establecido en kid_orden_compras (en shown):", sessionStorage.getItem('currentOrdenId'));
                 
                 // Disparar evento de cambio para notificar a otros controladores
                 const event = new Event('change', { bubbles: true });
