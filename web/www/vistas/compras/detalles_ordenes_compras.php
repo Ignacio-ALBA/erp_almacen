@@ -24,7 +24,7 @@
 <?php 
   $id = 'detalles_ordenes_compras';
   $ButtonAddLabel = "Nuevo Detalle de Orden";
-  $titulos = ['ID', 'Orden de Compra', 'Materia Prima', 'Cantidad De Super Sacos', 'Costo Unitario Total', 'Costo Unitario Neto', 'Monto Total', 'Monto Neto', 'Fecha de creación'];
+  $titulos = ['ID', 'Orden de Compra', 'Materia Prima', 'Cantidad (KG) Por Super Saco', 'Costo Unitario Total', 'Costo Unitario Neto', 'Monto Total', 'Monto Neto', 'Fecha de creación'];
   CreateTable($id, $ButtonAddLabel, $titulos, $data, $AllowADDButton);
   CreateModalForm(
     [

@@ -90,7 +90,7 @@
       CreateInput(['id'=>'kid_orden_compras','etiqueta'=>'Id Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly','div_style'=>'display: none']),
       CreateInput(['id'=>'orden_compras_name','etiqueta'=>'Orden de Compras','required' => '','readonly' => '','class'=>'OnEditReadOnly']),
       CreateSelect(['id'=>'kid_articulo','etiqueta'=>'Materia Prima','required' => ''],$articulos),
-      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad De Super Sacos','required' => '','class'=>'MUL-1 MUL-2']),
+      CreateInput(['type'=>'number','id'=>'cantidad','etiqueta'=>'Cantidad (KG) Por Super Saco','required' => '','class'=>'MUL-1 MUL-2']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_total','etiqueta'=>'Costo Unitario Total','required' => '','class'=>'MUL-1']),
       CreateInput(['type'=>'number','id'=>'costo_unitario_neto','etiqueta'=>'Costo Unitario Neto','required' => '','readonly' => '','class'=>'MUL-2']),
       CreateInput(['type'=>'number','id'=>'monto_total','etiqueta'=>'Monto Total','required' => '','readonly' => '','class'=>'RESULT-1 RESULT-3']),
