@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 # Variables de entorno
-ARG XAMPP_URL
+ARG XAMPP_URL=https://downloads.sourceforge.net/project/xampp/XAMPP%20Linux/8.2.0/xampp-linux-x64-8.2.0-0-installer.run
 
 # Establece la zona horaria
 ENV TZ=America/Mexico_City
@@ -14,7 +14,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     echo "La zona horaria está configurada como:" && date
-    
+
 # Instalar dependencias necesarias y descargar XAMPP
 RUN apt-get update && apt-get install -y \
     wget \
@@ -34,10 +34,8 @@ RUN apt-get update && apt-get install -y \
     && chown -R root:root /opt/lampp/htdocs/dashboard/tmp \
     && chmod -R 755 /opt/lampp/htdocs/dashboard/tmp
 
-
 # Modificar el archivo de configuración de Apache para phpMyAdmin
 RUN sed -i 's/Require local/Require all granted/' /opt/lampp/etc/extra/httpd-xampp.conf
-#RUN sed -i 's/Require local/Require ip 127.0.0.1/' /opt/lampp/etc/extra/httpd-xampp.conf
 
 # Ajustar los permisos de config.inc.php
 RUN chmod 644 /opt/lampp/phpmyadmin/config.inc.php && \

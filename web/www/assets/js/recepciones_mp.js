@@ -611,10 +611,10 @@ FECHA Y HORA:       ${data.fechaHora}
         // QR a la derecha
         const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
         const qrImageEmbed = await pdfDoc.embedPng(qrImageBytes);
-        const qrSize = 120;
+        const qrSize = 115; // antes 120
         page.drawImage(qrImageEmbed, {
-            x: width - qrSize - 20,
-            y: height - 220,
+            x: width - qrSize - 20,  // un poco más pegado al borde
+            y: height - 250,         // súbelo o bájalo según necesites
             width: qrSize,
             height: qrSize,
         });
@@ -623,15 +623,11 @@ FECHA Y HORA:       ${data.fechaHora}
         const pdfBase64 = btoa(
             new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
         );
-        const blob = new Blob([pdfBytes], {type: 'application/pdf'});
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'etiqueta-recepcion.pdf';
-        link.click();
-        await guardarPesajeRecepcionMP({
-            peso_tarimas: pesoTarimas,
-            pdf_generado: pdfBase64
-        });
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        
+        // Abrir en nueva pestaña con el visor PDF del navegador
+        window.open(url, "_blank");
     } catch (e) {
         console.error('Error completo:', e);
         alert('Error en el proceso: ' + e.message);

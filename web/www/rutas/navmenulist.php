@@ -796,6 +796,16 @@ $navItems = [
         ]
       ],
       [
+        "label" => "Tarimas",
+        "href" => "/peso_tarima",
+        "permiso" => [
+          "crear_tarima",
+          "editar_tarima",
+          "ver_tarima",
+          "eliminar_tarima"
+        ]
+      ],
+      [
         "label" => "Comentarios de Clientes",
         "href" => "/comentarios_clientes",
         "permiso" => [

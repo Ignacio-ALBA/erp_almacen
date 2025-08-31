@@ -140,8 +140,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ['column' => "rfc", "check_similar" => false]
                 ];
                 break;
+            
+                case 'pesos_tarimas':
+                    $tabla = 'pesos_tarimas';
+                    $idcolumn = "id";
+                
+                    // Datos para INSERT (alta)
+                    $newformDataJson = $formDataJson;
+                    $newformDataJson['kid_estatus'] = 1;
+                    $newformDataJson['fecha_creacion'] = date('Y-m-d H:i:s');
+                    $newformDataJson['kid_creacion'] = $_SESSION["s_id"];
+                
+                    // Datos para UPDATE (edición)
+                    $editformDataJson = $formDataJson;
+                
+                    // Consulta de retorno del registro
+                    $consultaselect = "SELECT id,
+                    descripcion,
+                    valor,
+                    orden,
+                    CASE WHEN defecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS defecto
+             FROM pesos_tarimas
+             WHERE kid_estatus != 3 AND id = :id";
+$ColumnsCheck = [
+['column' => "descripcion", "check_similar" => false]
+];
 
-            case 'comentarios_proveedores':
+                    break;
+                
+                
+                case 'comentarios_proveedores':
                 $tabla = 'comentarios_proveedores';
                 $idcolumn = "id_comentario_proveedor";
 

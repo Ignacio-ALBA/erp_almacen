@@ -258,7 +258,45 @@ if ($resultado) {
             $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
             $data['data_show']['clientes'] = GetClientesListForSelect();
             break;
-        case 'marcas':
+        
+        
+        ///////////////////
+        
+        case 'peso_tarima':
+            $perms = [
+               
+                    "crear_tarima",
+                    "editar_tarima",
+                    "ver_tarima",
+                    "eliminar_tarima"
+                
+            ];
+
+            checkPerms($perms);
+            $acciones = ['ver_', 'editar_', 'eliminar_'];
+            foreach ($acciones as $index => $accion) {
+                if (!checkPerms(preg_grep("/$accion/", $perms), true)) {
+                    unset($data_script['botones_acciones'][$index]);
+                }
+            }
+            $vista = 'peso_tarima';
+            $consultaselect = "SELECT c.id_tarima, 
+                    c.nombre_tarima, 
+                    c.peso_tarima
+                FROM 
+                    tarimas c
+                ";
+            $resultado = $conexion->prepare($consultaselect);
+            $resultado->execute();
+
+           // $data['data_show']['data'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+          //  $data['data_show']['tipo_comentario'] = GetTiposComentariosListForSelect();
+          //  $data['data_show']['clientes'] = GetClientesListForSelect();
+            break;
+        
+        
+        //////////////////
+            case 'marcas':
             $perms = [
                 "crear_marcas",
                 "editar_marcas",
