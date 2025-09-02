@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-                case 'pesos_tarimas':
-                    $consultaselect = "SELECT id,
+            case 'pesos_tarimas':
+                $consultaselect = "SELECT id,
                                               descripcion,
                                               valor,
                                               orden,
@@ -40,17 +40,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        FROM pesos_tarimas
                                        WHERE kid_estatus != 3 
                                          AND id = :id";
-                    $resultado = $conexion->prepare($consultaselect);
-                    $resultado->bindParam(':id', $elementID, PDO::PARAM_INT);
-                    $resultado->execute();
-                    $data = $resultado->fetch(PDO::FETCH_ASSOC);
-                
-                    if ($data) {
-                        print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
-                    } else {
-                        print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
-                    }
-                    break;                
+                $resultado = $conexion->prepare($consultaselect);
+                $resultado->bindParam(':id', $elementID, PDO::PARAM_INT);
+                $resultado->execute();
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                if ($data) {
+                    print json_encode(['status' => 'success', 'data' => $data], JSON_UNESCAPED_UNICODE);
+                } else {
+                    print json_encode(['status' => 'error', 'message' => 'No se encontraron datos'], JSON_UNESCAPED_UNICODE);
+                }
+                break;
 
             case 'comentarios_proveedores':
                 if (isset($_POST['opcion'])) {

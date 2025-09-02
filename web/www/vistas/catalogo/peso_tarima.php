@@ -4,8 +4,8 @@ ob_start(); // Inicia la captura del buffer de salida
 $consultaselect = "SELECT c.id, 
                           c.descripcion, 
                           CONCAT(c.valor, ' kg') AS valor,
-                          c.orden,
-                          CASE WHEN c.defecto = 1 THEN 'Activado' ELSE 'Desactivado' END AS defecto
+                          c.orden
+                         
                    FROM pesos_tarimas c
                    WHERE c.kid_estatus = 1";
 
@@ -31,7 +31,7 @@ $PageSection = "Peso de Tarimas";
 <?php
 $id = 'pesos_tarimas';
 $ButtonAddLabel = "Nueva Tarima";
-$titulos = ['ID', 'Nombre', 'Peso', 'Orden', 'Por defecto'];
+$titulos = ['ID', 'Nombre', 'Peso', 'Orden'];
 
 CreateTable($id, $ButtonAddLabel, $titulos, $data, true, []);
 CreateModalForm(
@@ -47,7 +47,7 @@ CreateModalForm(
   ],
   [
     CreateInput(['type'=>'text','id'=>'descripcion','etiqueta'=>'Nombre','required' => '']),
-    CreateInput(['type'=>'number','id'=>'valor','etiqueta'=>'Peso de tarima','required' => '']),
+    CreateInput(['type'=>'number','id'=>'valor','etiqueta'=>'Peso de tarima (kg)','required' => '']),
     CreateInput(['type'=>'number','id'=>'orden','etiqueta'=>'Orden','required' => '']),
     CreatSwitchCheck(['id'=>'defecto','etiqueta'=>'Por defecto'])
     
@@ -112,8 +112,9 @@ include 'wrapper.php';
       if (data.status === "success") {
         // llenar modal en modo solo lectura
         document.getElementById("descripcion").value = data.data.descripcion;
-        document.getElementById("valor").value = data.data.valor;
-        document.getElementById("orden").value = data.data.orden;
+        document.getElementById("valor").value = data.data.valor; 
+
+                document.getElementById("orden").value = data.data.orden;
         document.getElementById("defecto").checked = data.data.defecto == 1;
 
         // deshabilitar inputs para ver
@@ -145,8 +146,9 @@ include 'wrapper.php';
       if (data.status === "success") {
         // llenar modal en modo edición
         document.getElementById("descripcion").value = data.data.descripcion;
-        document.getElementById("valor").value = data.data.valor;
-        document.getElementById("orden").value = data.data.orden;
+        document.getElementById("valor").value = data.data.valor; 
+
+                document.getElementById("orden").value = data.data.orden;
         document.getElementById("defecto").checked = data.data.defecto == 1;
 
         // habilitar inputs
