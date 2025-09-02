@@ -32,9 +32,9 @@ function renderView($viewName, $params = []) {
     
     $viewFile = '../vistas/'.$carpeta .'/'. $viewName . ".php"; 
  
-    echo "Incluyendo vista: " . $viewFile . PHP_EOL;
+    //echo "Incluyendo vista: " . $viewFile . PHP_EOL;
 
-    echo $viewFile;
+    //echo $viewFile;
     //debug($viewFile);
     if (file_exists($viewFile)) {
         include($viewFile);
