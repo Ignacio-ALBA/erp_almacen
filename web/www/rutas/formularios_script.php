@@ -1649,6 +1649,7 @@ console.log("OBJETO ENVIADO:");
                         data = Object.values(response.data);
                         AddRow(modalCRUD,data)
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
+                        window.location.reload();
                     }
                 },
                 error: function(xhr, status, error) {
