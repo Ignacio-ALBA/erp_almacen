@@ -272,18 +272,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 /*-------------------- Obtener Tablas Foráneas --------------------*/
                 // Validar y obtener kid_articulo
-                if (!isset($formDataJson['kid_articulo']) || empty($formDataJson['kid_articulo'])) {
-                    print json_encode(['status' => 'error', 'message' => 'El campo kid_articulo 
-                    es obligatorio y no puede ser nulo.'], JSON_UNESCAPED_UNICODE);
-                    exit;
-                }
+                if($opcion != '3' ){ // No para eliminar
+                    if (!isset($formDataJson['kid_articulo']) || empty($formDataJson['kid_articulo'])) {
+                        print json_encode(['status' => 'error', 'message' => 'El campo kid_articulo 
+                        es obligatorio y no puede ser nulo.'], JSON_UNESCAPED_UNICODE);
+                        exit;
+                    }
 
-                // Validar y obtener kid_lista_compras
-                if (!isset($formDataJson['kid_lista_compras']) || empty($formDataJson['kid_lista_compras'])) {
-                    print json_encode(['status' => 'error', 'message' => 'El campo kid_lista_compras
-                     es obligatorio y no puede ser nulo.'], JSON_UNESCAPED_UNICODE);
-                    exit;
-                }
+
+                    // Validar y obtener kid_lista_compras
+                
+                    if (!isset($formDataJson['kid_lista_compras']) || empty($formDataJson['kid_lista_compras'])) {
+                        print json_encode(['status' => 'error', 'message' => 'El campo kid_lista_compras
+                        es obligatorio y no puede ser nulo.'], JSON_UNESCAPED_UNICODE);
+                        exit;
+                    }
+               
 
                 // Consultar el ID de la lista de compras si se proporciona el nombre
                 $consultaLista = "SELECT id_lista_compra FROM listas_compras WHERE lista_compra 
@@ -298,9 +302,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     JSON_UNESCAPED_UNICODE);
                     exit;
                 }
+                 
 
                 $formDataJson['kid_lista_compras'] = $listaId;
-          
+
+                }
                 /*------------------- Fin Obtener Tablas Foráneas ------------------*/
 
                 $editformDataJson = CleanJson($formDataJson);
@@ -399,6 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'fecha_entrega'
     ];
 
+    if($opcion != 3){
     $missing_fields = [];
     foreach ($required_fields as $field) {
         if (!isset($formDataJson[$field]) || 
@@ -419,6 +426,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         exit;
     }
+}
 
     // Asignar valores por defecto y mantener el estado existente en actualizaciones
     if ($opcion == 1) {
@@ -703,11 +711,12 @@ case 'update_estatus_cotizaciones_compras':
     $consultaselect = "SELECT cc.id_cotizacion_compra,
         cc.cotizacion_compras,
         cc.grupo,
-        p.proyecto AS kid_proyecto,
+        --p.proyecto AS kid_proyecto,
         prov.razon_social AS kid_proveedor,
         cc.kid_estatus,
         u.email AS kid_creacion,
         COALESCE(u2.email, 'Sin Autorizar') AS kid_autorizo,
+        'transporte' as kid_transporte,
         cc.kid_tiempo_entrega,
         cc.fecha_cotizacion,
         cc.fecha_entrega,
@@ -732,6 +741,7 @@ case 'update_estatus_cotizaciones_compras':
 
         $row['botones'] = GenerateCustomsButtons($botones_acciones, 'cotizaciones_compras');
         $row['kid_estatus'] = isset($estatus[$row['kid_estatus']]) ? $estatus[$row['kid_estatus']] : 'Estado desconocido';
+        //row.unset('kid_proyecto'); 
         return $row;
     };
 
