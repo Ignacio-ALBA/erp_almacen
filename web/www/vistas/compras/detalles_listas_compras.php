@@ -23,7 +23,7 @@
   $id = 'detalles_listas_compras';
   $ButtonAddLabel = "Nuevo Detalle";
   $titulos = ['ID', 'Programa de Compras','Insumo','Cantidad (KG)','Precio por Kg','SubTotal','Precio por Kg (IVA)','Monto IVA','Retención de IVA','Total','Fecha de creación'];
-  CreateTable($id, $ButtonAddLabel, $titulos, $data);
+  CreateTable($id, $ButtonAddLabel, $titulos, $data, $AllowADDButton);
   CreateModalForm(
     [
       'id'=> $id, 

@@ -128,6 +128,9 @@ if($resultado){
             
             // Agregar el script específico para detalles_listas_compras
             $data['list_js_scripts']['../vistas/compras/detalles_listas_compras_script'] = ['data' => $data_script];
+            
+            // Ocultar el botón "Nuevo Detalle" - debe ir al final para sobrescribir la configuración global
+            $data['data_show']['AllowADDButton'] = false;
             break;
         case 'cotizaciones_compras':
             $perms = [
