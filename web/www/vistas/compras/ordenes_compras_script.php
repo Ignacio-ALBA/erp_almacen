@@ -72,7 +72,7 @@ $nonce_value = isset($nonce) ? htmlspecialchars($nonce) : '';
                 }
             }
 
-            [cantidad, costoUnitarioTotal, porcentajeDescuento].forEach(campo => {
+            [cantidad, costoUnitarioTotal].forEach(campo => {
                 ['input', 'change'].forEach(evento => {
                     campo.addEventListener(evento, calcularMontos);
                 });
