@@ -387,6 +387,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         doc.costo_unitario_neto,
                         doc.monto_total,
                         doc.monto_neto,
+                        doc.porcentaje_descuento,
                         doc.fecha_creacion
                     FROM detalles_ordenes_compras doc
                     LEFT JOIN ordenes_compras oc ON doc.kid_orden_compras = oc.id_orden_compras
