@@ -420,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modo = modoPesajeSelect.value;
         const numTarimas = numTarimasInput.value;
         const pesoReal = pesoKg > 0 ? pesoKg : pesoTarima;
+        const observaciones = document.getElementById('observaciones')?.value || '';
 
         return {
             numPedido: numPedidoInput.value,
@@ -430,7 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pesoTarima,
             modo,
             numTarimas,
-            fechaHora
+            fechaHora,
+            observaciones
         };
     }
 
@@ -621,6 +623,16 @@ FECHA Y HORA:       ${data.fechaHora}
             font: fontBold,
             color: rgb(0, 0, 0),
         });
+
+        if(datos.observaciones && datos.observaciones.trim() !== ''){
+            page.drawText(`Obs: ${datos.observaciones}`, {
+                x: 14,
+                y: height - 250,
+                size: 17,
+                font: font,
+                color: rgb(0, 0, 0),
+            });
+        }
 
         // QR a la derecha
         const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());

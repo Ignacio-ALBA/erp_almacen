@@ -215,6 +215,14 @@ echo CreateSelect([
     ['valor' => 'Captura Estatica', 'texto' => 'Captura Estática', 'pordefecto' => 0]
 ]);
 echo '</div>';
+echo CreateInput([
+    'type' => 'text',
+    'id' => 'observaciones',
+    'etiqueta' => 'Observaciones',
+    'value' => '',
+    'class' => 'form-control form-control-sm'
+]);
+echo '</div>';
 echo '<div id=\"contenedor_valor_tarima\">';
 // Aquí el JS insertará dinámicamente el input/select según el modo de pesaje
 echo '</div>';
