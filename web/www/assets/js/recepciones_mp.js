@@ -355,43 +355,60 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('No hay recepción activa.');
         }
     });
+    
     // Lógica para conectar con la báscula
     btnConectarBalanza?.addEventListener('click', async () => {
-        try {
-            const port = await navigator.serial.requestPort();
-            await port.open({
-                baudRate: 9600,
-                dataBits: 8,
-                stopBits: 1,
-                parity: "none",
-                flowControl: "none"
+        
+        $.get('http://127.0.0.1:5000/estado_puerto', function(data) {
+        if (data.estado === 'desconectado') {
+            // Si está desconectado, obtener lista de puertos y mostrar modal
+            $.get('http://127.0.0.1:5000/listar_puertos', function(resp) {
+                let opciones = resp.puertos.map(p => `<option value="${p}">${p}</option>`).join('');
+                let modalHtml = `
+                    <div id="modalPuertos" style="display:block; position:fixed; top:30%; left:30%; background:#fff; border:1px solid #ccc; padding:20px; z-index:9999;">
+                        <h3>Selecciona un puerto COM</h3>
+                        <select id="puertoSelect">${opciones}</select>
+                        <button id="configurarPuertoBtn">Configurar</button>
+                    </div>
+                `;
+                $('body').append(modalHtml);
+                $('#configurarPuertoBtn').on('click', function() {
+                    let puerto = $('#puertoSelect').val();
+                    $.ajax({
+                        url: 'http://127.0.0.1:5000/configurar_puerto',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ puerto }),
+                        success: function() {
+                            $('#modalPuertos').remove();
+                            alert('Puerto configurado correctamente');
+                             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
+                             btnConectarBalanza.classList.remove('btn-info');
+                             btnConectarBalanza.classList.add('btn-success');
+                             window.balanzaConectada = true;
+                        }
+                    });
+                });
             });
-
+        } else {
+            alert('Puerto conectado: ' + data.puerto);
             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
             btnConectarBalanza.classList.remove('btn-info');
             btnConectarBalanza.classList.add('btn-success');
-            window.balanzaConectada = true; // Simulación global (si usas verificación en el otro handler)
-
-            const decoder = new TextDecoderStream();
-            port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable;
-            const reader = inputStream.getReader();
-
-            while (true) {
-                const {value, done} = await reader.read();
-                if (done) break;
-                if (value) pesoBasculaInput.value = value.trim();
-            }
-
-            await reader.releaseLock();
-        } catch (err) {
-            alert('Error al conectar con la balanza: ' + err.message);
+            window.balanzaConectada = true;
         }
+        });
+
     });
 
     // Utilidad para obtener peso de báscula
     function obtenerPesoBascula() {
-        return parseFloat(pesoBasculaInput.value) || 0;
+        $.get('http://127.0.0.1:5000/estado_puerto', function(data) {
+            if (data.valor){
+               return parseFloat(pesoBasculaInput.value) 
+            }else
+              return 0;  
+        });
     }
 
     function getEtiquetaData() {
@@ -402,13 +419,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const pesoTarima = localStorage.getItem('peso_tarima') || '';
         const modo = modoPesajeSelect.value;
         const numTarimas = numTarimasInput.value;
+        const pesoReal = pesoKg > 0 ? pesoKg : pesoTarima;
 
         return {
             numPedido: numPedidoInput.value,
             nombreInsumo,
             proveedor,
             cantidadSolicitada: cantidadInput.value,
-            pesoNeto: pesoKg,
+            pesoNeto: pesoReal,
             pesoTarima,
             modo,
             numTarimas,
@@ -451,14 +469,16 @@ FECHA Y HORA:       ${data.fechaHora}
             document.body.appendChild(qrDiv);
         }
         qrDiv.innerHTML = '';
-        let qr = new QRCode(qrDiv, {
-            text: JSON.stringify({
+        let jsonQR = JSON.stringify({
+                idOrdenCompra: datos.numPedido,
                 insumo: datos.nombreInsumo,
                 proveedor: datos.proveedor,
                 fecha_hora: datos.fechaHora,
                 peso_kg: datos.pesoNeto,
                 peso_tarima: datos.pesoTarima
-            }),
+            });
+        let qr = new QRCode(qrDiv, {
+            text: jsonQR,
             width: 200,
             height: 200,
             correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.H : 2 // fallback
@@ -479,13 +499,7 @@ FECHA Y HORA:       ${data.fechaHora}
             throw new Error('No se pudo generar el código QR');
         }
         // Guardar datos del QR en window para usarlos después
-        window.valorCodigoQR = JSON.stringify({
-            insumo: datos.nombreInsumo,
-            proveedor: datos.proveedor,
-            fecha_hora: datos.fechaHora,
-            peso_kg: datos.pesoNeto,
-            peso_tarima: datos.pesoTarima
-        });
+        window.valorCodigoQR = jsonQR;
         window.imagenCodigoQR = qrDataUrl;
 
         // === OBTENER PESO DE TARIMA SEGUN EL TIPO DE PESAJE ===
