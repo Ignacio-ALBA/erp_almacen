@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let contenedorTarima = document.getElementById('contenedor_valor_tarima');
     const numTarimasInput = document.getElementById('num_tarimas');
     const btnConectarBalanza = document.getElementById('btn_conectar_balanza');
+    const btnDesconectarBalanza = document.getElementById('btn_desconectar_balanza');
     const pesoBasculaInput = document.getElementById('peso_bascula');
     const btnGuardarPesaje = document.getElementById('btn_guardar_pesaje');
     const btnFinalizarRecepcion = document.getElementById('btn_finalizar_recepcion');
@@ -368,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="modalPuertos" style="display:block; position:fixed; top:30%; left:30%; background:#fff; border:1px solid #ccc; padding:20px; z-index:9999;">
                         <h3>Selecciona un puerto COM</h3>
                         <select id="puertoSelect">${opciones}</select>
-                        <button id="configurarPuertoBtn">Configurar</button>
+                        <button id="configurarPuertoBtn">Conectar</button>
                     </div>
                 `;
                 $('body').append(modalHtml);
@@ -401,6 +402,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
+    btnDesconectarBalanza?.addEventListener('click', async () => {
+        
+        $.post('http://127.0.0.1:5000/desconectar_puerto', function(data) {
+            alert('Puerto desconectado correctamente');
+            btnConectarBalanza.classList.remove('btn-success');
+            btnConectarBalanza.classList.add('btn-info');
+            btnConectarBalanza.innerHTML = '<i class="bi bi-bluetooth"></i> Conectar Balanza';
+        });
+
+    });
+
     // Utilidad para obtener peso de báscula
     function obtenerPesoBascula() {
         $.get('http://127.0.0.1:5000/estado_puerto', function(data) {
@@ -419,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const pesoTarima = localStorage.getItem('peso_tarima') || '';
         const modo = modoPesajeSelect.value;
         const numTarimas = numTarimasInput.value;
-        const pesoReal = pesoKg > 0 ? pesoKg : pesoTarima;
         const observaciones = document.getElementById('observaciones')?.value || '';
 
         return {
@@ -427,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nombreInsumo,
             proveedor,
             cantidadSolicitada: cantidadInput.value,
-            pesoNeto: pesoReal,
+            pesoNeto: pesoKg,
             pesoTarima,
             modo,
             numTarimas,

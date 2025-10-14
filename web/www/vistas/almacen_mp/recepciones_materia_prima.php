@@ -129,6 +129,13 @@ echo '<div class="row mb-3">
             'text' => '<i class="bi bi-bluetooth"></i> Conectar Balanza',
             'html' => true
         ]);
+        echo CreateButtonP([
+            'id' => 'btn_desconectar_balanza',
+            'type' => 'button',
+            'class' => 'btn btn-info btn-sm mb-2',
+            'text' => '<i class="bi bi-bluetooth"></i> Desconectar Balanza',
+            'html' => true
+        ]);
         echo CreateWeightLabel(['id' => 'peso_bascula', 'etiqueta' => 'Peso en Báscula']);
         echo CreateWeightInput([
             'id' => 'peso_bascula',
