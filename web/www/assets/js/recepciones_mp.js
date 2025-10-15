@@ -357,9 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Lógica para conectar con la báscula
-    btnConectarBalanza?.addEventListener('click', async () => {
-        
+    // Función para conectar con la báscula (reutilizable)
+    function conectarBalanza() {
         $.get('http://127.0.0.1:5000/estado_puerto', function(data) {
         if (data.estado === 'desconectado') {
             // Si está desconectado, obtener lista de puertos y mostrar modal
@@ -387,20 +386,36 @@ document.addEventListener('DOMContentLoaded', () => {
                              btnConectarBalanza.classList.remove('btn-info');
                              btnConectarBalanza.classList.add('btn-success');
                              window.balanzaConectada = true;
+                             // Iniciar lectura automática al conectarse
+                             iniciarLecturaAutomatica();
                         }
                     });
                 });
             });
         } else {
-            alert('Puerto conectado: ' + data.puerto);
             btnConectarBalanza.innerHTML = '<i class="bi bi-check-circle"></i> Conectado';
             btnConectarBalanza.classList.remove('btn-info');
             btnConectarBalanza.classList.add('btn-success');
             window.balanzaConectada = true;
+            // Iniciar lectura automática si ya estaba conectado
+            iniciarLecturaAutomatica();
         }
         });
+    }
 
-    });
+    // Lógica para conectar con la báscula
+    btnConectarBalanza?.addEventListener('click', conectarBalanza);
+
+    // Ejecutar automáticamente la conexión al cargar la página
+    setTimeout(() => {
+        if (btnConectarBalanza) {
+            conectarBalanza();
+        }
+        // Iniciar la lectura automática del peso después de intentar conectar
+        setTimeout(() => {
+            iniciarLecturaAutomatica();
+        }, 2000); // Espera 2 segundos adicionales para que la conexión se establezca
+    }, 1000); // Espera 1 segundo para asegurar que todos los elementos estén cargados
 
     btnDesconectarBalanza?.addEventListener('click', async () => {
         
@@ -409,18 +424,49 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConectarBalanza.classList.remove('btn-success');
             btnConectarBalanza.classList.add('btn-info');
             btnConectarBalanza.innerHTML = '<i class="bi bi-bluetooth"></i> Conectar Balanza';
+            window.balanzaConectada = false;
+            // Detener lectura automática al desconectar
+            detenerLecturaAutomatica();
         });
 
     });
 
     // Utilidad para obtener peso de báscula
     function obtenerPesoBascula() {
-        $.get('http://127.0.0.1:5000/estado_puerto', function(data) {
+        $.get('http://127.0.0.1:5000/leer_puerto', function(data) {
             if (data.valor){
-               return parseFloat(pesoBasculaInput.value) 
+                pesoBasculaInput.value = data.valor;
+               return parseFloat(data.valor) 
             }else
               return 0;  
         });
+    }
+
+    // Variable para controlar el intervalo de lectura automática
+    let intervaloPesoBascula = null;
+
+    // Función para iniciar la lectura automática del peso
+    function iniciarLecturaAutomatica() {
+        // Si ya existe un intervalo, lo limpia primero
+        if (intervaloPesoBascula) {
+            clearInterval(intervaloPesoBascula);
+        }
+        
+        // Ejecutar cada segundo (1000ms)
+        intervaloPesoBascula = setInterval(() => {
+            // Solo ejecutar si la balanza está conectada y el input existe
+            if (window.balanzaConectada && pesoBasculaInput) {
+                obtenerPesoBascula();
+            }
+        }, 2000);
+    }
+
+    // Función para detener la lectura automática
+    function detenerLecturaAutomatica() {
+        if (intervaloPesoBascula) {
+            clearInterval(intervaloPesoBascula);
+            intervaloPesoBascula = null;
+        }
     }
 
     function getEtiquetaData() {
