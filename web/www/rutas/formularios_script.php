@@ -1649,7 +1649,10 @@ console.log("OBJETO ENVIADO:");
                         data = Object.values(response.data);
                         AddRow(modalCRUD,data)
                         $(`#modalCRUD${modalCRUD}`).modal('hide'); // Cerrar el modal después de enviar
-                        window.location.reload();
+                        // No recargar la página si estamos en el modal de detalles de órdenes de compra
+                        if (modalCRUD !== 'detalles_ordenes_compras') {
+                            window.location.reload();
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
