@@ -244,7 +244,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     defaultOption.value = '';
                     defaultOption.textContent = 'Seleccione un insumo';
                     insumoSelect.appendChild(defaultOption);
+                    
+                    // Eliminar duplicados basándose en kid_articulo
+                    const insumosUnicos = [];
+                    const idsVistos = new Set();
+                    
                     data.detalles.forEach(insumo => {
+                        if (!idsVistos.has(insumo.kid_articulo)) {
+                            idsVistos.add(insumo.kid_articulo);
+                            insumosUnicos.push(insumo);
+                        }
+                    });
+                    
+                    // Agregar solo los insumos únicos
+                    insumosUnicos.forEach(insumo => {
                         const option = document.createElement('option');
                         option.value = insumo.kid_articulo;
                         option.textContent = insumo.nombre_articulo;
