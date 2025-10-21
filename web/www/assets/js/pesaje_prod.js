@@ -696,8 +696,7 @@ FECHA Y HORA:       ${data.fechaHora}
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${det.kid_articulo}</td>
                                 <td>${det.cantidad_tarimas}</td>
-                                <td>${det.peso_real}</td>
-                                <td>${det.valor_codigoqr}</td>`;
+                                <td>${det.peso_real}</td>`;
                 tbody.appendChild(tr);
             });
             const modal = new bootstrap.Modal(document.getElementById('modal_detalles_recepcion_mp'));

@@ -310,7 +310,6 @@ echo '            <tr>';
 echo '              <th>Insumo</th>';
 echo '              <th>Cantidad Tarimas</th>';
 echo '              <th>Peso Real</th>';
-echo '              <th>QR</th>';
 echo '            </tr>';
 echo '          </thead>';
 echo '          <tbody id="modal_detalles_recepcion_mp_tbody"></tbody>';

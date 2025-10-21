@@ -1,4 +1,8 @@
 <?php
+session_start();
+require_once __DIR__ . '/../../helpers/vistas_funciones.php';
+require_once __DIR__ . '/../../bd/conexion.php';
+require_once __DIR__ . '/../../bd/funciones_db.php';
     ob_start();
     // $productos = GetProductosListForSelect(); // Función que debes crear
     // $proveedores = GetProveedoresListForSelect(); // Función que debes crear
@@ -325,7 +329,6 @@ echo '            <tr>';
 echo '              <th>Insumo</th>';
 echo '              <th>Peso Estimado</th>';
 echo '              <th>Peso Real</th>';
-echo '              <th>QR</th>';
 echo '            </tr>';
 echo '          </thead>';
 echo '          <tbody id="modal_detalles_recepcion_mp_tbody"></tbody>';
